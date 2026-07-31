@@ -1,0 +1,225 @@
+schema_version: 1
+fragment_type: relationships
+
+relationships:
+  - source: machine-learning
+    type: is_subfield_of
+    target: artificial-intelligence
+
+  - source: statistical-learning
+    type: is_subfield_of
+    target: machine-learning
+    description: Statistical learning substantially overlaps both machine learning and statistics.
+
+  - source: deep-learning
+    type: is_subfield_of
+    target: machine-learning
+
+  - source: generative-ai
+    type: is_subfield_of
+    target: artificial-intelligence
+
+  - source: natural-language-processing
+    type: is_subfield_of
+    target: artificial-intelligence
+
+  - source: computer-vision
+    type: is_subfield_of
+    target: artificial-intelligence
+
+  - source: speech-and-audio-ml
+    type: is_subfield_of
+    target: machine-learning
+
+  - source: robotics
+    type: is_subfield_of
+    target: artificial-intelligence
+
+  - source: recommendation-systems
+    type: is_subfield_of
+    target: machine-learning
+
+  - source: scientific-machine-learning
+    type: is_subfield_of
+    target: machine-learning
+
+  - source: supervised-learning
+    type: is_a
+    target: machine-learning
+
+  - source: unsupervised-learning
+    type: is_a
+    target: machine-learning
+
+  - source: self-supervised-learning
+    type: is_a
+    target: machine-learning
+
+  - source: semi-supervised-learning
+    type: is_a
+    target: machine-learning
+
+  - source: reinforcement-learning
+    type: is_a
+    target: machine-learning
+
+  - source: imitation-learning
+    type: is_a
+    target: machine-learning
+
+  - source: transfer-learning
+    type: is_a
+    target: machine-learning
+
+  - source: multitask-learning
+    type: is_a
+    target: machine-learning
+
+  - source: active-learning
+    type: is_a
+    target: machine-learning
+
+  - source: online-learning
+    type: is_a
+    target: machine-learning
+
+  - source: continual-learning
+    type: is_a
+    target: machine-learning
+
+  - source: federated-learning
+    type: is_a
+    target: machine-learning
+
+  - source: predictive-model
+    type: is_a
+    target: model
+
+  - source: generative-model
+    type: is_a
+    target: model
+
+  - source: discriminative-model
+    type: is_a
+    target: model
+
+  - source: probabilistic-model
+    type: is_a
+    target: model
+
+  - source: deterministic-model
+    type: is_a
+    target: model
+
+  - source: conditional-model
+    type: is_a
+    target: model
+
+  - source: unconditional-model
+    type: is_a
+    target: model
+
+  - source: latent-variable-model
+    type: is_a
+    target: model
+
+  - source: autoregressive-model
+    type: is_a
+    target: probabilistic-model
+
+  - source: foundation-model
+    type: is_a
+    target: model
+
+  - source: representation-model
+    type: is_a
+    target: model
+
+  - source: embedding-model
+    type: is_a
+    target: representation-model
+
+  - source: world-model
+    type: is_a
+    target: predictive-model
+
+  - source: surrogate-model
+    type: is_a
+    target: predictive-model
+
+  - source: linear-regression
+    type: is_a
+    target: predictive-model
+
+  - source: logistic-regression
+    type: is_a
+    target: discriminative-model
+
+  - source: logistic-regression
+    type: is_a
+    target: probabilistic-model
+
+  - source: generalized-linear-model
+    type: is_a
+    target: probabilistic-model
+
+  - source: nearest-neighbor-model
+    type: is_a
+    target: predictive-model
+
+  - source: decision-tree
+    type: is_a
+    target: predictive-model
+
+  - source: random-forest
+    type: is_a
+    target: predictive-model
+
+  - source: gradient-boosted-trees
+    type: is_a
+    target: predictive-model
+
+  - source: support-vector-machine
+    type: is_a
+    target: discriminative-model
+
+  - source: naive-bayes-classifier
+    type: is_a
+    target: probabilistic-model
+
+  - source: naive-bayes-classifier
+    type: is_a
+    target: generative-model
+
+  - source: gaussian-process
+    type: is_a
+    target: probabilistic-model
+
+  - source: gaussian-process
+    type: is_a
+    target: predictive-model
+
+  - source: gaussian-mixture-model
+    type: is_a
+    target: probabilistic-model
+
+  - source: gaussian-mixture-model
+    type: is_a
+    target: generative-model
+
+  - source: hidden-markov-model
+    type: is_a
+    target: latent-variable-model
+
+  - source: hidden-markov-model
+    type: is_a
+    target: probabilistic-model
+
+  - source: bayesian-network
+    type: is_a
+    target: probabilistic-model
+
+  - source: principal-component-analysis
+    type: is_a
+    target: representation-model
+

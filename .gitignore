@@ -1,0 +1,4 @@
+node_modules/
+dist/
+public/graph.json
+.DS_Store

@@ -1,0 +1,116 @@
+schema_version: 1
+fragment_type: relationships
+
+relationships:
+  - source: supervised-learning
+    type: used_for
+    target: regression
+
+  - source: supervised-learning
+    type: used_for
+    target: classification
+
+  - source: unsupervised-learning
+    type: used_for
+    target: clustering
+
+  - source: unsupervised-learning
+    type: used_for
+    target: dimensionality-reduction
+
+  - source: reinforcement-learning
+    type: used_for
+    target: control
+
+  - source: reinforcement-learning
+    type: used_for
+    target: planning
+
+  - source: predictive-model
+    type: used_for
+    target: regression
+
+  - source: predictive-model
+    type: used_for
+    target: classification
+
+  - source: predictive-model
+    type: used_for
+    target: forecasting
+
+  - source: generative-model
+    type: used_for
+    target: density-estimation
+
+  - source: autoencoder
+    type: used_for
+    target: representation-learning
+
+  - source: autoencoder
+    type: used_for
+    target: dimensionality-reduction
+
+  - source: gaussian-mixture-model
+    type: used_for
+    target: clustering
+
+  - source: gaussian-mixture-model
+    type: used_for
+    target: density-estimation
+
+  - source: principal-component-analysis
+    type: used_for
+    target: dimensionality-reduction
+
+  - source: k-means-clustering
+    type: used_for
+    target: clustering
+
+  - source: language-model
+    type: used_for
+    target: language-modeling
+
+  - source: causal-language-model
+    type: used_for
+    target: next-token-prediction
+
+  - source: masked-language-model
+    type: used_for
+    target: masked-token-prediction
+
+  - source: large-language-model
+    type: used_for
+    target: text-generation
+
+  - source: large-language-model
+    type: used_for
+    target: question-answering
+
+  - source: text-to-image-model
+    type: used_for
+    target: image-generation
+
+  - source: retrieval-augmented-generation
+    type: uses
+    target: information-retrieval
+
+  - source: retrieval-augmented-generation
+    type: uses
+    target: generative-model
+
+  - source: function-calling
+    type: is_a
+    target: tool-use
+
+  - source: ai-agent
+    type: typically_uses
+    target: tool-use
+
+  - source: ai-agent
+    type: used_for
+    target: planning
+
+  - source: ai-assistant
+    type: is_a
+    target: chatbot
+

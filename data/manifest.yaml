@@ -1,0 +1,24 @@
+schema_version: 1
+fragment_type: manifest
+
+relationship_types_file: relationship-types.yaml
+
+concept_files:
+  - concepts/fields.yaml
+  - concepts/learning-paradigms.yaml
+  - concepts/model-roles.yaml
+  - concepts/tasks.yaml
+  - concepts/classical-models.yaml
+  - concepts/architectures.yaml
+  - concepts/model-families.yaml
+  - concepts/training.yaml
+  - concepts/systems.yaml
+  - concepts/products.yaml
+
+relationship_files:
+  - relationships/taxonomy.yaml
+  - relationships/architecture.yaml
+  - relationships/training.yaml
+  - relationships/applications.yaml
+  - relationships/products.yaml
+

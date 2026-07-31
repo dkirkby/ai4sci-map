@@ -1,0 +1,56 @@
+schema_version: 1
+fragment_type: concepts
+
+concepts:
+  - id: prompt
+    label: Prompt
+    kind: data_concept
+    description: Input supplied to a generative or interactive model to specify context, instructions, or desired output.
+
+  - id: prompt-engineering
+    label: Prompt engineering
+    kind: training_method
+    description: Designing and evaluating prompts to elicit desired model behavior without changing the model's main parameters.
+
+  - id: context-window
+    label: Context window
+    kind: property
+    description: The amount of input and generated sequence information a model can directly condition on in one invocation.
+
+  - id: in-context-learning
+    label: In-context learning
+    kind: learning_paradigm
+    description: Adapting model behavior from instructions or examples in its current context without updating its main parameters.
+
+  - id: retrieval-augmented-generation
+    label: Retrieval-augmented generation
+    kind: system
+    description: A system pattern that retrieves external information and supplies it as context to a generative model.
+    aliases:
+      - RAG
+
+  - id: tool-use
+    label: Tool use
+    kind: system
+    description: A model or system's ability to select and invoke external computational capabilities.
+
+  - id: function-calling
+    label: Function calling
+    kind: system
+    description: A structured interface through which a model requests invocation of predefined functions or tools.
+
+  - id: ai-agent
+    label: AI agent
+    kind: system
+    description: A system that uses models and tools to select actions over multiple steps in pursuit of an objective.
+
+  - id: chatbot
+    label: Chatbot
+    kind: system
+    description: An interactive system designed to communicate with users through conversational messages.
+
+  - id: ai-assistant
+    label: AI assistant
+    kind: system
+    description: An interactive AI system designed to help users perform informational, creative, or operational tasks.
+

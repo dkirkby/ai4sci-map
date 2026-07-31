@@ -1,0 +1,191 @@
+schema_version: 1
+fragment_type: concepts
+
+concepts:
+  - id: autoencoder
+    label: Autoencoder
+    kind: model_family
+    description: A neural network trained to reconstruct its input through an intermediate representation.
+    attributes:
+      deep: usually
+      probabilistic: sometimes
+    typical_tasks:
+      - representation-learning
+      - dimensionality-reduction
+
+  - id: denoising-autoencoder
+    label: Denoising autoencoder
+    kind: model_family
+    description: An autoencoder trained to reconstruct clean data from corrupted inputs.
+    attributes:
+      deep: usually
+      probabilistic: sometimes
+    typical_tasks:
+      - representation-learning
+
+  - id: variational-autoencoder
+    label: Variational autoencoder
+    kind: model_family
+    description: A latent-variable generative model trained with variational inference and an encoder–decoder architecture.
+    aliases:
+      - VAE
+    introduced: 2013
+    attributes:
+      deep: usually
+      probabilistic: always
+      likelihood_evaluation: approximate-bound
+    typical_tasks:
+      - density-estimation
+      - representation-learning
+
+  - id: generative-adversarial-network
+    label: Generative adversarial network
+    kind: model_family
+    description: A generative model trained through competition between a generator and a discriminator.
+    aliases:
+      - GAN
+    introduced: 2014
+    attributes:
+      deep: usually
+      probabilistic: implicit
+      likelihood_evaluation: unavailable
+
+  - id: autoregressive-generative-model
+    label: Autoregressive generative model
+    kind: model_family
+    description: A generative model that produces variables sequentially using conditional predictions.
+    attributes:
+      probabilistic: always
+      likelihood_evaluation: usually-exact
+
+  - id: normalizing-flow
+    label: Normalizing flow
+    kind: model_family
+    description: A probabilistic model that transforms a simple distribution through a sequence of invertible mappings.
+    aliases:
+      - normalizing flow model
+    attributes:
+      deep: usually
+      probabilistic: always
+      invertible: always
+      likelihood_evaluation: exact
+    typical_tasks:
+      - density-estimation
+
+  - id: diffusion-model
+    label: Diffusion model
+    kind: model_family
+    description: A generative model that learns to reverse a gradual noising process.
+    attributes:
+      deep: usually
+      probabilistic: always
+      sampling_process: iterative-denoising
+
+  - id: score-based-generative-model
+    label: Score-based generative model
+    kind: model_family
+    description: A generative model based on estimating the gradient of the log density across noise levels.
+    attributes:
+      deep: usually
+      probabilistic: always
+      sampling_process: iterative
+
+  - id: energy-based-model
+    label: Energy-based model
+    kind: model_family
+    description: A model that assigns an unnormalized scalar energy to configurations of variables.
+    attributes:
+      probabilistic: usually
+
+  - id: language-model
+    label: Language model
+    kind: model_class
+    description: A model that represents or predicts sequences of human-language units.
+    modalities:
+      - text
+    typical_tasks:
+      - language-modeling
+      - text-generation
+
+  - id: large-language-model
+    label: Large language model
+    kind: model_class
+    description: A language model with substantial scale and broad capabilities acquired through training on large corpora.
+    aliases:
+      - LLM
+    attributes:
+      deep: always
+      probabilistic: usually
+      foundation_model: usually
+    modalities:
+      - text
+    typical_tasks:
+      - language-modeling
+      - text-generation
+      - question-answering
+
+  - id: pretrained-language-model
+    label: Pretrained language model
+    kind: model_class
+    description: A language model trained on a broad corpus before task-specific adaptation or use.
+
+  - id: masked-language-model
+    label: Masked language model
+    kind: model_class
+    description: A language model trained to infer tokens hidden within an otherwise visible context.
+    typical_tasks:
+      - masked-token-prediction
+
+  - id: causal-language-model
+    label: Causal language model
+    kind: model_class
+    description: A language model trained to predict each token from preceding tokens.
+    typical_tasks:
+      - next-token-prediction
+      - text-generation
+
+  - id: vision-foundation-model
+    label: Vision foundation model
+    kind: model_class
+    description: A broadly pretrained model intended for adaptation across visual tasks.
+    modalities:
+      - image
+      - video
+
+  - id: vision-language-model
+    label: Vision–language model
+    kind: model_class
+    description: A model that jointly processes or relates visual and linguistic information.
+    aliases:
+      - VLM
+    modalities:
+      - image
+      - text
+
+  - id: multimodal-model
+    label: Multimodal model
+    kind: model_class
+    description: A model that consumes or produces more than one data modality.
+
+  - id: multimodal-foundation-model
+    label: Multimodal foundation model
+    kind: model_class
+    description: A broadly pretrained foundation model that operates across multiple modalities.
+
+  - id: text-to-image-model
+    label: Text-to-image model
+    kind: model_class
+    description: A generative model that produces images conditioned on text.
+    modalities:
+      - text
+      - image
+    typical_tasks:
+      - image-generation
+
+  - id: speech-foundation-model
+    label: Speech foundation model
+    kind: model_class
+    description: A broadly pretrained model intended for adaptation across speech or audio tasks.
+    modalities:
+      - audio
+

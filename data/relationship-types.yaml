@@ -1,0 +1,107 @@
+schema_version: 1
+fragment_type: relationship_types
+
+relationship_types:
+  - id: is_a
+    label: is a
+    description: The source is a specialization or member of the target concept.
+    inverse: has_subtype
+    transitive: true
+
+  - id: has_subtype
+    label: has subtype
+    description: The target is a specialization or member of the source concept.
+    inverse: is_a
+    transitive: true
+
+  - id: is_subfield_of
+    label: is a subfield of
+    description: The source is an area of study contained substantially within the target.
+    inverse: has_subfield
+    transitive: true
+
+  - id: has_subfield
+    label: has subfield
+    description: The target is an area of study contained substantially within the source.
+    inverse: is_subfield_of
+    transitive: true
+
+  - id: uses
+    label: uses
+    description: The source uses the target as a required or defining component.
+    inverse: used_by
+
+  - id: used_by
+    label: used by
+    description: The source is used as a required or defining component by the target.
+    inverse: uses
+
+  - id: typically_uses
+    label: typically uses
+    description: The source commonly, but not necessarily, uses the target.
+    inverse: typically_used_by
+
+  - id: typically_used_by
+    label: typically used by
+    description: The source is commonly, but not necessarily, used by the target.
+    inverse: typically_uses
+
+  - id: trained_by
+    label: trained by
+    description: The source model or model class can be trained by the target method.
+    inverse: trains
+
+  - id: trains
+    label: trains
+    description: The source method trains the target model or model class.
+    inverse: trained_by
+
+  - id: used_for
+    label: used for
+    description: The source is applied to the target task or purpose.
+    inverse: uses_method
+
+  - id: uses_method
+    label: uses method
+    description: The source task or purpose is addressed using the target.
+    inverse: used_for
+
+  - id: optimizes
+    label: optimizes
+    description: The source procedure adjusts parameters with respect to the target objective.
+    inverse: optimized_by
+
+  - id: optimized_by
+    label: optimized by
+    description: The source objective is optimized by the target procedure.
+    inverse: optimizes
+
+  - id: produces
+    label: produces
+    description: The source process or system produces the target representation or output.
+    inverse: produced_by
+
+  - id: produced_by
+    label: produced by
+    description: The source representation or output is produced by the target.
+    inverse: produces
+
+  - id: product_uses_model_family
+    label: product uses model family
+    description: The source product is powered substantially by members of the target model family.
+    inverse: model_family_powers_product
+
+  - id: model_family_powers_product
+    label: model family powers product
+    description: Members of the source model family substantially power the target product.
+    inverse: product_uses_model_family
+
+  - id: family_of
+    label: is a family of
+    description: The source is a named model family whose members belong to the target model class.
+    inverse: has_model_family
+
+  - id: has_model_family
+    label: has model family
+    description: The target is a named family whose members belong to the source model class.
+    inverse: family_of

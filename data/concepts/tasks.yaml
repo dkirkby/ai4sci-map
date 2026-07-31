@@ -1,0 +1,104 @@
+schema_version: 1
+fragment_type: concepts
+
+concepts:
+  - id: regression
+    label: Regression
+    kind: task
+    description: Predicting one or more continuous numerical values.
+
+  - id: classification
+    label: Classification
+    kind: task
+    description: Assigning an input to one or more discrete categories.
+
+  - id: forecasting
+    label: Forecasting
+    kind: task
+    description: Predicting future observations or states from past and current information.
+
+  - id: clustering
+    label: Clustering
+    kind: task
+    description: Grouping observations according to similarity without predefined target labels.
+
+  - id: dimensionality-reduction
+    label: Dimensionality reduction
+    kind: task
+    description: Representing data with fewer variables while preserving selected structure or information.
+
+  - id: density-estimation
+    label: Density estimation
+    kind: task
+    description: Estimating a probability distribution from observed samples.
+
+  - id: anomaly-detection
+    label: Anomaly detection
+    kind: task
+    description: Identifying observations that differ substantially from expected or typical patterns.
+
+  - id: representation-learning
+    label: Representation learning
+    kind: task
+    description: Learning features or latent variables useful for subsequent analysis or prediction.
+
+  - id: sequence-modeling
+    label: Sequence modeling
+    kind: task
+    description: Modeling ordered data in which relationships depend on position or time.
+
+  - id: language-modeling
+    label: Language modeling
+    kind: task
+    description: Assigning probabilities to language sequences or predicting elements of those sequences.
+
+  - id: masked-token-prediction
+    label: Masked-token prediction
+    kind: task
+    description: Predicting tokens hidden from an otherwise visible input sequence.
+
+  - id: next-token-prediction
+    label: Next-token prediction
+    kind: task
+    description: Predicting the next token conditioned on preceding tokens.
+
+  - id: image-generation
+    label: Image generation
+    kind: task
+    description: Producing new images, optionally conditioned on text, images, or other information.
+
+  - id: text-generation
+    label: Text generation
+    kind: task
+    description: Producing sequences of natural-language text.
+
+  - id: machine-translation
+    label: Machine translation
+    kind: task
+    description: Converting content from one human language to another.
+
+  - id: question-answering
+    label: Question answering
+    kind: task
+    description: Producing answers to questions using learned knowledge, supplied context, retrieval, or tools.
+
+  - id: information-retrieval
+    label: Information retrieval
+    kind: task
+    description: Finding and ranking information relevant to a query.
+
+  - id: recommendation
+    label: Recommendation
+    kind: task
+    description: Selecting or ranking items for a user or context.
+
+  - id: control
+    label: Control
+    kind: task
+    description: Selecting actions intended to influence the behavior or state of a system.
+
+  - id: planning
+    label: Planning
+    kind: task
+    description: Constructing a sequence or policy of actions intended to achieve an objective.
+

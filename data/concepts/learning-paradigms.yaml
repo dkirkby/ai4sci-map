@@ -1,0 +1,66 @@
+schema_version: 1
+fragment_type: concepts
+
+concepts:
+  - id: supervised-learning
+    label: Supervised learning
+    kind: learning_paradigm
+    description: Learning from examples that pair inputs with desired labels or target values.
+
+  - id: unsupervised-learning
+    label: Unsupervised learning
+    kind: learning_paradigm
+    description: Learning structure or representations from data without externally supplied target labels.
+
+  - id: self-supervised-learning
+    label: Self-supervised learning
+    kind: learning_paradigm
+    description: Learning from prediction targets constructed from the input data itself.
+
+  - id: semi-supervised-learning
+    label: Semi-supervised learning
+    kind: learning_paradigm
+    description: Learning from a mixture of labeled and unlabeled examples.
+
+  - id: reinforcement-learning
+    label: Reinforcement learning
+    kind: learning_paradigm
+    description: Learning behavior through interaction with an environment to maximize cumulative reward.
+    aliases:
+      - RL
+
+  - id: imitation-learning
+    label: Imitation learning
+    kind: learning_paradigm
+    description: Learning behavior from demonstrations supplied by another agent or policy.
+
+  - id: transfer-learning
+    label: Transfer learning
+    kind: learning_paradigm
+    description: Reusing knowledge learned for one setting to improve learning or performance in another.
+
+  - id: multitask-learning
+    label: Multitask learning
+    kind: learning_paradigm
+    description: Jointly learning multiple related tasks with shared model components or representations.
+
+  - id: active-learning
+    label: Active learning
+    kind: learning_paradigm
+    description: Learning in a process that selects which examples should next receive labels or evaluation.
+
+  - id: online-learning
+    label: Online learning
+    kind: learning_paradigm
+    description: Updating a model incrementally as observations arrive.
+
+  - id: continual-learning
+    label: Continual learning
+    kind: learning_paradigm
+    description: Learning from a sequence of tasks or data distributions while retaining earlier capabilities.
+
+  - id: federated-learning
+    label: Federated learning
+    kind: learning_paradigm
+    description: Training across decentralized data holders without centralizing their raw data.
+

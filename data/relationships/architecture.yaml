@@ -1,0 +1,208 @@
+schema_version: 1
+fragment_type: relationships
+
+relationships:
+  - source: feed-forward-neural-network
+    type: is_a
+    target: neural-network
+
+  - source: multilayer-perceptron
+    type: is_a
+    target: feed-forward-neural-network
+
+  - source: deep-neural-network
+    type: is_a
+    target: neural-network
+
+  - source: convolutional-neural-network
+    type: is_a
+    target: neural-network
+
+  - source: recurrent-neural-network
+    type: is_a
+    target: neural-network
+
+  - source: long-short-term-memory-network
+    type: is_a
+    target: recurrent-neural-network
+
+  - source: transformer
+    type: is_a
+    target: neural-network
+
+  - source: transformer
+    type: uses
+    target: attention-mechanism
+
+  - source: encoder-only-transformer
+    type: is_a
+    target: transformer
+
+  - source: decoder-only-transformer
+    type: is_a
+    target: transformer
+
+  - source: encoder-decoder-transformer
+    type: is_a
+    target: transformer
+
+  - source: encoder-decoder-transformer
+    type: is_a
+    target: encoder-decoder-architecture
+
+  - source: graph-neural-network
+    type: is_a
+    target: neural-network
+
+  - source: autoencoder
+    type: is_a
+    target: neural-network
+
+  - source: autoencoder
+    type: is_a
+    target: representation-model
+
+  - source: denoising-autoencoder
+    type: is_a
+    target: autoencoder
+
+  - source: variational-autoencoder
+    type: is_a
+    target: autoencoder
+
+  - source: variational-autoencoder
+    type: is_a
+    target: generative-model
+
+  - source: variational-autoencoder
+    type: is_a
+    target: probabilistic-model
+
+  - source: variational-autoencoder
+    type: is_a
+    target: latent-variable-model
+
+  - source: variational-autoencoder
+    type: typically_uses
+    target: encoder-decoder-architecture
+
+  - source: generative-adversarial-network
+    type: is_a
+    target: generative-model
+
+  - source: generative-adversarial-network
+    type: uses
+    target: neural-network
+
+  - source: autoregressive-generative-model
+    type: is_a
+    target: generative-model
+
+  - source: autoregressive-generative-model
+    type: is_a
+    target: autoregressive-model
+
+  - source: normalizing-flow
+    type: is_a
+    target: generative-model
+
+  - source: normalizing-flow
+    type: is_a
+    target: probabilistic-model
+
+  - source: normalizing-flow
+    type: typically_uses
+    target: neural-network
+
+  - source: diffusion-model
+    type: is_a
+    target: generative-model
+
+  - source: diffusion-model
+    type: is_a
+    target: probabilistic-model
+
+  - source: diffusion-model
+    type: typically_uses
+    target: neural-network
+
+  - source: score-based-generative-model
+    type: is_a
+    target: generative-model
+
+  - source: score-based-generative-model
+    type: is_a
+    target: probabilistic-model
+
+  - source: energy-based-model
+    type: is_a
+    target: probabilistic-model
+
+  - source: language-model
+    type: is_a
+    target: probabilistic-model
+
+  - source: large-language-model
+    type: is_a
+    target: language-model
+
+  - source: large-language-model
+    type: typically_uses
+    target: transformer
+
+  - source: pretrained-language-model
+    type: is_a
+    target: language-model
+
+  - source: masked-language-model
+    type: is_a
+    target: language-model
+
+  - source: masked-language-model
+    type: typically_uses
+    target: encoder-only-transformer
+
+  - source: causal-language-model
+    type: is_a
+    target: autoregressive-model
+
+  - source: causal-language-model
+    type: is_a
+    target: language-model
+
+  - source: causal-language-model
+    type: typically_uses
+    target: decoder-only-transformer
+
+  - source: vision-foundation-model
+    type: is_a
+    target: foundation-model
+
+  - source: vision-language-model
+    type: is_a
+    target: multimodal-model
+
+  - source: vision-language-model
+    type: typically_uses
+    target: transformer
+
+  - source: multimodal-foundation-model
+    type: is_a
+    target: multimodal-model
+
+  - source: multimodal-foundation-model
+    type: is_a
+    target: foundation-model
+
+  - source: text-to-image-model
+    type: is_a
+    target: conditional-model
+
+  - source: text-to-image-model
+    type: is_a
+    target: generative-model
+
+  - source: speech-foundation-model
+    type: is_a
+    target: foundation-model
+

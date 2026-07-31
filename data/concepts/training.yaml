@@ -1,0 +1,216 @@
+schema_version: 1
+fragment_type: concepts
+
+concepts:
+  - id: training
+    label: Training
+    kind: training_method
+    description: The process of adjusting model parameters using data, experience, and an objective.
+
+  - id: pretraining
+    label: Pretraining
+    kind: training_method
+    description: Training a model on broad data before adaptation or application to downstream tasks.
+
+  - id: fine-tuning
+    label: Fine-tuning
+    kind: training_method
+    description: Continuing training of a pretrained model to adapt it to a domain, task, or behavior.
+
+  - id: supervised-fine-tuning
+    label: Supervised fine-tuning
+    kind: training_method
+    description: Fine-tuning a pretrained model using examples paired with desired outputs.
+    aliases:
+      - SFT
+
+  - id: instruction-tuning
+    label: Instruction tuning
+    kind: training_method
+    description: Fine-tuning a model on examples of instructions and desired responses.
+
+  - id: parameter-efficient-fine-tuning
+    label: Parameter-efficient fine-tuning
+    kind: training_method
+    description: Adapting a pretrained model while updating only a small fraction of parameters or added components.
+    aliases:
+      - PEFT
+
+  - id: reinforcement-learning-from-human-feedback
+    label: Reinforcement learning from human feedback
+    kind: training_method
+    description: Adapting a model or policy using reinforcement-learning signals derived from human preferences or evaluations.
+    aliases:
+      - RLHF
+
+  - id: reinforcement-learning-from-ai-feedback
+    label: Reinforcement learning from AI feedback
+    kind: training_method
+    description: Adapting a model or policy using reinforcement-learning signals derived substantially from evaluations by AI systems.
+    aliases:
+      - RLAIF
+
+  - id: preference-optimization
+    label: Preference optimization
+    kind: training_method
+    description: Training a model to favor preferred outputs using comparison or preference data.
+
+  - id: knowledge-distillation
+    label: Knowledge distillation
+    kind: training_method
+    description: Training a model to reproduce selected behavior or representations of another model.
+
+  - id: quantization
+    label: Quantization
+    kind: training_method
+    description: Representing model parameters or computations with reduced numerical precision.
+
+  - id: pruning
+    label: Pruning
+    kind: training_method
+    description: Removing selected parameters, connections, or components from a trained model.
+
+  - id: inference
+    label: Inference
+    kind: training_method
+    description: Applying a trained model to inputs without performing its main parameter-training process.
+
+  - id: loss-function
+    label: Loss function
+    kind: mathematical_object
+    description: A function assigning a numerical penalty to predictions, model states, or parameter choices.
+
+  - id: objective-function
+    label: Objective function
+    kind: mathematical_object
+    description: A scalar function that an optimization procedure attempts to minimize or maximize.
+
+  - id: likelihood
+    label: Likelihood
+    kind: mathematical_object
+    description: A model's probability or density for observed data, regarded as a function of model parameters.
+
+  - id: maximum-likelihood-estimation
+    label: Maximum-likelihood estimation
+    kind: training_method
+    description: Estimating parameters by maximizing the likelihood assigned to observed data.
+    aliases:
+      - MLE
+
+  - id: gradient-descent
+    label: Gradient descent
+    kind: training_method
+    description: An iterative optimization method that moves parameters opposite the gradient of an objective.
+
+  - id: stochastic-gradient-descent
+    label: Stochastic gradient descent
+    kind: training_method
+    description: Gradient-based optimization using individual samples or minibatches to estimate an objective gradient.
+    aliases:
+      - SGD
+
+  - id: backpropagation
+    label: Backpropagation
+    kind: training_method
+    description: An efficient reverse-mode procedure for differentiating a composed computational graph.
+
+  - id: optimizer
+    label: Optimizer
+    kind: training_method
+    description: An algorithm that updates model parameters to improve an objective.
+
+  - id: regularization
+    label: Regularization
+    kind: training_method
+    description: A constraint, penalty, or procedure intended to improve generalization or encode preferences among solutions.
+
+  - id: parameter
+    label: Parameter
+    kind: mathematical_object
+    description: A model quantity estimated or adjusted during training.
+
+  - id: hyperparameter
+    label: Hyperparameter
+    kind: mathematical_object
+    description: A configuration value controlling a model or learning procedure rather than being learned directly by that procedure.
+
+  - id: dataset
+    label: Dataset
+    kind: data_concept
+    description: A collection of observations or examples used for analysis, training, or evaluation.
+
+  - id: training-set
+    label: Training set
+    kind: data_concept
+    description: The portion of a dataset used to estimate or update model parameters.
+
+  - id: validation-set
+    label: Validation set
+    kind: data_concept
+    description: Data used to guide model selection or tuning without being used as the final test set.
+
+  - id: test-set
+    label: Test set
+    kind: data_concept
+    description: Held-out data used for final evaluation of a selected modeling procedure.
+
+  - id: training-example
+    label: Training example
+    kind: data_concept
+    description: An individual observation or structured unit presented during model training.
+
+  - id: feature
+    label: Feature
+    kind: data_concept
+    description: A measured, constructed, or learned variable supplied to a model.
+
+  - id: label
+    label: Label
+    kind: data_concept
+    description: A categorical target or annotation associated with an example.
+
+  - id: target
+    label: Target
+    kind: data_concept
+    description: A value or structure that a supervised model is trained to predict.
+
+  - id: token
+    label: Token
+    kind: data_concept
+    description: A discrete unit used to represent text or another tokenized modality.
+
+  - id: vocabulary
+    label: Vocabulary
+    kind: data_concept
+    description: The set of discrete tokens recognized or produced by a model.
+
+  - id: embedding
+    label: Embedding
+    kind: data_concept
+    description: A vector representation intended to encode useful properties or relationships.
+
+  - id: latent-representation
+    label: Latent representation
+    kind: data_concept
+    description: An internal representation whose components are not directly observed in the original data.
+
+  - id: data-augmentation
+    label: Data augmentation
+    kind: training_method
+    description: Constructing modified training examples intended to preserve selected meaning while increasing useful variation.
+
+  - id: synthetic-data
+    label: Synthetic data
+    kind: data_concept
+    description: Artificially generated data intended to resemble or supplement observations from a target setting.
+
+  - id: labeled-data
+    label: Labeled data
+    kind: data_concept
+    description: Data containing externally supplied targets or annotations.
+
+  - id: unlabeled-data
+    label: Unlabeled data
+    kind: data_concept
+    description: Data without externally supplied target labels for the learning task.
+

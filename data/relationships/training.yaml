@@ -1,0 +1,122 @@
+schema_version: 1
+fragment_type: relationships
+
+relationships:
+  - source: supervised-learning
+    type: uses
+    target: labeled-data
+
+  - source: unsupervised-learning
+    type: uses
+    target: unlabeled-data
+
+  - source: self-supervised-learning
+    type: uses
+    target: unlabeled-data
+
+  - source: semi-supervised-learning
+    type: uses
+    target: labeled-data
+
+  - source: semi-supervised-learning
+    type: uses
+    target: unlabeled-data
+
+  - source: foundation-model
+    type: trained_by
+    target: pretraining
+
+  - source: pretraining
+    type: used_for
+    target: transfer-learning
+
+  - source: fine-tuning
+    type: used_for
+    target: transfer-learning
+
+  - source: supervised-fine-tuning
+    type: is_a
+    target: fine-tuning
+
+  - source: instruction-tuning
+    type: is_a
+    target: supervised-fine-tuning
+
+  - source: parameter-efficient-fine-tuning
+    type: is_a
+    target: fine-tuning
+
+  - source: reinforcement-learning-from-human-feedback
+    type: is_a
+    target: preference-optimization
+
+  - source: reinforcement-learning-from-human-feedback
+    type: uses
+    target: reinforcement-learning
+
+  - source: reinforcement-learning-from-ai-feedback
+    type: is_a
+    target: preference-optimization
+
+  - source: reinforcement-learning-from-ai-feedback
+    type: uses
+    target: reinforcement-learning
+
+  - source: training
+    type: uses
+    target: objective-function
+
+  - source: training
+    type: uses
+    target: optimizer
+
+  - source: loss-function
+    type: is_a
+    target: objective-function
+
+  - source: optimizer
+    type: optimizes
+    target: objective-function
+
+  - source: gradient-descent
+    type: is_a
+    target: optimizer
+
+  - source: stochastic-gradient-descent
+    type: is_a
+    target: gradient-descent
+
+  - source: training
+    type: typically_uses
+    target: backpropagation
+    qualifiers:
+      context: Gradient-trained neural networks.
+
+  - source: maximum-likelihood-estimation
+    type: optimizes
+    target: likelihood
+
+  - source: embedding-model
+    type: produces
+    target: embedding
+
+  - source: representation-model
+    type: produces
+    target: latent-representation
+
+  - source: language-model
+    type: uses
+    target: token
+
+  - source: language-model
+    type: uses
+    target: vocabulary
+
+  - source: prompt-engineering
+    type: uses
+    target: prompt
+
+  - source: in-context-learning
+    type: uses
+    target: prompt
+

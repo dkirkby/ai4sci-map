@@ -1,0 +1,99 @@
+schema_version: 1
+fragment_type: relationships
+
+relationships:
+  - source: chatgpt
+    type: is_a
+    target: ai-assistant
+
+  - source: claude-assistant
+    type: is_a
+    target: ai-assistant
+
+  - source: gemini-app
+    type: is_a
+    target: ai-assistant
+
+  - source: grok-assistant
+    type: is_a
+    target: ai-assistant
+
+  - source: chatgpt
+    type: product_uses_model_family
+    target: gpt-model-family
+
+  - source: claude-assistant
+    type: product_uses_model_family
+    target: claude-model-family
+
+  - source: gemini-app
+    type: product_uses_model_family
+    target: gemini-model-family
+
+  - source: grok-assistant
+    type: product_uses_model_family
+    target: grok-model-family
+
+  - source: gpt-model-family
+    type: family_of
+    target: large-language-model
+
+  - source: gpt-model-family
+    type: family_of
+    target: foundation-model
+
+  - source: claude-model-family
+    type: family_of
+    target: large-language-model
+
+  - source: claude-model-family
+    type: family_of
+    target: foundation-model
+
+  - source: gemini-model-family
+    type: family_of
+    target: large-language-model
+
+  - source: gemini-model-family
+    type: family_of
+    target: multimodal-foundation-model
+
+  - source: grok-model-family
+    type: family_of
+    target: large-language-model
+
+  - source: llama-model-family
+    type: family_of
+    target: large-language-model
+
+  - source: llama-model-family
+    type: family_of
+    target: foundation-model
+
+  - source: mistral-model-family
+    type: family_of
+    target: large-language-model
+
+  - source: qwen-model-family
+    type: family_of
+    target: large-language-model
+
+  - source: deepseek-model-family
+    type: family_of
+    target: large-language-model
+
+  - source: stable-diffusion
+    type: family_of
+    target: diffusion-model
+
+  - source: stable-diffusion
+    type: family_of
+    target: text-to-image-model
+
+  - source: dall-e
+    type: family_of
+    target: text-to-image-model
+
+  - source: midjourney
+    type: used_for
+    target: image-generation

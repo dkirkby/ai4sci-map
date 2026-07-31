@@ -1,0 +1,79 @@
+schema_version: 1
+fragment_type: concepts
+
+concepts:
+  - id: model
+    label: Model
+    kind: model_class
+    description: A mathematical or computational representation used to describe, predict, generate, or control a system.
+
+  - id: predictive-model
+    label: Predictive model
+    kind: model_role
+    description: A model used to predict an unknown output, state, or future observation from available information.
+
+  - id: generative-model
+    label: Generative model
+    kind: model_role
+    description: A model that represents how observations may be generated and can generally be used to produce new samples.
+
+  - id: discriminative-model
+    label: Discriminative model
+    kind: model_role
+    description: A model that directly represents a decision boundary or a conditional relationship between outputs and inputs.
+
+  - id: probabilistic-model
+    label: Probabilistic model
+    kind: model_role
+    description: A model that represents uncertainty using probability distributions.
+
+  - id: deterministic-model
+    label: Deterministic model
+    kind: model_role
+    description: A model whose outputs are fixed by its inputs and parameters without an explicit stochastic component.
+
+  - id: conditional-model
+    label: Conditional model
+    kind: model_role
+    description: A model that represents outputs or distributions conditioned on supplied information.
+
+  - id: unconditional-model
+    label: Unconditional model
+    kind: model_role
+    description: A model that represents data or generates samples without an externally supplied conditioning input.
+
+  - id: latent-variable-model
+    label: Latent-variable model
+    kind: model_role
+    description: A model containing unobserved variables that explain or represent structure in observed data.
+
+  - id: autoregressive-model
+    label: Autoregressive model
+    kind: model_role
+    description: A model that factorizes a joint distribution into a sequence of predictions conditioned on earlier values.
+
+  - id: foundation-model
+    label: Foundation model
+    kind: model_role
+    description: A broadly pretrained model intended to be adapted or applied across many downstream tasks.
+
+  - id: representation-model
+    label: Representation model
+    kind: model_role
+    description: A model used primarily to transform data into features or latent representations.
+
+  - id: embedding-model
+    label: Embedding model
+    kind: model_role
+    description: A representation model that maps inputs to vectors intended to encode useful relationships or similarity.
+
+  - id: world-model
+    label: World model
+    kind: model_role
+    description: A model of an environment's state and dynamics used for prediction, planning, or control.
+
+  - id: surrogate-model
+    label: Surrogate model
+    kind: model_role
+    description: A comparatively inexpensive approximation to a costly process, experiment, or simulation.
+

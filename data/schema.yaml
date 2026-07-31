@@ -1,0 +1,233 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://example.org/schemas/ai-concept-fragment.schema.yaml
+title: AI/ML concept graph fragment
+
+oneOf:
+  - $ref: "#/$defs/manifest"
+  - $ref: "#/$defs/concept_fragment"
+  - $ref: "#/$defs/relationship_fragment"
+  - $ref: "#/$defs/relationship_type_fragment"
+
+$defs:
+  id:
+    type: string
+    pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+
+  relationship_id:
+    type: string
+    pattern: "^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$"
+
+  reference_list:
+    type: array
+    items:
+      $ref: "#/$defs/id"
+    uniqueItems: true
+
+  concept:
+    type: object
+    additionalProperties: false
+    required:
+      - id
+      - label
+      - kind
+      - description
+    properties:
+      id:
+        $ref: "#/$defs/id"
+      label:
+        type: string
+        minLength: 1
+      kind:
+        enum:
+          - field
+          - learning_paradigm
+          - model_role
+          - model_class
+          - model_family
+          - architecture
+          - training_method
+          - mathematical_object
+          - task
+          - system
+          - product
+          - property
+          - data_concept
+          - evaluation_concept
+      description:
+        type: string
+        minLength: 1
+      aliases:
+        type: array
+        items:
+          type: string
+          minLength: 1
+        uniqueItems: true
+      introduced:
+        type: integer
+        minimum: 1800
+        maximum: 2100
+      attributes:
+        type: object
+        additionalProperties:
+          oneOf:
+            - type: string
+            - type: number
+            - type: boolean
+            - type: array
+              items:
+                type: string
+      modalities:
+        $ref: "#/$defs/reference_list"
+      typical_tasks:
+        $ref: "#/$defs/reference_list"
+      external_links:
+        type: array
+        items:
+          type: object
+          additionalProperties: false
+          required:
+            - label
+            - url
+          properties:
+            label:
+              type: string
+            url:
+              type: string
+              format: uri
+
+  relationship:
+    type: object
+    additionalProperties: false
+    required:
+      - source
+      - type
+      - target
+    properties:
+      source:
+        $ref: "#/$defs/id"
+      type:
+        $ref: "#/$defs/relationship_id"
+      target:
+        $ref: "#/$defs/id"
+      description:
+        type: string
+      qualifiers:
+        type: object
+        additionalProperties: false
+        properties:
+          frequency:
+            enum:
+              - always
+              - usually
+              - sometimes
+              - rarely
+          confidence:
+            enum:
+              - high
+              - medium
+              - low
+          context:
+            type: string
+          valid_from:
+            type: integer
+          valid_until:
+            type: integer
+
+  relationship_type:
+    type: object
+    additionalProperties: false
+    required:
+      - id
+      - label
+      - description
+    properties:
+      id:
+        $ref: "#/$defs/relationship_id"
+      label:
+        type: string
+      description:
+        type: string
+      inverse:
+        $ref: "#/$defs/relationship_id"
+      symmetric:
+        type: boolean
+      transitive:
+        type: boolean
+
+  manifest:
+    type: object
+    additionalProperties: false
+    required:
+      - schema_version
+      - fragment_type
+      - relationship_types_file
+      - concept_files
+      - relationship_files
+    properties:
+      schema_version:
+        const: 1
+      fragment_type:
+        const: manifest
+      relationship_types_file:
+        type: string
+      concept_files:
+        type: array
+        items:
+          type: string
+        uniqueItems: true
+      relationship_files:
+        type: array
+        items:
+          type: string
+        uniqueItems: true
+
+  concept_fragment:
+    type: object
+    additionalProperties: false
+    required:
+      - schema_version
+      - fragment_type
+      - concepts
+    properties:
+      schema_version:
+        const: 1
+      fragment_type:
+        const: concepts
+      concepts:
+        type: array
+        items:
+          $ref: "#/$defs/concept"
+
+  relationship_fragment:
+    type: object
+    additionalProperties: false
+    required:
+      - schema_version
+      - fragment_type
+      - relationships
+    properties:
+      schema_version:
+        const: 1
+      fragment_type:
+        const: relationships
+      relationships:
+        type: array
+        items:
+          $ref: "#/$defs/relationship"
+
+  relationship_type_fragment:
+    type: object
+    additionalProperties: false
+    required:
+      - schema_version
+      - fragment_type
+      - relationship_types
+    properties:
+      schema_version:
+        const: 1
+      fragment_type:
+        const: relationship_types
+      relationship_types:
+        type: array
+        items:
+          $ref: "#/$defs/relationship_type"
