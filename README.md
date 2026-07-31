@@ -22,11 +22,12 @@ This is a **proof of concept**. Currently implemented:
   (`data/`) and compiles it into the JSON the app loads.
 - Automated deployment to GitHub Pages on every push to `main` (see
   [Deployment](#deployment)).
+- A search box for jumping straight to any concept by label or alias (e.g. "CNN"),
+  with keyboard and mouse-driven autocomplete.
 
 Not yet implemented:
 
 - Automated tests.
-- Search or filter UI for jumping to a concept without knowing its id.
 - Any visual styling based on a concept's `kind` (field, task, architecture, ...).
 
 ## Requirements

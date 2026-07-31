@@ -65,11 +65,19 @@ satellites" diagram:
   redraw from the longest label among the concepts currently on screen (concept
   labels vary widely in length), not a fixed constant — this avoids clipping
   without needing per-label text measurement.
+- **`src/search.ts`** — a search-as-you-type box matching every concept's label
+  and aliases (e.g. "CNN" → "Convolutional neural network"), ranked prefix-first.
+  Filters the already-fetched concept list client-side; at 182 concepts this needs
+  no separate build-time search index. Built once against `#search-root`, a DOM
+  node in `index.html` that's a *sibling* of `#app`, not a child of it — `#app`
+  gets fully wiped on every graph redraw (see below), which would destroy the
+  search box if it lived there.
 - **`src/main.ts`** — entry point: fetches `graph.json`, resolves the initial
   concept from `?concept=<id>` (random fallback, written back via
   `history.replaceState` so the random pick is immediately bookmarkable), and
-  wires satellite clicks to `history.pushState` + redraw (with a `popstate`
-  listener for back/forward).
+  defines `navigateTo(conceptId)` (pushes URL state, then redraws) as the single
+  shared path used by both satellite clicks and search selection, plus a
+  `popstate` listener for back/forward.
 
 Every redraw fully clears and rebuilds the SVG (`innerHTML = ""` /
 `selectAll('*').remove()`) rather than using D3's enter/update/exit pattern —

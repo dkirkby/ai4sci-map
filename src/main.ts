@@ -1,13 +1,16 @@
 import "./style.css";
 import { buildGraphIndex } from "./graph.js";
 import { render } from "./render.js";
+import { initSearch } from "./search.js";
 import type { GraphData } from "./types.js";
 
 const QUERY_PARAM = "concept";
 
 async function main() {
   const app = document.getElementById("app");
+  const searchRoot = document.getElementById("search-root");
   if (!app) throw new Error("Missing #app container");
+  if (!searchRoot) throw new Error("Missing #search-root container");
 
   const response = await fetch(`${import.meta.env.BASE_URL}graph.json`);
   if (!response.ok) {
@@ -31,14 +34,14 @@ async function main() {
   }
 
   function draw(conceptId: string): void {
-    render(app!, index, conceptId, {
-      onSelectConcept: (nextId) => {
-        const url = new URL(location.href);
-        url.searchParams.set(QUERY_PARAM, nextId);
-        history.pushState({ conceptId: nextId }, "", url);
-        draw(nextId);
-      },
-    });
+    render(app!, index, conceptId, { onSelectConcept: navigateTo });
+  }
+
+  function navigateTo(conceptId: string): void {
+    const url = new URL(location.href);
+    url.searchParams.set(QUERY_PARAM, conceptId);
+    history.pushState({ conceptId }, "", url);
+    draw(conceptId);
   }
 
   window.addEventListener("popstate", () => {
@@ -47,6 +50,8 @@ async function main() {
       draw(conceptId);
     }
   });
+
+  initSearch(searchRoot, [...index.conceptsById.values()], { onSelectConcept: navigateTo });
 
   draw(resolveInitialConceptId());
 }
