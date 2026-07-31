@@ -2,6 +2,7 @@ import "./style.css";
 import { buildGraphIndex } from "./graph.js";
 import { render } from "./render.js";
 import { initSearch } from "./search.js";
+import { initShareButton } from "./share.js";
 import type { GraphData } from "./types.js";
 
 const QUERY_PARAM = "concept";
@@ -9,8 +10,10 @@ const QUERY_PARAM = "concept";
 async function main() {
   const app = document.getElementById("app");
   const searchRoot = document.getElementById("search-root");
+  const shareRoot = document.getElementById("share-root");
   if (!app) throw new Error("Missing #app container");
   if (!searchRoot) throw new Error("Missing #search-root container");
+  if (!shareRoot) throw new Error("Missing #share-root container");
 
   const response = await fetch(`${import.meta.env.BASE_URL}graph.json`);
   if (!response.ok) {
@@ -52,6 +55,7 @@ async function main() {
   });
 
   initSearch(searchRoot, [...index.conceptsById.values()], { onSelectConcept: navigateTo });
+  initShareButton(shareRoot);
 
   draw(resolveInitialConceptId());
 }

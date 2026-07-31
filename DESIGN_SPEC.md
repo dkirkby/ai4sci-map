@@ -40,6 +40,11 @@ are suggested via autocomplete; choosing a suggestion designates it as the new
 central concept and triggers a redraw, the same as clicking a satellite. The input
 has rounded corners, a largish font, and a magnifying-glass icon.
 
+## Sharing
+
+A button copies a URL for the current view to the clipboard, so a specific
+concept can be linked or bookmarked directly.
+
 ## Implementation notes
 
 The sections above are the requirements; this section records the choices made
@@ -84,6 +89,12 @@ added; `scripts/build-data.ts` only needed to keep emitting `aliases` in
 `public/graph.json`, which it already did. The search box lives in its own DOM
 node (`#search-root` in `index.html`, built once in `main.ts`) outside `#app`,
 since `render.ts` fully clears and rebuilds `#app` on every redraw.
+
+**Sharing** (`src/share.ts`): copies `location.href` to the clipboard via the
+Clipboard API. No URL construction needed — the app already keeps the URL in
+sync with the centered concept via `history.pushState`/`replaceState` (see
+Zoomable concept browser above), so the current URL *is* the shareable link.
+Same sibling-of-`#app` placement as the search box, for the same reason.
 
 **Current status.** Local development and production builds work
 (`npm run dev`, `npm run build` + `npm run preview`), and `main` auto-deploys to

@@ -72,6 +72,11 @@ satellites" diagram:
   node in `index.html` that's a *sibling* of `#app`, not a child of it — `#app`
   gets fully wiped on every graph redraw (see below), which would destroy the
   search box if it lived there.
+- **`src/share.ts`** — a "Copy link" button that writes `location.href` to the
+  clipboard via the Clipboard API. Needs no conceptId/state of its own: the URL
+  is already kept in sync with the centered concept by `main.ts`, so reading
+  `location.href` at click time is always correct. Same sibling-of-`#app`
+  placement as `search.ts`, for the same reason.
 - **`src/main.ts`** — entry point: fetches `graph.json`, resolves the initial
   concept from `?concept=<id>` (random fallback, written back via
   `history.replaceState` so the random pick is immediately bookmarkable), and

@@ -24,6 +24,7 @@ This is a **proof of concept**. Currently implemented:
   [Deployment](#deployment)).
 - A search box for jumping straight to any concept by label or alias (e.g. "CNN"),
   with keyboard and mouse-driven autocomplete.
+- A "Copy link" button that copies a URL for the current view to the clipboard.
 
 Not yet implemented:
 
