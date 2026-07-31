@@ -20,10 +20,11 @@ This is a **proof of concept**. Currently implemented:
   concept chosen when none is given.
 - A data build pipeline that validates the hand-authored YAML concept database
   (`data/`) and compiles it into the JSON the app loads.
+- Automated deployment to GitHub Pages on every push to `main` (see
+  [Deployment](#deployment)).
 
 Not yet implemented:
 
-- Automated deployment (see [Deployment](#deployment) below for the manual path).
 - Automated tests.
 - Search or filter UI for jumping to a concept without knowing its id.
 - Any visual styling based on a concept's `kind` (field, task, architecture, ...).
@@ -68,17 +69,18 @@ is involved.
 
 ## Deployment
 
-There's no CI/CD set up yet, so deployment is manual for now. `dist/` (produced by
-`npm run build`) can be uploaded to any static file host. For GitHub Pages
-specifically:
+Live at **<https://dkirkby.github.io/ai4sci-map/>**.
 
-1. Run `npm run build`.
-2. Publish the contents of `dist/` to the branch/path your repo's Pages settings
-   serve from (e.g. via `git subtree push`, the `gh-pages` npm package, or a manual
-   copy) — or wire up GitHub's "Deploy from a branch"/Actions Pages flow once one
-   exists in this repo.
+`.github/workflows/deploy.yml` builds the site and deploys it to GitHub Pages
+(via `actions/upload-pages-artifact` + `actions/deploy-pages`) automatically on
+every push to `main`, or on demand from the Actions tab (`workflow_dispatch`). The
+repo's Pages source is set to "GitHub Actions" (not a branch), so nothing needs to
+be pushed to a `gh-pages` branch.
 
-**If deploying to a project page** (`https://<user>.github.io/<repo>/`, as opposed
-to a user/org page or custom domain), set `base: "/<repo>/"` in `vite.config.ts`
-first — it currently defaults to `/`, which only serves correctly from a domain
-root.
+This is a GitHub Pages *project* page (`https://<user>.github.io/<repo>/`, not a
+domain root), so `vite.config.ts` sets `base: "/ai4sci-map/"` for both the
+production build and `vite preview` — but not for `vite dev`, which stays at `/`
+for a normal localhost experience. `src/main.ts` fetches data via
+`import.meta.env.BASE_URL`, so it automatically respects whichever base is active.
+If this repo is ever renamed, or the site moved to a different path, update `base`
+in `vite.config.ts` to match.

@@ -74,3 +74,14 @@ satellites" diagram:
 Every redraw fully clears and rebuilds the SVG (`innerHTML = ""` /
 `selectAll('*').remove()`) rather than using D3's enter/update/exit pattern —
 intentional at this scale, not an oversight.
+
+## Deployment
+
+`.github/workflows/deploy.yml` builds and deploys `main` to GitHub Pages
+(`https://dkirkby.github.io/ai4sci-map/`) via GitHub's Actions-based Pages flow
+(no `gh-pages` branch). Because it's a project page, `vite.config.ts` sets
+`base: "/ai4sci-map/"` for the production build **and** `vite preview` (both serve
+the built `dist/` output, which has that prefix baked into `index.html`) — but not
+for `vite dev`. Distinguish these with the config function's `command`/`isPreview`
+flags, not `command` alone: `vite preview` reports `command: "serve"`, the same as
+`vite dev`, so `isPreview` is the only signal that tells them apart.

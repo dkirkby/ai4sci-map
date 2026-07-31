@@ -69,6 +69,7 @@ label among the concepts on screen, so long labels (some concept labels exceed 4
 characters) never clip against the viewBox edge.
 
 **Current status.** Local development and production builds work
-(`npm run dev`, `npm run build` + `npm run preview`); see [README.md](README.md)
-for setup. Not yet implemented: GitHub Pages CI/deployment, automated tests,
-search/filter UI, and any visual styling keyed on concept `kind`.
+(`npm run dev`, `npm run build` + `npm run preview`), and `main` auto-deploys to
+GitHub Pages via `.github/workflows/deploy.yml`; see [README.md](README.md) for
+setup and the deployment URL. Not yet implemented: automated tests, search/filter
+UI, and any visual styling keyed on concept `kind`.
