@@ -1,5 +1,5 @@
 import "./style.css";
-import { buildGraphIndex } from "./graph.js";
+import { buildGraphIndex, resolveConceptId } from "./graph.js";
 import { render } from "./render.js";
 import { initSearch } from "./search.js";
 import { initShareButton } from "./share.js";
@@ -26,8 +26,17 @@ async function main() {
 
   function resolveInitialConceptId(): string {
     const requested = new URLSearchParams(location.search).get(QUERY_PARAM);
-    if (requested && index.conceptsById.has(requested)) {
-      return requested;
+    if (requested) {
+      // Falls back to the raw (unresolved) value when nothing matches, so
+      // draw() hits render()'s "Unknown concept" error path instead of
+      // silently substituting a random concept.
+      const resolvedId = resolveConceptId(index, requested) ?? requested;
+      if (resolvedId !== requested) {
+        const url = new URL(location.href);
+        url.searchParams.set(QUERY_PARAM, resolvedId);
+        history.replaceState({ conceptId: resolvedId }, "", url);
+      }
+      return resolvedId;
     }
     const randomId = conceptIds[Math.floor(Math.random() * conceptIds.length)]!;
     const url = new URL(location.href);
@@ -48,9 +57,9 @@ async function main() {
   }
 
   window.addEventListener("popstate", () => {
-    const conceptId = new URLSearchParams(location.search).get(QUERY_PARAM);
-    if (conceptId && index.conceptsById.has(conceptId)) {
-      draw(conceptId);
+    const requested = new URLSearchParams(location.search).get(QUERY_PARAM);
+    if (requested) {
+      draw(resolveConceptId(index, requested) ?? requested);
     }
   });
 

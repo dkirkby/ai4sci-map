@@ -9,6 +9,9 @@
   --highlight-bg: rgba(28, 28, 28, 0.06);
   --success: #2e7d32;
   --danger: #c62828;
+  --attr-always: #3f3f3f;
+  --attr-usually: #6b6b6b;
+  --attr-sometimes: #9c9c98;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,6 +26,9 @@
     --highlight-bg: rgba(255, 255, 255, 0.08);
     --success: #66bb6a;
     --danger: #ef5350;
+    --attr-always: #c7c9cc;
+    --attr-usually: #9aa0a6;
+    --attr-sometimes: #6a6e73;
   }
 }
 
@@ -48,6 +54,30 @@ body {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.concept-error {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  padding: 24px;
+}
+
+.concept-error-message {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.concept-error-hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted);
 }
 
 .center-card {
@@ -80,6 +110,12 @@ body {
   line-height: 1.2;
 }
 
+.center-card-acronyms {
+  font-size: 13px;
+  line-height: 1.2;
+  color: var(--muted);
+}
+
 .center-card-description {
   margin: 0;
   font-size: 12.5px;
@@ -89,6 +125,27 @@ body {
   display: -webkit-box;
   -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
+}
+
+.center-card-attributes {
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.attribute-dot {
+  color: var(--muted);
+}
+
+.attribute-always {
+  color: var(--attr-always);
+}
+
+.attribute-usually {
+  color: var(--attr-usually);
+}
+
+.attribute-sometimes {
+  color: var(--attr-sometimes);
 }
 
 .spoke {

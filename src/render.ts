@@ -13,7 +13,7 @@ const BASE_VIEW_SIZE = 1000;
 const RING_RADIUS = 300;
 const SATELLITE_NODE_RADIUS = 9;
 const CARD_WIDTH = 300;
-const CARD_HEIGHT = 160;
+const CARD_HEIGHT = 210;
 const CARD_HALF_WIDTH = CARD_WIDTH / 2;
 const CARD_HALF_HEIGHT = CARD_HEIGHT / 2;
 const LABEL_GAP = 6;
@@ -57,7 +57,7 @@ export function render(
 
   const centerConcept = index.conceptsById.get(centerId);
   if (!centerConcept) {
-    container.textContent = `Unknown concept: "${centerId}"`;
+    renderUnknownConceptError(container, centerId);
     return;
   }
 
@@ -219,7 +219,27 @@ export function render(
   const card = foreignObject.append("xhtml:div").attr("class", "center-card");
   card.append("div").attr("class", "center-card-kind").text(centerConcept.kind.replace(/_/g, " "));
   card.append("h2").attr("class", "center-card-label").text(centerConcept.label);
+
+  const acronyms = centerConcept.acronyms ?? [];
+  if (acronyms.length > 0) {
+    card.append("div").attr("class", "center-card-acronyms").text(acronyms.join(" · "));
+  }
+
   card.append("p").attr("class", "center-card-description").text(centerConcept.description);
+
+  const displayableAttributes = Object.entries(centerConcept.attributes ?? {}).filter(
+    (entry): entry is [string, AttributeDisplayValue] => isDisplayableAttributeValue(entry[1]),
+  );
+  if (displayableAttributes.length > 0) {
+    const attributesRow = card.append("div").attr("class", "center-card-attributes");
+    displayableAttributes.forEach(([key, value], i) => {
+      if (i > 0) attributesRow.append("span").attr("class", "attribute-dot").text(" · ");
+      attributesRow
+        .append("span")
+        .attr("class", `attribute attribute-${value}`)
+        .text(humanizeAttributeKey(key));
+    });
+  }
 
   // --- Legend ---
   const legendEntries = buildLegend(index.relationshipTypesById).filter(
@@ -248,6 +268,33 @@ export function render(
   });
 }
 
+function renderUnknownConceptError(container: HTMLElement, conceptId: string): void {
+  const wrapper = document.createElement("div");
+  wrapper.className = "concept-error";
+
+  const message = document.createElement("p");
+  message.className = "concept-error-message";
+  message.textContent = `Unknown concept: "${conceptId}"`;
+
+  const hint = document.createElement("p");
+  hint.className = "concept-error-hint";
+  hint.textContent = "Try searching for a known concept using the search bar above.";
+
+  wrapper.append(message, hint);
+  container.appendChild(wrapper);
+}
+
 function relationshipTooltip(index: GraphIndex, relationshipTypeId: string): string {
   return index.relationshipTypesById.get(relationshipTypeId)?.label ?? relationshipTypeId;
+}
+
+type AttributeDisplayValue = "always" | "usually" | "sometimes";
+
+function isDisplayableAttributeValue(value: unknown): value is AttributeDisplayValue {
+  return value === "always" || value === "usually" || value === "sometimes";
+}
+
+function humanizeAttributeKey(key: string): string {
+  const words = key.replace(/_/g, " ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
 }

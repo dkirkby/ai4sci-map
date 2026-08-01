@@ -65,6 +65,24 @@ export function buildGraphIndex(data: GraphData): GraphIndex {
   return { conceptsById, relationshipTypesById, adjacency, relationshipsByConceptId };
 }
 
+/**
+ * Resolves a user-supplied concept identifier to a canonical concept id.
+ * Tries an exact id match first, then falls back to a case-insensitive match
+ * against each concept's label, aliases, and acronyms. Returns `undefined` if
+ * nothing matches.
+ */
+export function resolveConceptId(index: GraphIndex, query: string): string | undefined {
+  if (index.conceptsById.has(query)) return query;
+
+  const normalized = query.trim().toLowerCase();
+  for (const concept of index.conceptsById.values()) {
+    if (concept.label.toLowerCase() === normalized) return concept.id;
+    if ((concept.aliases ?? []).some((alias) => alias.toLowerCase() === normalized)) return concept.id;
+    if ((concept.acronyms ?? []).some((acronym) => acronym.toLowerCase() === normalized)) return concept.id;
+  }
+  return undefined;
+}
+
 /** All relationships whose two endpoints both lie within `satelliteIds`. */
 export function getSatelliteSatelliteRelationships(
   index: GraphIndex,
