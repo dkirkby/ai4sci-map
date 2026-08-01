@@ -14,6 +14,23 @@ export type ConceptKind =
   | "data_concept"
   | "evaluation_concept";
 
+export const CONCEPT_KINDS: ConceptKind[] = [
+  "field",
+  "learning_paradigm",
+  "model_role",
+  "model_class",
+  "model_family",
+  "architecture",
+  "training_method",
+  "mathematical_object",
+  "task",
+  "system",
+  "product",
+  "property",
+  "data_concept",
+  "evaluation_concept",
+];
+
 export interface ExternalLink {
   label: string;
   url: string;

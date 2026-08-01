@@ -8,6 +8,7 @@ import {
   familyKeyForRelationshipType,
   markerIdForRelationshipType,
 } from "./style.js";
+import { CONCEPT_KINDS, type ConceptKind } from "./types.js";
 
 const BASE_VIEW_SIZE = 1000;
 const RING_RADIUS = 300;
@@ -25,6 +26,8 @@ const VIEW_MARGIN = 24;
 
 export interface RenderOptions {
   onSelectConcept: (conceptId: string) => void;
+  onSelectKind: (kind: ConceptKind, conceptId: string) => void;
+  onSwitchKind: (kind: ConceptKind) => void;
 }
 
 interface Point {
@@ -57,7 +60,7 @@ export function render(
 
   const centerConcept = index.conceptsById.get(centerId);
   if (!centerConcept) {
-    renderUnknownConceptError(container, centerId);
+    renderError(container, `Unknown concept: "${centerId}"`);
     return;
   }
 
@@ -217,7 +220,11 @@ export function render(
     .attr("width", CARD_WIDTH)
     .attr("height", CARD_HEIGHT);
   const card = foreignObject.append("xhtml:div").attr("class", "center-card");
-  card.append("div").attr("class", "center-card-kind").text(centerConcept.kind.replace(/_/g, " "));
+  card
+    .append("div")
+    .attr("class", "center-card-kind")
+    .text(centerConcept.kind.replace(/_/g, " "))
+    .on("click", () => options.onSelectKind(centerConcept.kind, centerConcept.id));
   card.append("h2").attr("class", "center-card-label").text(centerConcept.label);
 
   const acronyms = centerConcept.acronyms ?? [];
@@ -237,7 +244,7 @@ export function render(
       attributesRow
         .append("span")
         .attr("class", `attribute attribute-${value}`)
-        .text(humanizeAttributeKey(key));
+        .text(humanizeSnakeCase(key));
     });
   }
 
@@ -268,19 +275,111 @@ export function render(
   });
 }
 
-function renderUnknownConceptError(container: HTMLElement, conceptId: string): void {
+function renderError(container: HTMLElement, message: string): void {
   const wrapper = document.createElement("div");
   wrapper.className = "concept-error";
 
-  const message = document.createElement("p");
-  message.className = "concept-error-message";
-  message.textContent = `Unknown concept: "${conceptId}"`;
+  const messageEl = document.createElement("p");
+  messageEl.className = "concept-error-message";
+  messageEl.textContent = message;
 
   const hint = document.createElement("p");
   hint.className = "concept-error-hint";
   hint.textContent = "Try searching for a known concept using the search bar above.";
 
-  wrapper.append(message, hint);
+  wrapper.append(messageEl, hint);
+  container.appendChild(wrapper);
+}
+
+const SORTED_CONCEPT_KINDS = [...CONCEPT_KINDS].sort((a, b) =>
+  humanizeSnakeCase(a).localeCompare(humanizeSnakeCase(b)),
+);
+
+/**
+ * The two-pane view shown when the center card's "kind" badge is clicked: a
+ * sidebar listing every defined kind (highlighting the current one), and an
+ * alphabetical listing of every concept sharing the selected kind. `kind ===
+ * ""` (the `?kind` param present but empty) shows the sidebar with nothing
+ * selected and no concept list. A non-empty `kind` that isn't a real
+ * `ConceptKind` is treated as an error instead -- there's no sensible sidebar
+ * selection state for it.
+ */
+export function renderKindList(
+  container: HTMLElement,
+  index: GraphIndex,
+  kind: string,
+  hiliteConceptId: string | null,
+  options: RenderOptions,
+): void {
+  container.innerHTML = "";
+
+  if (kind !== "" && !CONCEPT_KINDS.includes(kind as ConceptKind)) {
+    renderError(container, `Unknown kind: "${kind}"`);
+    return;
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "kind-browser";
+
+  const sidebar = document.createElement("ul");
+  sidebar.className = "kind-browser-sidebar";
+  for (const candidateKind of SORTED_CONCEPT_KINDS) {
+    const item = document.createElement("li");
+    item.className = "kind-browser-sidebar-item";
+    if (candidateKind === kind) {
+      item.classList.add("is-active");
+    }
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "kind-browser-sidebar-button";
+    button.textContent = humanizeSnakeCase(candidateKind);
+    button.addEventListener("click", () => options.onSwitchKind(candidateKind));
+
+    item.appendChild(button);
+    sidebar.appendChild(item);
+  }
+  wrapper.appendChild(sidebar);
+
+  const content = document.createElement("div");
+  content.className = "kind-browser-content";
+
+  if (kind !== "") {
+    const concepts = [...index.conceptsById.values()]
+      .filter((concept) => concept.kind === kind)
+      .sort((a, b) => a.label.localeCompare(b.label));
+
+    const list = document.createElement("ul");
+    list.className = "kind-list-items";
+
+    if (concepts.length === 0) {
+      const empty = document.createElement("li");
+      empty.className = "kind-list-empty";
+      empty.textContent = "No concepts of this kind yet.";
+      list.appendChild(empty);
+    }
+
+    for (const concept of concepts) {
+      const item = document.createElement("li");
+      item.className = "kind-list-item";
+      if (concept.id === hiliteConceptId) {
+        item.classList.add("is-hilited");
+      }
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "kind-list-item-button";
+      button.textContent = concept.label;
+      button.addEventListener("click", () => options.onSelectConcept(concept.id));
+
+      item.appendChild(button);
+      list.appendChild(item);
+    }
+
+    content.appendChild(list);
+  }
+
+  wrapper.appendChild(content);
   container.appendChild(wrapper);
 }
 
@@ -294,7 +393,8 @@ function isDisplayableAttributeValue(value: unknown): value is AttributeDisplayV
   return value === "always" || value === "usually" || value === "sometimes";
 }
 
-function humanizeAttributeKey(key: string): string {
-  const words = key.replace(/_/g, " ");
+/** Turns a snake_case schema value (a `kind` or an attribute key) into display text. */
+function humanizeSnakeCase(value: string): string {
+  const words = value.replace(/_/g, " ");
   return words.charAt(0).toUpperCase() + words.slice(1);
 }

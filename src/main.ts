@@ -1,11 +1,13 @@
 import "./style.css";
 import { buildGraphIndex, resolveConceptId } from "./graph.js";
-import { render } from "./render.js";
+import { render, renderKindList } from "./render.js";
 import { initSearch } from "./search.js";
 import { initShareButton } from "./share.js";
-import type { GraphData } from "./types.js";
+import type { ConceptKind, GraphData } from "./types.js";
 
-const QUERY_PARAM = "concept";
+const CONCEPT_PARAM = "concept";
+const KIND_PARAM = "kind";
+const HILITE_PARAM = "hilite";
 
 async function main() {
   const app = document.getElementById("app");
@@ -24,49 +26,79 @@ async function main() {
   const index = buildGraphIndex(data);
   const conceptIds = [...index.conceptsById.keys()];
 
-  function resolveInitialConceptId(): string {
-    const requested = new URLSearchParams(location.search).get(QUERY_PARAM);
-    if (requested) {
-      // Falls back to the raw (unresolved) value when nothing matches, so
-      // draw() hits render()'s "Unknown concept" error path instead of
-      // silently substituting a random concept.
-      const resolvedId = resolveConceptId(index, requested) ?? requested;
-      if (resolvedId !== requested) {
-        const url = new URL(location.href);
-        url.searchParams.set(QUERY_PARAM, resolvedId);
-        history.replaceState({ conceptId: resolvedId }, "", url);
-      }
-      return resolvedId;
-    }
-    const randomId = conceptIds[Math.floor(Math.random() * conceptIds.length)]!;
-    const url = new URL(location.href);
-    url.searchParams.set(QUERY_PARAM, randomId);
-    history.replaceState({ conceptId: randomId }, "", url);
-    return randomId;
-  }
-
-  function draw(conceptId: string): void {
-    render(app!, index, conceptId, { onSelectConcept: navigateTo });
-  }
-
   function navigateTo(conceptId: string): void {
     const url = new URL(location.href);
-    url.searchParams.set(QUERY_PARAM, conceptId);
-    history.pushState({ conceptId }, "", url);
-    draw(conceptId);
+    url.search = "";
+    url.searchParams.set(CONCEPT_PARAM, conceptId);
+    history.pushState(null, "", url);
+    renderRoute(false);
   }
 
-  window.addEventListener("popstate", () => {
-    const requested = new URLSearchParams(location.search).get(QUERY_PARAM);
-    if (requested) {
-      draw(resolveConceptId(index, requested) ?? requested);
+  function navigateToKind(kind: ConceptKind, conceptId: string): void {
+    const url = new URL(location.href);
+    url.search = "";
+    url.searchParams.set(KIND_PARAM, kind);
+    url.searchParams.set(HILITE_PARAM, conceptId);
+    history.pushState(null, "", url);
+    renderRoute(false);
+  }
+
+  function navigateToKindOnly(kind: ConceptKind): void {
+    const url = new URL(location.href);
+    url.search = "";
+    url.searchParams.set(KIND_PARAM, kind);
+    history.pushState(null, "", url);
+    renderRoute(false);
+  }
+
+  /**
+   * Draws whichever view the current URL's query params describe: a kind
+   * listing if `kind` is present, otherwise the normal concept view (falling
+   * back to a random concept if `concept` is absent). `rewriteUrl` is only
+   * passed true for the initial page load, matching the existing convention
+   * of canonicalizing the URL once via `replaceState` rather than on every
+   * popstate.
+   */
+  function renderRoute(rewriteUrl: boolean): void {
+    const params = new URLSearchParams(location.search);
+    const kind = params.get(KIND_PARAM);
+    if (kind !== null) {
+      renderKindList(app!, index, kind, params.get(HILITE_PARAM), {
+        onSelectConcept: navigateTo,
+        onSelectKind: navigateToKind,
+        onSwitchKind: navigateToKindOnly,
+      });
+      return;
     }
-  });
+
+    const requested = params.get(CONCEPT_PARAM);
+    // Falls back to the raw (unresolved) value when nothing matches, so
+    // render() hits its "Unknown concept" error path instead of silently
+    // substituting a random concept.
+    const conceptId = requested
+      ? (resolveConceptId(index, requested) ?? requested)
+      : conceptIds[Math.floor(Math.random() * conceptIds.length)]!;
+
+    if (rewriteUrl && conceptId !== requested) {
+      const url = new URL(location.href);
+      url.search = "";
+      url.searchParams.set(CONCEPT_PARAM, conceptId);
+      history.replaceState(null, "", url);
+    }
+
+    render(app!, index, conceptId, {
+      onSelectConcept: navigateTo,
+      onSelectKind: navigateToKind,
+      onSwitchKind: navigateToKindOnly,
+    });
+  }
+
+  window.addEventListener("popstate", () => renderRoute(false));
 
   initSearch(searchRoot, [...index.conceptsById.values()], { onSelectConcept: navigateTo });
   initShareButton(shareRoot);
 
-  draw(resolveInitialConceptId());
+  renderRoute(true);
 }
 
 main().catch((err) => {
