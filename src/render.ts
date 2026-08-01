@@ -1,4 +1,5 @@
 import * as d3 from "d3";
+import cloud from "d3-cloud";
 import { getSatelliteSatelliteRelationships, type GraphIndex } from "./graph.js";
 import { computeRadialLayout } from "./layout.js";
 import {
@@ -8,7 +9,7 @@ import {
   familyKeyForRelationshipType,
   markerIdForRelationshipType,
 } from "./style.js";
-import { CONCEPT_KINDS, type ConceptKind } from "./types.js";
+import { CONCEPT_KINDS, type Concept, type ConceptKind } from "./types.js";
 
 const BASE_VIEW_SIZE = 1000;
 const RING_RADIUS = 300;
@@ -28,6 +29,9 @@ export interface RenderOptions {
   onSelectConcept: (conceptId: string) => void;
   onSelectKind: (kind: ConceptKind, conceptId: string) => void;
   onSwitchKind: (kind: ConceptKind) => void;
+  onSelectAttribute: (attributeKey: string, conceptId: string) => void;
+  onSwitchAttribute: (attributeKey: string) => void;
+  onSelectAcronym: (acronym: string, conceptId: string) => void;
 }
 
 interface Point {
@@ -229,7 +233,15 @@ export function render(
 
   const acronyms = centerConcept.acronyms ?? [];
   if (acronyms.length > 0) {
-    card.append("div").attr("class", "center-card-acronyms").text(acronyms.join(" · "));
+    const acronymsRow = card.append("div").attr("class", "center-card-acronyms");
+    acronyms.forEach((acronym, i) => {
+      if (i > 0) acronymsRow.append("span").attr("class", "dot-separator").text(" · ");
+      acronymsRow
+        .append("span")
+        .attr("class", "acronym-link")
+        .text(acronym)
+        .on("click", () => options.onSelectAcronym(acronym, centerConcept.id));
+    });
   }
 
   card.append("p").attr("class", "center-card-description").text(centerConcept.description);
@@ -240,11 +252,12 @@ export function render(
   if (displayableAttributes.length > 0) {
     const attributesRow = card.append("div").attr("class", "center-card-attributes");
     displayableAttributes.forEach(([key, value], i) => {
-      if (i > 0) attributesRow.append("span").attr("class", "attribute-dot").text(" · ");
+      if (i > 0) attributesRow.append("span").attr("class", "dot-separator").text(" · ");
       attributesRow
         .append("span")
         .attr("class", `attribute attribute-${value}`)
-        .text(humanizeSnakeCase(key));
+        .text(humanizeSnakeCase(key))
+        .on("click", () => options.onSelectAttribute(key, centerConcept.id));
     });
   }
 
@@ -295,6 +308,61 @@ const SORTED_CONCEPT_KINDS = [...CONCEPT_KINDS].sort((a, b) =>
   humanizeSnakeCase(a).localeCompare(humanizeSnakeCase(b)),
 );
 
+/** A vertical nav list of clickable items, used for both the kind and attribute sidebars. */
+function buildSidebar<T extends string>(
+  side: "left" | "right",
+  entries: T[],
+  activeEntry: T | null,
+  onSelect: (entry: T) => void,
+): HTMLUListElement {
+  const sidebar = document.createElement("ul");
+  sidebar.className = `browser-sidebar browser-sidebar--${side}`;
+  for (const entry of entries) {
+    const item = document.createElement("li");
+    item.className = "browser-sidebar-item";
+    if (entry === activeEntry) {
+      item.classList.add("is-active");
+    }
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "browser-sidebar-button";
+    button.textContent = humanizeSnakeCase(entry);
+    button.addEventListener("click", () => onSelect(entry));
+
+    item.appendChild(button);
+    sidebar.appendChild(item);
+  }
+  return sidebar;
+}
+
+/** A vertical list of concept names (canonical labels only), used by both browser views. */
+function buildConceptList(
+  concepts: Concept[],
+  hiliteConceptId: string | null,
+  onSelectConcept: (conceptId: string) => void,
+): HTMLUListElement {
+  const list = document.createElement("ul");
+  list.className = "concept-list-items";
+  for (const concept of concepts) {
+    const item = document.createElement("li");
+    item.className = "concept-list-item";
+    if (concept.id === hiliteConceptId) {
+      item.classList.add("is-hilited");
+    }
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "concept-list-item-button";
+    button.textContent = concept.label;
+    button.addEventListener("click", () => onSelectConcept(concept.id));
+
+    item.appendChild(button);
+    list.appendChild(item);
+  }
+  return list;
+}
+
 /**
  * The two-pane view shown when the center card's "kind" badge is clicked: a
  * sidebar listing every defined kind (highlighting the current one), and an
@@ -319,68 +387,208 @@ export function renderKindList(
   }
 
   const wrapper = document.createElement("div");
-  wrapper.className = "kind-browser";
+  wrapper.className = "browser-view";
 
-  const sidebar = document.createElement("ul");
-  sidebar.className = "kind-browser-sidebar";
-  for (const candidateKind of SORTED_CONCEPT_KINDS) {
-    const item = document.createElement("li");
-    item.className = "kind-browser-sidebar-item";
-    if (candidateKind === kind) {
-      item.classList.add("is-active");
-    }
-
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "kind-browser-sidebar-button";
-    button.textContent = humanizeSnakeCase(candidateKind);
-    button.addEventListener("click", () => options.onSwitchKind(candidateKind));
-
-    item.appendChild(button);
-    sidebar.appendChild(item);
-  }
-  wrapper.appendChild(sidebar);
+  wrapper.appendChild(
+    buildSidebar("left", SORTED_CONCEPT_KINDS, kind === "" ? null : (kind as ConceptKind), options.onSwitchKind),
+  );
 
   const content = document.createElement("div");
-  content.className = "kind-browser-content";
+  content.className = "browser-content";
 
   if (kind !== "") {
     const concepts = [...index.conceptsById.values()]
       .filter((concept) => concept.kind === kind)
       .sort((a, b) => a.label.localeCompare(b.label));
 
-    const list = document.createElement("ul");
-    list.className = "kind-list-items";
-
     if (concepts.length === 0) {
-      const empty = document.createElement("li");
-      empty.className = "kind-list-empty";
+      const empty = document.createElement("p");
+      empty.className = "concept-list-empty";
       empty.textContent = "No concepts of this kind yet.";
-      list.appendChild(empty);
+      content.appendChild(empty);
+    } else {
+      content.appendChild(buildConceptList(concepts, hiliteConceptId, options.onSelectConcept));
     }
-
-    for (const concept of concepts) {
-      const item = document.createElement("li");
-      item.className = "kind-list-item";
-      if (concept.id === hiliteConceptId) {
-        item.classList.add("is-hilited");
-      }
-
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "kind-list-item-button";
-      button.textContent = concept.label;
-      button.addEventListener("click", () => options.onSelectConcept(concept.id));
-
-      item.appendChild(button);
-      list.appendChild(item);
-    }
-
-    content.appendChild(list);
   }
 
   wrapper.appendChild(content);
   container.appendChild(wrapper);
+}
+
+const FREQUENCY_VALUE_ORDER = ["always", "usually", "sometimes", "rarely", "never"];
+
+/** Frequency-like values (always/usually/.../never) sort first in that fixed order; anything else follows alphabetically. */
+function compareAttributeValues(a: string, b: string): number {
+  const indexA = FREQUENCY_VALUE_ORDER.indexOf(a.toLowerCase());
+  const indexB = FREQUENCY_VALUE_ORDER.indexOf(b.toLowerCase());
+  if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+  if (indexA !== -1) return -1;
+  if (indexB !== -1) return 1;
+  return a.localeCompare(b);
+}
+
+function collectAttributeKeys(index: GraphIndex): string[] {
+  const keys = new Set<string>();
+  for (const concept of index.conceptsById.values()) {
+    for (const key of Object.keys(concept.attributes ?? {})) {
+      keys.add(key);
+    }
+  }
+  return [...keys].sort((a, b) => humanizeSnakeCase(a).localeCompare(humanizeSnakeCase(b)));
+}
+
+/**
+ * The two-pane view shown when an attribute badge on the center card is
+ * clicked: on the left, every concept that declares `attributeKey`, grouped
+ * by the value they declare it with; on the right, a sidebar listing every
+ * attribute key found anywhere in the data (highlighting the current one).
+ * Sides are swapped relative to `renderKindList` so the two views read as
+ * visibly distinct. `attributeKey === ""` shows the sidebar only. Unlike
+ * `kind`, there's no schema enum of valid attribute keys to fall back on, so
+ * any key that isn't actually used by some concept is simply unknown.
+ */
+export function renderAttributeBrowser(
+  container: HTMLElement,
+  index: GraphIndex,
+  attributeKey: string,
+  hiliteConceptId: string | null,
+  options: RenderOptions,
+): void {
+  container.innerHTML = "";
+
+  const allAttributeKeys = collectAttributeKeys(index);
+
+  if (attributeKey !== "" && !allAttributeKeys.includes(attributeKey)) {
+    renderError(container, `Unknown attribute: "${attributeKey}"`);
+    return;
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "browser-view";
+
+  const content = document.createElement("div");
+  content.className = "browser-content";
+
+  if (attributeKey !== "") {
+    const conceptsByValue = new Map<string, Concept[]>();
+    for (const concept of index.conceptsById.values()) {
+      const value = concept.attributes?.[attributeKey];
+      if (value === undefined) continue;
+      const valueKey = String(value);
+      const bucket = conceptsByValue.get(valueKey);
+      if (bucket) bucket.push(concept);
+      else conceptsByValue.set(valueKey, [concept]);
+    }
+
+    const sortedValueKeys = [...conceptsByValue.keys()].sort(compareAttributeValues);
+    for (const valueKey of sortedValueKeys) {
+      const concepts = conceptsByValue.get(valueKey)!.sort((a, b) => a.label.localeCompare(b.label));
+
+      const group = document.createElement("div");
+      group.className = "attr-value-group";
+
+      const heading = document.createElement("h2");
+      heading.className = "attr-value-group-heading";
+      heading.textContent = humanizeSnakeCase(valueKey);
+      group.appendChild(heading);
+
+      group.appendChild(buildConceptList(concepts, hiliteConceptId, options.onSelectConcept));
+      content.appendChild(group);
+    }
+  }
+
+  wrapper.appendChild(content);
+  wrapper.appendChild(
+    buildSidebar("right", allAttributeKeys, attributeKey === "" ? null : attributeKey, options.onSwitchAttribute),
+  );
+  container.appendChild(wrapper);
+}
+
+const ACRONYM_CLOUD_WIDTH = 1200;
+const ACRONYM_CLOUD_HEIGHT = 800;
+const ACRONYM_CLOUD_MIN_FONT = 16;
+const ACRONYM_CLOUD_MAX_FONT = 72;
+const ACRONYM_CLOUD_PADDING = 6;
+
+interface AcronymWord {
+  text: string;
+  conceptId: string;
+  size: number;
+  x?: number;
+  y?: number;
+  rotate?: number;
+}
+
+/**
+ * The word cloud shown when an acronym badge on the center card is clicked:
+ * every acronym in the dataset, font-sized by its concept's relationship
+ * count (graph degree) and linking to that concept. `tla` (non-empty)
+ * highlights the matching acronym; `?tla` with no value shows the cloud with
+ * nothing highlighted. A non-empty `tla` that matches no acronym is an error,
+ * same as an unrecognized kind or attribute.
+ */
+export function renderAcronymCloud(
+  container: HTMLElement,
+  index: GraphIndex,
+  tla: string,
+  options: RenderOptions,
+): void {
+  container.innerHTML = "";
+
+  const words: AcronymWord[] = [];
+  for (const concept of index.conceptsById.values()) {
+    const degree = index.adjacency.get(concept.id)?.length ?? 0;
+    for (const acronym of concept.acronyms ?? []) {
+      words.push({ text: acronym, conceptId: concept.id, size: degree });
+    }
+  }
+
+  const tlaLower = tla.toLowerCase();
+  if (tla !== "" && !words.some((word) => word.text.toLowerCase() === tlaLower)) {
+    renderError(container, `Unknown acronym: "${tla}"`);
+    return;
+  }
+
+  const degrees = words.map((word) => word.size);
+  const fontScale = d3
+    .scaleSqrt()
+    .domain([Math.min(...degrees), Math.max(...degrees)])
+    .range([ACRONYM_CLOUD_MIN_FONT, ACRONYM_CLOUD_MAX_FONT]);
+  for (const word of words) {
+    word.size = fontScale(word.size);
+  }
+
+  cloud<AcronymWord>()
+    .size([ACRONYM_CLOUD_WIDTH, ACRONYM_CLOUD_HEIGHT])
+    .words(words)
+    .padding(ACRONYM_CLOUD_PADDING)
+    .rotate(0)
+    .font("sans-serif")
+    .fontSize((word) => word.size)
+    .on("end", (placedWords) => {
+      const svg = d3
+        .select(container)
+        .append("svg")
+        .attr("viewBox", `0 0 ${ACRONYM_CLOUD_WIDTH} ${ACRONYM_CLOUD_HEIGHT}`)
+        .attr("class", "acronym-cloud");
+
+      svg
+        .append("g")
+        .attr("transform", `translate(${ACRONYM_CLOUD_WIDTH / 2}, ${ACRONYM_CLOUD_HEIGHT / 2})`)
+        .selectAll("text")
+        .data(placedWords)
+        .join("text")
+        .attr("class", (word) => (word.text.toLowerCase() === tlaLower ? "acronym-word is-hilited" : "acronym-word"))
+        .attr("text-anchor", "middle")
+        .attr("dy", "0.35em")
+        .attr("transform", (word) => `translate(${word.x}, ${word.y})`)
+        .style("font-size", (word) => `${word.size}px`)
+        .text((word) => word.text)
+        .on("click", (_event, word) => options.onSelectConcept(word.conceptId))
+        .append("title")
+        .text((word) => index.conceptsById.get(word.conceptId)?.label ?? word.conceptId);
+    })
+    .start();
 }
 
 function relationshipTooltip(index: GraphIndex, relationshipTypeId: string): string {
