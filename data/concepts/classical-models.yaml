@@ -26,7 +26,7 @@ concepts:
     label: Generalized linear model
     kind: model_family
     description: A family of regression models combining a linear predictor, response distribution, and link function.
-    aliases:
+    acronyms:
       - GLM
     attributes:
       deep: never
@@ -41,6 +41,7 @@ concepts:
     description: A nonparametric model that predicts using nearby examples under a chosen distance or similarity measure.
     aliases:
       - k-nearest neighbors
+    acronyms:
       - k-NN
     attributes:
       deep: never
@@ -86,7 +87,7 @@ concepts:
     label: Support vector machine
     kind: model_family
     description: A margin-based model that can form linear or kernel-defined decision boundaries.
-    aliases:
+    acronyms:
       - SVM
     attributes:
       deep: never
@@ -117,7 +118,7 @@ concepts:
     label: Gaussian process
     kind: model_family
     description: A probabilistic model that places a joint Gaussian distribution over function values.
-    aliases:
+    acronyms:
       - GP
     attributes:
       deep: never
@@ -131,7 +132,7 @@ concepts:
     label: Gaussian mixture model
     kind: model_family
     description: A probabilistic density model representing a distribution as a weighted mixture of Gaussian components.
-    aliases:
+    acronyms:
       - GMM
     attributes:
       deep: never
@@ -145,7 +146,7 @@ concepts:
     label: Hidden Markov model
     kind: model_family
     description: A sequential probabilistic model with latent states satisfying a Markov dependence assumption.
-    aliases:
+    acronyms:
       - HMM
     attributes:
       deep: never
@@ -165,7 +166,7 @@ concepts:
     label: Principal component analysis
     kind: model_family
     description: A linear method that projects data onto directions of decreasing sample variance.
-    aliases:
+    acronyms:
       - PCA
     attributes:
       deep: never

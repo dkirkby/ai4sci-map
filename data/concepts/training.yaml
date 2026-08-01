@@ -21,7 +21,7 @@ concepts:
     label: Supervised fine-tuning
     kind: training_method
     description: Fine-tuning a pretrained model using examples paired with desired outputs.
-    aliases:
+    acronyms:
       - SFT
 
   - id: instruction-tuning
@@ -33,21 +33,21 @@ concepts:
     label: Parameter-efficient fine-tuning
     kind: training_method
     description: Adapting a pretrained model while updating only a small fraction of parameters or added components.
-    aliases:
+    acronyms:
       - PEFT
 
   - id: reinforcement-learning-from-human-feedback
     label: Reinforcement learning from human feedback
     kind: training_method
     description: Adapting a model or policy using reinforcement-learning signals derived from human preferences or evaluations.
-    aliases:
+    acronyms:
       - RLHF
 
   - id: reinforcement-learning-from-ai-feedback
     label: Reinforcement learning from AI feedback
     kind: training_method
     description: Adapting a model or policy using reinforcement-learning signals derived substantially from evaluations by AI systems.
-    aliases:
+    acronyms:
       - RLAIF
 
   - id: preference-optimization
@@ -94,7 +94,7 @@ concepts:
     label: Maximum-likelihood estimation
     kind: training_method
     description: Estimating parameters by maximizing the likelihood assigned to observed data.
-    aliases:
+    acronyms:
       - MLE
 
   - id: gradient-descent
@@ -106,7 +106,7 @@ concepts:
     label: Stochastic gradient descent
     kind: training_method
     description: Gradient-based optimization using individual samples or minibatches to estimate an objective gradient.
-    aliases:
+    acronyms:
       - SGD
 
   - id: backpropagation

@@ -6,14 +6,14 @@ concepts:
     label: Artificial intelligence
     kind: field
     description: The broad field concerned with constructing systems that perform tasks associated with intelligent behavior.
-    aliases:
+    acronyms:
       - AI
 
   - id: machine-learning
     label: Machine learning
     kind: field
     description: The field concerned with systems whose behavior or parameters are learned from data or experience.
-    aliases:
+    acronyms:
       - ML
 
   - id: statistical-learning
@@ -35,7 +35,7 @@ concepts:
     label: Natural language processing
     kind: field
     description: The area of AI concerned with computational processing and generation of human language.
-    aliases:
+    acronyms:
       - NLP
 
   - id: computer-vision
@@ -62,7 +62,7 @@ concepts:
     label: Scientific machine learning
     kind: field
     description: The application and integration of machine learning with scientific data, models, and physical constraints.
-    aliases:
+    acronyms:
       - SciML
 
   - id: text

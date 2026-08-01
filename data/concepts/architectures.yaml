@@ -18,14 +18,14 @@ concepts:
     label: Multilayer perceptron
     kind: architecture
     description: A feed-forward neural network composed primarily of fully connected layers and nonlinear activations.
-    aliases:
+    acronyms:
       - MLP
 
   - id: deep-neural-network
     label: Deep neural network
     kind: model_class
     description: A neural network containing multiple successive learned representation layers.
-    aliases:
+    acronyms:
       - DNN
     attributes:
       deep: always
@@ -34,7 +34,7 @@ concepts:
     label: Convolutional neural network
     kind: architecture
     description: A neural-network architecture using learned convolutional filters and shared local parameters.
-    aliases:
+    acronyms:
       - CNN
     modalities:
       - image
@@ -44,7 +44,7 @@ concepts:
     label: Recurrent neural network
     kind: architecture
     description: A neural-network architecture that reuses state-dependent computations across sequence positions.
-    aliases:
+    acronyms:
       - RNN
     typical_tasks:
       - sequence-modeling
@@ -53,7 +53,7 @@ concepts:
     label: Long short-term memory network
     kind: architecture
     description: A gated recurrent neural network designed to regulate the storage and flow of information through time.
-    aliases:
+    acronyms:
       - LSTM
     typical_tasks:
       - sequence-modeling
@@ -91,7 +91,7 @@ concepts:
     label: Graph neural network
     kind: architecture
     description: A neural-network architecture that operates on entities and relationships represented as a graph.
-    aliases:
+    acronyms:
       - GNN
     modalities:
       - graph-data
@@ -110,6 +110,6 @@ concepts:
     label: Mixture-of-experts
     kind: architecture
     description: An architecture that routes each input to a selected subset of specialized component networks.
-    aliases:
+    acronyms:
       - MoE
 

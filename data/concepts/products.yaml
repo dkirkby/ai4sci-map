@@ -30,7 +30,7 @@ concepts:
     label: GPT model family
     kind: model_family
     description: OpenAI's family of generative pretrained transformer models.
-    aliases:
+    acronyms:
       - GPT
 
   - id: claude-model-family

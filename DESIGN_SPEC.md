@@ -81,12 +81,13 @@ shown via arrowheads. The SVG viewBox is sized per redraw based on the longest
 label among the concepts on screen, so long labels (some concept labels exceed 40
 characters) never clip against the viewBox edge.
 
-**Search** (`src/search.ts`): matches against every concept's label and aliases
-(e.g. "CNN" finds "Convolutional neural network"), filtered and ranked client-side
-(prefix matches before substring matches) against the already-fetched concept
-list — at 182 concepts this needs no separate build-time search index, so none was
-added; `scripts/build-data.ts` only needed to keep emitting `aliases` in
-`public/graph.json`, which it already did. The search box lives in its own DOM
+**Search** (`src/search.ts`): matches against every concept's label, aliases, and
+acronyms (e.g. "CNN" finds "Convolutional neural network"), filtered and ranked
+client-side (prefix matches before substring matches) against the already-fetched
+concept list — at 182 concepts this needs no separate build-time search index, so
+none was added; `scripts/build-data.ts` only needed to keep emitting `aliases` and
+`acronyms` in `public/graph.json`, which it already did. The search box lives in
+its own DOM
 node (`#search-root` in `index.html`, built once in `main.ts`) outside `#app`,
 since `render.ts` fully clears and rebuilds `#app` on every redraw.
 

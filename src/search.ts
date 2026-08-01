@@ -13,7 +13,7 @@ const MAX_SUGGESTIONS = 8;
 const LISTBOX_ID = "search-listbox";
 
 /**
- * A search-as-you-type box that matches concepts by label or alias (all 182
+ * A search-as-you-type box that matches concepts by label, alias, or acronym (all 182
  * concepts, not just the ones currently on screen) and hands the chosen concept's
  * id to `onSelectConcept` -- the same navigation path satellite clicks use. Built
  * once against a plain DOM node outside of #app, since #app's contents are fully
@@ -22,7 +22,9 @@ const LISTBOX_ID = "search-listbox";
 export function initSearch(container: HTMLElement, concepts: Concept[], options: SearchOptions): void {
   const entries: SearchEntry[] = concepts.map((concept) => ({
     concept,
-    searchTerms: [concept.label, ...(concept.aliases ?? [])].map((term) => term.toLowerCase()),
+    searchTerms: [concept.label, ...(concept.aliases ?? []), ...(concept.acronyms ?? [])].map((term) =>
+      term.toLowerCase(),
+    ),
   }));
 
   container.innerHTML = "";

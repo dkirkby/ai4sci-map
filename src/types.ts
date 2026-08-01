@@ -25,6 +25,7 @@ export interface Concept {
   kind: ConceptKind;
   description: string;
   aliases?: string[];
+  acronyms?: string[];
   introduced?: number;
   attributes?: Record<string, string | number | boolean | string[]>;
   modalities?: string[];

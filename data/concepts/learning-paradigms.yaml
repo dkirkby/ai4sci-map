@@ -26,7 +26,7 @@ concepts:
     label: Reinforcement learning
     kind: learning_paradigm
     description: Learning behavior through interaction with an environment to maximize cumulative reward.
-    aliases:
+    acronyms:
       - RL
 
   - id: imitation-learning

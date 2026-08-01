@@ -26,7 +26,7 @@ concepts:
     label: Retrieval-augmented generation
     kind: system
     description: A system pattern that retrieves external information and supplies it as context to a generative model.
-    aliases:
+    acronyms:
       - RAG
 
   - id: tool-use

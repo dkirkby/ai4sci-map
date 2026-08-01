@@ -27,7 +27,7 @@ concepts:
     label: Variational autoencoder
     kind: model_family
     description: A latent-variable generative model trained with variational inference and an encoder–decoder architecture.
-    aliases:
+    acronyms:
       - VAE
     introduced: 2013
     attributes:
@@ -42,7 +42,7 @@ concepts:
     label: Generative adversarial network
     kind: model_family
     description: A generative model trained through competition between a generator and a discriminator.
-    aliases:
+    acronyms:
       - GAN
     introduced: 2014
     attributes:
@@ -111,7 +111,7 @@ concepts:
     label: Large language model
     kind: model_class
     description: A language model with substantial scale and broad capabilities acquired through training on large corpora.
-    aliases:
+    acronyms:
       - LLM
     attributes:
       deep: always
@@ -156,7 +156,7 @@ concepts:
     label: Vision–language model
     kind: model_class
     description: A model that jointly processes or relates visual and linguistic information.
-    aliases:
+    acronyms:
       - VLM
     modalities:
       - image
