@@ -1,4 +1,51 @@
 schema_version: 1
 fragment_type: concepts
 
-concepts: []
+concepts:
+  - id: hardware-accelerator
+    label: Hardware accelerator
+    kind: infrastructure
+    audience_level: 4
+    description: Specialized computing hardware designed to speed up specific workloads, such as neural-network training or inference, beyond what a general-purpose processor can achieve.
+
+  - id: gpu
+    label: GPU
+    kind: infrastructure
+    audience_level: 2
+    description: A processor built for massively parallel computation, originally for graphics rendering and now the dominant hardware for training and running neural networks; NVIDIA is the dominant vendor.
+    aliases:
+      - Graphics processing unit
+
+  - id: tpu
+    label: TPU
+    kind: infrastructure
+    audience_level: 4
+    description: Google's custom-designed chip built specifically for accelerating neural-network training and inference.
+    aliases:
+      - Tensor processing unit
+
+  - id: npu
+    label: NPU
+    kind: infrastructure
+    audience_level: 3
+    description: A processor built into consumer devices specifically to accelerate on-device AI inference with low power consumption.
+    aliases:
+      - Neural processing unit
+
+  - id: cuda
+    label: CUDA
+    kind: infrastructure
+    audience_level: 4
+    description: NVIDIA's proprietary parallel-computing platform and programming interface for running general-purpose computation on its GPUs.
+
+  - id: pytorch
+    label: PyTorch
+    kind: infrastructure
+    audience_level: 4
+    description: An open-source machine-learning framework widely used for building and training neural networks, originally developed by Meta.
+
+  - id: tensorflow
+    label: TensorFlow
+    kind: infrastructure
+    audience_level: 4
+    description: An open-source machine-learning framework widely used for building and training neural networks, originally developed by Google.

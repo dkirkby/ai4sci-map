@@ -190,6 +190,36 @@ relationships:
     type: uses
     target: action
 
+  - source: training
+    type: typically_uses
+    target: gpu
+    qualifiers:
+      frequency: usually
+
+  - source: training
+    type: typically_uses
+    target: tpu
+    qualifiers:
+      frequency: sometimes
+
+  - source: inference
+    type: typically_uses
+    target: gpu
+    qualifiers:
+      frequency: usually
+
+  - source: training
+    type: typically_uses
+    target: pytorch
+    qualifiers:
+      frequency: sometimes
+
+  - source: training
+    type: typically_uses
+    target: tensorflow
+    qualifiers:
+      frequency: sometimes
+
   - source: chain-of-thought-prompting
     type: is_a
     target: prompt-engineering

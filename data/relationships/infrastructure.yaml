@@ -1,4 +1,19 @@
 schema_version: 1
 fragment_type: relationships
 
-relationships: []
+relationships:
+  - source: gpu
+    type: is_a
+    target: hardware-accelerator
+
+  - source: tpu
+    type: is_a
+    target: hardware-accelerator
+
+  - source: npu
+    type: is_a
+    target: hardware-accelerator
+
+  - source: cuda
+    type: uses
+    target: gpu
