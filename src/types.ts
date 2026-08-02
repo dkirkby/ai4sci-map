@@ -41,6 +41,7 @@ export interface Concept {
   label: string;
   kind: ConceptKind;
   description: string;
+  audience_level: number;
   aliases?: string[];
   acronyms?: string[];
   introduced?: number;

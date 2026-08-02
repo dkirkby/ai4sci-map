@@ -5,6 +5,7 @@ concepts:
   - id: artificial-intelligence
     label: Artificial intelligence
     kind: field
+    audience_level: 1
     description: The broad field concerned with constructing systems that perform tasks associated with intelligent behavior.
     acronyms:
       - AI
@@ -12,6 +13,7 @@ concepts:
   - id: machine-learning
     label: Machine learning
     kind: field
+    audience_level: 2
     description: The field concerned with systems whose behavior or parameters are learned from data or experience.
     acronyms:
       - ML
@@ -19,21 +21,25 @@ concepts:
   - id: statistical-learning
     label: Statistical learning
     kind: field
+    audience_level: 4
     description: The study of inference and prediction from data using statistical models and principles.
 
   - id: deep-learning
     label: Deep learning
     kind: field
+    audience_level: 2
     description: The area of machine learning based on neural networks with multiple learned representation layers.
 
   - id: generative-ai
     label: Generative AI
     kind: field
+    audience_level: 2
     description: The area of AI concerned with systems that generate content such as text, images, audio, video, or structured data.
 
   - id: natural-language-processing
     label: Natural language processing
     kind: field
+    audience_level: 3
     description: The area of AI concerned with computational processing and generation of human language.
     acronyms:
       - NLP
@@ -41,26 +47,31 @@ concepts:
   - id: computer-vision
     label: Computer vision
     kind: field
+    audience_level: 3
     description: The area of AI concerned with extracting information from and generating visual data.
 
   - id: speech-and-audio-ml
     label: Speech and audio machine learning
     kind: field
+    audience_level: 5
     description: The area of machine learning concerned with speech, music, environmental sound, and other audio signals.
 
   - id: robotics
     label: Robotics
     kind: field
+    audience_level: 1
     description: The field concerned with machines that perceive, plan, and act in physical environments.
 
   - id: recommendation-systems
     label: Recommendation systems
     kind: field
+    audience_level: 3
     description: The area concerned with predicting and ranking items that may be relevant to a user or context.
 
   - id: scientific-machine-learning
     label: Scientific machine learning
     kind: field
+    audience_level: 5
     description: The application and integration of machine learning with scientific data, models, and physical constraints.
     acronyms:
       - SciML
@@ -68,40 +79,47 @@ concepts:
   - id: text
     label: Text
     kind: data_concept
+    audience_level: 1
     description: Written language represented as characters, tokens, or other symbolic units.
 
   - id: image
     label: Image
     kind: data_concept
+    audience_level: 1
     description: Two-dimensional visual data represented by pixels, features, or related structures.
 
   - id: audio
     label: Audio
     kind: data_concept
+    audience_level: 1
     description: Sound represented as waveforms, spectra, tokens, or learned features.
 
   - id: video
     label: Video
     kind: data_concept
+    audience_level: 1
     description: Temporally ordered visual data, usually accompanied by optional audio.
 
   - id: tabular-data
     label: Tabular data
     kind: data_concept
+    audience_level: 4
     description: Data organized as records with a common set of named variables or columns.
 
   - id: time-series
     label: Time series
     kind: data_concept
+    audience_level: 3
     description: Observations indexed in temporal order.
 
   - id: graph-data
     label: Graph data
     kind: data_concept
+    audience_level: 5
     description: Data represented by entities and relationships between them.
 
   - id: action
     label: Action
     kind: data_concept
+    audience_level: 4
     description: A choice or control signal that can affect an environment or system state.
-

@@ -5,11 +5,13 @@ concepts:
   - id: chatgpt
     label: ChatGPT
     kind: product
+    audience_level: 1
     description: OpenAI's conversational AI product and assistant.
 
   - id: claude-assistant
     label: Claude
     kind: product
+    audience_level: 3
     description: Anthropic's conversational AI product and assistant.
     aliases:
       - Claude.ai
@@ -17,6 +19,7 @@ concepts:
   - id: gemini-app
     label: Gemini
     kind: product
+    audience_level: 2
     description: Google's conversational AI product and assistant.
     aliases:
       - Gemini app
@@ -24,11 +27,13 @@ concepts:
   - id: grok-assistant
     label: Grok
     kind: product
+    audience_level: 3
     description: xAI's conversational AI product and assistant.
 
   - id: gpt-model-family
     label: GPT model family
     kind: model_family
+    audience_level: 1
     description: OpenAI's family of generative pretrained transformer models.
     acronyms:
       - GPT
@@ -36,21 +41,25 @@ concepts:
   - id: claude-model-family
     label: Claude model family
     kind: model_family
+    audience_level: 4
     description: Anthropic's family of language and multimodal foundation models.
 
   - id: gemini-model-family
     label: Gemini model family
     kind: model_family
+    audience_level: 4
     description: Google's family of language and multimodal foundation models.
 
   - id: grok-model-family
     label: Grok model family
     kind: model_family
+    audience_level: 4
     description: xAI's family of language and multimodal models.
 
   - id: llama-model-family
     label: Llama model family
     kind: model_family
+    audience_level: 3
     description: Meta's family of language foundation models.
     aliases:
       - Llama
@@ -58,6 +67,7 @@ concepts:
   - id: mistral-model-family
     label: Mistral model family
     kind: model_family
+    audience_level: 4
     description: Mistral AI's family of language models.
     aliases:
       - Mistral
@@ -65,6 +75,7 @@ concepts:
   - id: qwen-model-family
     label: Qwen model family
     kind: model_family
+    audience_level: 5
     description: Alibaba's family of language and multimodal models.
     aliases:
       - Qwen
@@ -72,6 +83,7 @@ concepts:
   - id: deepseek-model-family
     label: DeepSeek model family
     kind: model_family
+    audience_level: 2
     description: DeepSeek's family of language and reasoning-oriented models.
     aliases:
       - DeepSeek
@@ -79,11 +91,13 @@ concepts:
   - id: stable-diffusion
     label: Stable Diffusion
     kind: model_family
+    audience_level: 3
     description: A family of latent diffusion models used primarily for image generation.
 
   - id: dall-e
     label: DALL·E
     kind: model_family
+    audience_level: 2
     description: OpenAI's family of text-conditioned image-generation models.
     aliases:
       - DALL-E
@@ -91,5 +105,5 @@ concepts:
   - id: midjourney
     label: Midjourney
     kind: product
+    audience_level: 3
     description: A generative-image product that creates images from prompts and other inputs.
-

@@ -5,6 +5,7 @@ concepts:
   - id: linear-regression
     label: Linear regression
     kind: model_family
+    audience_level: 3
     description: A regression model in which the predicted response is linear in the fitted parameters.
     attributes:
       deep: never
@@ -15,6 +16,7 @@ concepts:
   - id: logistic-regression
     label: Logistic regression
     kind: model_family
+    audience_level: 4
     description: A linear probabilistic classifier that models class probabilities through a logistic link.
     attributes:
       deep: never
@@ -25,6 +27,7 @@ concepts:
   - id: generalized-linear-model
     label: Generalized linear model
     kind: model_family
+    audience_level: 5
     description: A family of regression models combining a linear predictor, response distribution, and link function.
     acronyms:
       - GLM
@@ -38,6 +41,7 @@ concepts:
   - id: nearest-neighbor-model
     label: Nearest-neighbor model
     kind: model_family
+    audience_level: 4
     description: A nonparametric model that predicts using nearby examples under a chosen distance or similarity measure.
     aliases:
       - k-nearest neighbors
@@ -53,6 +57,7 @@ concepts:
   - id: decision-tree
     label: Decision tree
     kind: model_family
+    audience_level: 3
     description: A model that recursively partitions inputs using a tree of feature-based decisions.
     attributes:
       deep: never
@@ -64,6 +69,7 @@ concepts:
   - id: random-forest
     label: Random forest
     kind: model_family
+    audience_level: 4
     description: An ensemble of randomized decision trees whose predictions are aggregated.
     attributes:
       deep: never
@@ -75,6 +81,7 @@ concepts:
   - id: gradient-boosted-trees
     label: Gradient-boosted trees
     kind: model_family
+    audience_level: 5
     description: An additive ensemble of decision trees fitted sequentially to reduce an objective function.
     attributes:
       deep: never
@@ -86,6 +93,7 @@ concepts:
   - id: support-vector-machine
     label: Support vector machine
     kind: model_family
+    audience_level: 4
     description: A margin-based model that can form linear or kernel-defined decision boundaries.
     acronyms:
       - SVM
@@ -99,6 +107,7 @@ concepts:
   - id: kernel-method
     label: Kernel method
     kind: model_family
+    audience_level: 5
     description: A method that operates through pairwise kernel evaluations corresponding to an implicit feature space.
     attributes:
       deep: never
@@ -107,6 +116,7 @@ concepts:
   - id: naive-bayes-classifier
     label: Naive Bayes classifier
     kind: model_family
+    audience_level: 4
     description: A probabilistic classifier based on Bayes' rule and conditional-independence assumptions.
     attributes:
       deep: never
@@ -117,6 +127,7 @@ concepts:
   - id: gaussian-process
     label: Gaussian process
     kind: model_family
+    audience_level: 5
     description: A probabilistic model that places a joint Gaussian distribution over function values.
     acronyms:
       - GP
@@ -131,6 +142,7 @@ concepts:
   - id: gaussian-mixture-model
     label: Gaussian mixture model
     kind: model_family
+    audience_level: 5
     description: A probabilistic density model representing a distribution as a weighted mixture of Gaussian components.
     acronyms:
       - GMM
@@ -145,6 +157,7 @@ concepts:
   - id: hidden-markov-model
     label: Hidden Markov model
     kind: model_family
+    audience_level: 5
     description: A sequential probabilistic model with latent states satisfying a Markov dependence assumption.
     acronyms:
       - HMM
@@ -157,6 +170,7 @@ concepts:
   - id: bayesian-network
     label: Bayesian network
     kind: model_family
+    audience_level: 4
     description: A directed acyclic graph that factorizes a joint probability distribution through conditional dependencies.
     attributes:
       deep: never
@@ -165,6 +179,7 @@ concepts:
   - id: principal-component-analysis
     label: Principal component analysis
     kind: model_family
+    audience_level: 4
     description: A linear method that projects data onto directions of decreasing sample variance.
     acronyms:
       - PCA
@@ -178,10 +193,10 @@ concepts:
   - id: k-means-clustering
     label: k-means clustering
     kind: model_family
+    audience_level: 4
     description: A clustering method that assigns observations to clusters represented by their centroids.
     attributes:
       deep: never
       probabilistic: never
     typical_tasks:
       - clustering
-

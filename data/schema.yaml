@@ -31,12 +31,22 @@ $defs:
       - label
       - kind
       - description
+      - audience_level
     properties:
       id:
         $ref: "#/$defs/id"
       label:
         type: string
         minLength: 1
+      audience_level:
+        description: >-
+          How likely the reference audience is to recognize this term in its
+          AI/ML sense, from 1 (widely recognized) to 5 (specialist). See
+          AUDIENCE_LEVEL.md. Measures recognition, not difficulty or
+          importance, and is not inherited through graph relationships.
+        type: integer
+        minimum: 1
+        maximum: 5
       kind:
         enum:
           - field

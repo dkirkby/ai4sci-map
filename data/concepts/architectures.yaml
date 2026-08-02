@@ -5,6 +5,7 @@ concepts:
   - id: neural-network
     label: Neural network
     kind: model_class
+    audience_level: 2
     description: A parameterized model composed of connected computational units arranged into one or more layers.
     aliases:
       - artificial neural network
@@ -12,11 +13,13 @@ concepts:
   - id: feed-forward-neural-network
     label: Feed-forward neural network
     kind: architecture
+    audience_level: 5
     description: A neural network whose computation proceeds through a directed acyclic graph from inputs to outputs.
 
   - id: multilayer-perceptron
     label: Multilayer perceptron
     kind: architecture
+    audience_level: 5
     description: A feed-forward neural network composed primarily of fully connected layers and nonlinear activations.
     acronyms:
       - MLP
@@ -24,6 +27,7 @@ concepts:
   - id: deep-neural-network
     label: Deep neural network
     kind: model_class
+    audience_level: 3
     description: A neural network containing multiple successive learned representation layers.
     acronyms:
       - DNN
@@ -33,6 +37,7 @@ concepts:
   - id: convolutional-neural-network
     label: Convolutional neural network
     kind: architecture
+    audience_level: 4
     description: A neural-network architecture using learned convolutional filters and shared local parameters.
     acronyms:
       - CNN
@@ -43,6 +48,7 @@ concepts:
   - id: recurrent-neural-network
     label: Recurrent neural network
     kind: architecture
+    audience_level: 4
     description: A neural-network architecture that reuses state-dependent computations across sequence positions.
     acronyms:
       - RNN
@@ -52,6 +58,7 @@ concepts:
   - id: long-short-term-memory-network
     label: Long short-term memory network
     kind: architecture
+    audience_level: 5
     description: A gated recurrent neural network designed to regulate the storage and flow of information through time.
     acronyms:
       - LSTM
@@ -61,6 +68,7 @@ concepts:
   - id: transformer
     label: Transformer
     kind: architecture
+    audience_level: 3
     description: A neural-network architecture based primarily on attention and position-wise transformations.
     introduced: 2017
     attributes:
@@ -75,21 +83,25 @@ concepts:
   - id: encoder-only-transformer
     label: Encoder-only transformer
     kind: architecture
+    audience_level: 5
     description: A transformer architecture composed primarily of bidirectional encoder blocks.
 
   - id: decoder-only-transformer
     label: Decoder-only transformer
     kind: architecture
+    audience_level: 5
     description: A transformer architecture composed of causally masked decoder blocks.
 
   - id: encoder-decoder-transformer
     label: Encoder–decoder transformer
     kind: architecture
+    audience_level: 5
     description: A transformer containing an encoder for an input sequence and a decoder that generates an output sequence.
 
   - id: graph-neural-network
     label: Graph neural network
     kind: architecture
+    audience_level: 5
     description: A neural-network architecture that operates on entities and relationships represented as a graph.
     acronyms:
       - GNN
@@ -99,17 +111,19 @@ concepts:
   - id: attention-mechanism
     label: Attention mechanism
     kind: architecture
+    audience_level: 4
     description: A mechanism that computes context-dependent weighted combinations of representations.
 
   - id: encoder-decoder-architecture
     label: Encoder–decoder architecture
     kind: architecture
+    audience_level: 4
     description: An architecture that maps an input into an intermediate representation and then decodes it into an output.
 
   - id: mixture-of-experts
     label: Mixture-of-experts
     kind: architecture
+    audience_level: 4
     description: An architecture that routes each input to a selected subset of specialized component networks.
     acronyms:
       - MoE
-

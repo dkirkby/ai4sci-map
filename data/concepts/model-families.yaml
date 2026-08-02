@@ -5,6 +5,7 @@ concepts:
   - id: autoencoder
     label: Autoencoder
     kind: model_family
+    audience_level: 4
     description: A neural network trained to reconstruct its input through an intermediate representation.
     attributes:
       deep: usually
@@ -16,6 +17,7 @@ concepts:
   - id: denoising-autoencoder
     label: Denoising autoencoder
     kind: model_family
+    audience_level: 5
     description: An autoencoder trained to reconstruct clean data from corrupted inputs.
     attributes:
       deep: usually
@@ -26,6 +28,7 @@ concepts:
   - id: variational-autoencoder
     label: Variational autoencoder
     kind: model_family
+    audience_level: 4
     description: A latent-variable generative model trained with variational inference and an encoder–decoder architecture.
     acronyms:
       - VAE
@@ -41,6 +44,7 @@ concepts:
   - id: generative-adversarial-network
     label: Generative adversarial network
     kind: model_family
+    audience_level: 3
     description: A generative model trained through competition between a generator and a discriminator.
     acronyms:
       - GAN
@@ -53,6 +57,7 @@ concepts:
   - id: autoregressive-generative-model
     label: Autoregressive generative model
     kind: model_family
+    audience_level: 5
     description: A generative model that produces variables sequentially using conditional predictions.
     attributes:
       probabilistic: always
@@ -61,6 +66,7 @@ concepts:
   - id: normalizing-flow
     label: Normalizing flow
     kind: model_family
+    audience_level: 5
     description: A probabilistic model that transforms a simple distribution through a sequence of invertible mappings.
     aliases:
       - normalizing flow model
@@ -75,6 +81,7 @@ concepts:
   - id: diffusion-model
     label: Diffusion model
     kind: model_family
+    audience_level: 3
     description: A generative model that learns to reverse a gradual noising process.
     attributes:
       deep: usually
@@ -84,6 +91,7 @@ concepts:
   - id: score-based-generative-model
     label: Score-based generative model
     kind: model_family
+    audience_level: 5
     description: A generative model based on estimating the gradient of the log density across noise levels.
     attributes:
       deep: usually
@@ -93,6 +101,7 @@ concepts:
   - id: energy-based-model
     label: Energy-based model
     kind: model_family
+    audience_level: 5
     description: A model that assigns an unnormalized scalar energy to configurations of variables.
     attributes:
       probabilistic: usually
@@ -100,6 +109,7 @@ concepts:
   - id: language-model
     label: Language model
     kind: model_class
+    audience_level: 3
     description: A model that represents or predicts sequences of human-language units.
     modalities:
       - text
@@ -110,6 +120,7 @@ concepts:
   - id: large-language-model
     label: Large language model
     kind: model_class
+    audience_level: 2
     description: A language model with substantial scale and broad capabilities acquired through training on large corpora.
     acronyms:
       - LLM
@@ -127,11 +138,13 @@ concepts:
   - id: pretrained-language-model
     label: Pretrained language model
     kind: model_class
+    audience_level: 4
     description: A language model trained on a broad corpus before task-specific adaptation or use.
 
   - id: masked-language-model
     label: Masked language model
     kind: model_class
+    audience_level: 5
     description: A language model trained to infer tokens hidden within an otherwise visible context.
     typical_tasks:
       - masked-token-prediction
@@ -139,6 +152,7 @@ concepts:
   - id: causal-language-model
     label: Causal language model
     kind: model_class
+    audience_level: 5
     description: A language model trained to predict each token from preceding tokens.
     typical_tasks:
       - next-token-prediction
@@ -147,6 +161,7 @@ concepts:
   - id: vision-foundation-model
     label: Vision foundation model
     kind: model_class
+    audience_level: 5
     description: A broadly pretrained model intended for adaptation across visual tasks.
     modalities:
       - image
@@ -155,6 +170,7 @@ concepts:
   - id: vision-language-model
     label: Vision–language model
     kind: model_class
+    audience_level: 4
     description: A model that jointly processes or relates visual and linguistic information.
     acronyms:
       - VLM
@@ -165,16 +181,19 @@ concepts:
   - id: multimodal-model
     label: Multimodal model
     kind: model_class
+    audience_level: 3
     description: A model that consumes or produces more than one data modality.
 
   - id: multimodal-foundation-model
     label: Multimodal foundation model
     kind: model_class
+    audience_level: 4
     description: A broadly pretrained foundation model that operates across multiple modalities.
 
   - id: text-to-image-model
     label: Text-to-image model
     kind: model_class
+    audience_level: 2
     description: A generative model that produces images conditioned on text.
     modalities:
       - text
@@ -185,7 +204,7 @@ concepts:
   - id: speech-foundation-model
     label: Speech foundation model
     kind: model_class
+    audience_level: 5
     description: A broadly pretrained model intended for adaptation across speech or audio tasks.
     modalities:
       - audio
-
