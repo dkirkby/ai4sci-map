@@ -333,3 +333,19 @@ relationships:
     type: uses
     target: multilayer-perceptron
 
+  - source: reasoning-model
+    type: is_a
+    target: large-language-model
+
+  - source: reasoning-model
+    type: typically_uses
+    target: chain-of-thought-prompting
+
+  - source: small-language-model
+    type: is_a
+    target: language-model
+
+  - source: deep-neural-network
+    type: uses
+    target: parameter-count
+

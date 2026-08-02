@@ -190,3 +190,23 @@ relationships:
     type: uses
     target: action
 
+  - source: chain-of-thought-prompting
+    type: is_a
+    target: prompt-engineering
+
+  - source: zero-shot-learning
+    type: typically_uses
+    target: in-context-learning
+
+  - source: few-shot-learning
+    type: typically_uses
+    target: in-context-learning
+
+  - source: large-language-model
+    type: produces
+    target: hallucination
+
+  - source: generative-model
+    type: produces
+    target: deepfake
+

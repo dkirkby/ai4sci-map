@@ -97,3 +97,39 @@ relationships:
   - source: midjourney
     type: used_for
     target: image-generation
+
+  - source: siri
+    type: is_a
+    target: voice-assistant
+
+  - source: alexa
+    type: is_a
+    target: voice-assistant
+
+  - source: google-assistant
+    type: is_a
+    target: voice-assistant
+
+  - source: microsoft-copilot
+    type: is_a
+    target: ai-assistant
+
+  - source: microsoft-copilot
+    type: product_uses_model_family
+    target: gpt-model-family
+
+  - source: meta-ai
+    type: is_a
+    target: ai-assistant
+
+  - source: meta-ai
+    type: product_uses_model_family
+    target: llama-model-family
+
+  - source: apple-intelligence
+    type: typically_uses
+    target: small-language-model
+
+  - source: deepseek-model-family
+    type: family_of
+    target: reasoning-model

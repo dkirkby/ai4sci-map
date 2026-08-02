@@ -263,3 +263,87 @@ relationships:
     qualifiers:
       frequency: sometimes
 
+  - source: voice-assistant
+    type: is_a
+    target: ai-assistant
+
+  - source: coding-assistant
+    type: is_a
+    target: ai-assistant
+
+  - source: github-copilot
+    type: is_a
+    target: coding-assistant
+
+  - source: github-copilot
+    type: used_for
+    target: code-generation
+
+  - source: coding-assistant
+    type: used_for
+    target: code-generation
+
+  - source: perplexity
+    type: is_a
+    target: ai-assistant
+
+  - source: perplexity
+    type: uses
+    target: retrieval-augmented-generation
+
+  - source: perplexity
+    type: used_for
+    target: question-answering
+
+  - source: character-ai
+    type: is_a
+    target: chatbot
+
+  - source: speech-foundation-model
+    type: used_for
+    target: speech-recognition
+
+  - source: speech-foundation-model
+    type: used_for
+    target: text-to-speech
+
+  - source: convolutional-neural-network
+    type: used_for
+    target: facial-recognition
+
+  - source: convolutional-neural-network
+    type: used_for
+    target: object-detection
+
+  - source: large-language-model
+    type: used_for
+    target: summarization
+
+  - source: large-language-model
+    type: used_for
+    target: code-generation
+
+  - source: large-language-model
+    type: used_for
+    target: sentiment-analysis
+
+  - source: diffusion-model
+    type: used_for
+    target: video-generation
+
+  - source: generative-model
+    type: used_for
+    target: music-generation
+
+  - source: benchmark
+    type: evaluates
+    target: foundation-model
+
+  - source: accuracy
+    type: evaluates
+    target: predictive-model
+
+  - source: turing-test
+    type: evaluates
+    target: artificial-intelligence
+

@@ -75,3 +75,15 @@ concepts:
     kind: learning_paradigm
     audience_level: 4
     description: Training across decentralized data holders without centralizing their raw data.
+
+  - id: zero-shot-learning
+    label: Zero-shot learning
+    kind: learning_paradigm
+    audience_level: 3
+    description: Performing a task without having seen labeled examples of that specific task during training.
+
+  - id: few-shot-learning
+    label: Few-shot learning
+    kind: learning_paradigm
+    audience_level: 3
+    description: Learning or performing a task from only a small number of labeled examples.

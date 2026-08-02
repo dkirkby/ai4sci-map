@@ -208,3 +208,17 @@ concepts:
     description: A broadly pretrained model intended for adaptation across speech or audio tasks.
     modalities:
       - audio
+
+  - id: reasoning-model
+    label: Reasoning model
+    kind: model_class
+    audience_level: 2
+    description: A language model trained or prompted to produce extended intermediate reasoning steps before its final answer.
+
+  - id: small-language-model
+    label: Small language model
+    kind: model_class
+    audience_level: 3
+    description: A language model with a comparatively small parameter count, often designed to run efficiently on local or resource-constrained hardware.
+    acronyms:
+      - SLM

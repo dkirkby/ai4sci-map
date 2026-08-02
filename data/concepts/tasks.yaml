@@ -121,3 +121,61 @@ concepts:
     kind: task
     audience_level: 4
     description: Constructing a sequence or policy of actions intended to achieve an objective.
+
+  - id: speech-recognition
+    label: Speech recognition
+    kind: task
+    audience_level: 1
+    description: Converting spoken audio into written text.
+    acronyms:
+      - ASR
+
+  - id: facial-recognition
+    label: Facial recognition
+    kind: task
+    audience_level: 1
+    description: Identifying or verifying individuals from their facial features in images or video.
+
+  - id: text-to-speech
+    label: Text-to-speech
+    kind: task
+    audience_level: 2
+    description: Converting written text into synthesized spoken audio.
+    acronyms:
+      - TTS
+
+  - id: summarization
+    label: Summarization
+    kind: task
+    audience_level: 2
+    description: Producing a shorter version of a text that preserves its most important information.
+
+  - id: code-generation
+    label: Code generation
+    kind: task
+    audience_level: 2
+    description: Producing source code from natural-language descriptions or partial code.
+
+  - id: video-generation
+    label: Video generation
+    kind: task
+    audience_level: 2
+    description: Producing new video, optionally conditioned on text, images, or other information.
+
+  - id: object-detection
+    label: Object detection
+    kind: task
+    audience_level: 3
+    description: Locating and classifying objects within an image or video.
+
+  - id: sentiment-analysis
+    label: Sentiment analysis
+    kind: task
+    audience_level: 3
+    description: Determining the emotional tone or opinion expressed in text.
+
+  - id: music-generation
+    label: Music generation
+    kind: task
+    audience_level: 3
+    description: Producing new musical audio or compositions, optionally conditioned on text or other input.

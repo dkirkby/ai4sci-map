@@ -107,3 +107,57 @@ concepts:
     kind: product
     audience_level: 3
     description: A generative-image product that creates images from prompts and other inputs.
+
+  - id: siri
+    label: Siri
+    kind: product
+    audience_level: 1
+    description: Apple's voice-based AI assistant integrated into its devices and operating systems.
+
+  - id: alexa
+    label: Alexa
+    kind: product
+    audience_level: 1
+    description: Amazon's voice-based AI assistant used in Echo devices and other products.
+
+  - id: google-assistant
+    label: Google Assistant
+    kind: product
+    audience_level: 1
+    description: Google's voice-based AI assistant available across Android devices and smart speakers.
+
+  - id: microsoft-copilot
+    label: Microsoft Copilot
+    kind: product
+    audience_level: 1
+    description: Microsoft's AI assistant integrated into Windows, Office, and other Microsoft products.
+
+  - id: github-copilot
+    label: GitHub Copilot
+    kind: product
+    audience_level: 2
+    description: An AI coding assistant that suggests and completes code within a developer's editor.
+
+  - id: meta-ai
+    label: Meta AI
+    kind: product
+    audience_level: 2
+    description: Meta's AI assistant integrated into Facebook, Instagram, and WhatsApp.
+
+  - id: apple-intelligence
+    label: Apple Intelligence
+    kind: product
+    audience_level: 2
+    description: Apple's suite of on-device and cloud AI features integrated across its operating systems.
+
+  - id: perplexity
+    label: Perplexity
+    kind: product
+    audience_level: 3
+    description: An AI-powered answer engine that combines web search retrieval with a generative model.
+
+  - id: character-ai
+    label: Character.AI
+    kind: product
+    audience_level: 3
+    description: A platform for creating and chatting with customizable AI-driven personas.

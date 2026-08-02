@@ -63,3 +63,21 @@ concepts:
     kind: system
     audience_level: 2
     description: An interactive AI system designed to help users perform informational, creative, or operational tasks.
+
+  - id: voice-assistant
+    label: Voice assistant
+    kind: system
+    audience_level: 1
+    description: An AI assistant designed primarily for spoken interaction rather than text.
+
+  - id: coding-assistant
+    label: Coding assistant
+    kind: system
+    audience_level: 2
+    description: A system that helps write, complete, or review source code using a language model.
+
+  - id: hallucination
+    label: Hallucination
+    kind: property
+    audience_level: 1
+    description: A generative model's tendency to produce fluent, confident output that is factually incorrect or unsupported by its input.

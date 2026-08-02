@@ -253,3 +253,27 @@ concepts:
     kind: data_concept
     audience_level: 5
     description: Data without externally supplied target labels for the learning task.
+
+  - id: chain-of-thought-prompting
+    label: Chain-of-thought prompting
+    kind: training_method
+    audience_level: 3
+    description: Prompting or training a model to produce intermediate reasoning steps before its final output.
+
+  - id: benchmark
+    label: Benchmark
+    kind: evaluation_concept
+    audience_level: 3
+    description: A standardized dataset or task suite used to measure and compare model performance.
+
+  - id: accuracy
+    label: Accuracy
+    kind: evaluation_concept
+    audience_level: 2
+    description: The proportion of a model's predictions that are correct, evaluated against known outcomes.
+
+  - id: parameter-count
+    label: Parameter count
+    kind: property
+    audience_level: 2
+    description: A model's total number of learnable parameters, often cited as a rough indicator of scale.

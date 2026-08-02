@@ -123,3 +123,23 @@ concepts:
     kind: data_concept
     audience_level: 4
     description: A choice or control signal that can affect an environment or system state.
+
+  - id: artificial-general-intelligence
+    label: Artificial general intelligence
+    kind: field
+    audience_level: 2
+    description: The hypothetical or aspirational level of AI capability at which a system can understand, learn, and perform any intellectual task a human can.
+    acronyms:
+      - AGI
+
+  - id: turing-test
+    label: Turing test
+    kind: evaluation_concept
+    audience_level: 1
+    description: A proposed test of whether a machine's conversational behavior is indistinguishable from a human's.
+
+  - id: deepfake
+    label: Deepfake
+    kind: data_concept
+    audience_level: 1
+    description: Synthetic image, audio, or video content generated or altered to convincingly depict people, speech, or events that are not real.

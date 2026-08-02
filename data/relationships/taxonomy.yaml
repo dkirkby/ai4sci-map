@@ -247,3 +247,19 @@ relationships:
     type: typically_uses
     target: kernel-method
 
+  - source: zero-shot-learning
+    type: is_a
+    target: transfer-learning
+
+  - source: few-shot-learning
+    type: is_a
+    target: transfer-learning
+
+  - source: sentiment-analysis
+    type: is_a
+    target: classification
+
+  - source: artificial-general-intelligence
+    type: is_subfield_of
+    target: artificial-intelligence
+
