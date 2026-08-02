@@ -91,7 +91,7 @@ relationships:
     target: generative-model
 
   - source: generative-adversarial-network
-    type: uses
+    type: typically_uses
     target: neural-network
 
   - source: autoregressive-generative-model
@@ -102,6 +102,12 @@ relationships:
     type: is_a
     target: autoregressive-model
 
+  - source: autoregressive-generative-model
+    type: typically_uses
+    target: neural-network
+    qualifiers:
+      frequency: usually
+
   - source: normalizing-flow
     type: is_a
     target: generative-model
@@ -133,10 +139,20 @@ relationships:
   - source: score-based-generative-model
     type: is_a
     target: probabilistic-model
+
+  - source: score-based-generative-model
+    type: typically_uses
+    target: neural-network
 
   - source: energy-based-model
     type: is_a
     target: probabilistic-model
+
+  - source: energy-based-model
+    type: typically_uses
+    target: neural-network
+    qualifiers:
+      frequency: usually
 
   - source: language-model
     type: is_a
@@ -312,4 +328,8 @@ relationships:
   - source: transformer
     type: uses
     target: context-window
+
+  - source: transformer
+    type: uses
+    target: multilayer-perceptron
 

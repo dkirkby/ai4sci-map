@@ -151,6 +151,10 @@ relationships:
     type: is_a
     target: predictive-model
 
+  - source: linear-regression
+    type: is_a
+    target: generalized-linear-model
+
   - source: logistic-regression
     type: is_a
     target: discriminative-model
@@ -158,6 +162,10 @@ relationships:
   - source: logistic-regression
     type: is_a
     target: probabilistic-model
+
+  - source: logistic-regression
+    type: is_a
+    target: generalized-linear-model
 
   - source: generalized-linear-model
     type: is_a
@@ -214,6 +222,10 @@ relationships:
   - source: hidden-markov-model
     type: is_a
     target: probabilistic-model
+
+  - source: hidden-markov-model
+    type: is_a
+    target: generative-model
 
   - source: bayesian-network
     type: is_a

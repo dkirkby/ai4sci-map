@@ -251,3 +251,15 @@ relationships:
     qualifiers:
       frequency: sometimes
 
+  - source: diffusion-model
+    type: used_for
+    target: image-generation
+    qualifiers:
+      frequency: usually
+
+  - source: ai-agent
+    type: typically_uses
+    target: world-model
+    qualifiers:
+      frequency: sometimes
+
