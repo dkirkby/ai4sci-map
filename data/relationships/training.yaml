@@ -120,3 +120,73 @@ relationships:
     type: uses
     target: prompt
 
+  - source: large-language-model
+    type: trained_by
+    target: knowledge-distillation
+    qualifiers:
+      frequency: sometimes
+
+  - source: quantization
+    type: used_for
+    target: inference
+
+  - source: pruning
+    type: used_for
+    target: inference
+
+  - source: training
+    type: typically_uses
+    target: regularization
+
+  - source: training
+    type: typically_uses
+    target: data-augmentation
+
+  - source: data-augmentation
+    type: produces
+    target: synthetic-data
+
+  - source: training
+    type: uses
+    target: parameter
+
+  - source: optimizer
+    type: uses
+    target: hyperparameter
+
+  - source: training
+    type: uses
+    target: dataset
+
+  - source: training-set
+    type: is_a
+    target: dataset
+
+  - source: validation-set
+    type: is_a
+    target: dataset
+
+  - source: test-set
+    type: is_a
+    target: dataset
+
+  - source: training-set
+    type: uses
+    target: training-example
+
+  - source: predictive-model
+    type: uses
+    target: feature
+
+  - source: label
+    type: is_a
+    target: target
+
+  - source: supervised-learning
+    type: uses
+    target: target
+
+  - source: reinforcement-learning
+    type: uses
+    target: action
+

@@ -303,3 +303,13 @@ relationships:
     type: uses
     target: tabular-data
 
+  - source: large-language-model
+    type: typically_uses
+    target: mixture-of-experts
+    qualifiers:
+      frequency: sometimes
+
+  - source: transformer
+    type: uses
+    target: context-window
+

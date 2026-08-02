@@ -223,3 +223,15 @@ relationships:
     type: is_a
     target: representation-model
 
+  - source: k-means-clustering
+    type: is_a
+    target: deterministic-model
+
+  - source: gaussian-process
+    type: uses
+    target: kernel-method
+
+  - source: support-vector-machine
+    type: typically_uses
+    target: kernel-method
+

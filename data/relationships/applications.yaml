@@ -235,3 +235,19 @@ relationships:
     type: used_for
     target: text-generation
 
+  - source: encoder-decoder-transformer
+    type: used_for
+    target: machine-translation
+
+  - source: large-language-model
+    type: used_for
+    target: machine-translation
+    qualifiers:
+      frequency: usually
+
+  - source: embedding-model
+    type: used_for
+    target: recommendation
+    qualifiers:
+      frequency: sometimes
+
