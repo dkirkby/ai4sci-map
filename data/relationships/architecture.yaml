@@ -206,3 +206,100 @@ relationships:
     type: is_a
     target: foundation-model
 
+  # Modalities materialized from each concept's `modalities:` attribute.
+  - source: convolutional-neural-network
+    type: uses
+    target: image
+
+  - source: convolutional-neural-network
+    type: uses
+    target: video
+
+  - source: transformer
+    type: uses
+    target: text
+
+  - source: transformer
+    type: uses
+    target: image
+
+  - source: transformer
+    type: uses
+    target: audio
+
+  - source: transformer
+    type: uses
+    target: video
+
+  - source: transformer
+    type: uses
+    target: time-series
+
+  - source: graph-neural-network
+    type: uses
+    target: graph-data
+
+  - source: language-model
+    type: uses
+    target: text
+
+  - source: large-language-model
+    type: uses
+    target: text
+
+  - source: vision-foundation-model
+    type: uses
+    target: image
+
+  - source: vision-foundation-model
+    type: uses
+    target: video
+
+  - source: vision-language-model
+    type: uses
+    target: image
+
+  - source: vision-language-model
+    type: uses
+    target: text
+
+  - source: text-to-image-model
+    type: uses
+    target: text
+
+  - source: text-to-image-model
+    type: uses
+    target: image
+
+  - source: speech-foundation-model
+    type: uses
+    target: audio
+
+  - source: linear-regression
+    type: uses
+    target: tabular-data
+
+  - source: logistic-regression
+    type: uses
+    target: tabular-data
+
+  - source: decision-tree
+    type: uses
+    target: tabular-data
+
+  - source: random-forest
+    type: uses
+    target: tabular-data
+
+  - source: gradient-boosted-trees
+    type: uses
+    target: tabular-data
+
+  - source: support-vector-machine
+    type: uses
+    target: tabular-data
+
+  - source: k-means-clustering
+    type: uses
+    target: tabular-data
+

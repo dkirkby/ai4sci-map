@@ -114,3 +114,124 @@ relationships:
     type: is_a
     target: chatbot
 
+  # Materialized from each concept's `typical_tasks:` attribute.
+  - source: linear-regression
+    type: used_for
+    target: regression
+
+  - source: logistic-regression
+    type: used_for
+    target: classification
+
+  - source: generalized-linear-model
+    type: used_for
+    target: regression
+
+  - source: generalized-linear-model
+    type: used_for
+    target: classification
+
+  - source: nearest-neighbor-model
+    type: used_for
+    target: classification
+
+  - source: nearest-neighbor-model
+    type: used_for
+    target: regression
+
+  - source: decision-tree
+    type: used_for
+    target: classification
+
+  - source: decision-tree
+    type: used_for
+    target: regression
+
+  - source: random-forest
+    type: used_for
+    target: classification
+
+  - source: random-forest
+    type: used_for
+    target: regression
+
+  - source: gradient-boosted-trees
+    type: used_for
+    target: classification
+
+  - source: gradient-boosted-trees
+    type: used_for
+    target: regression
+
+  - source: support-vector-machine
+    type: used_for
+    target: classification
+
+  - source: support-vector-machine
+    type: used_for
+    target: regression
+
+  - source: naive-bayes-classifier
+    type: used_for
+    target: classification
+
+  - source: gaussian-process
+    type: used_for
+    target: regression
+
+  - source: gaussian-process
+    type: used_for
+    target: classification
+
+  - source: gaussian-process
+    type: used_for
+    target: forecasting
+
+  - source: gaussian-mixture-model
+    type: used_for
+    target: anomaly-detection
+
+  - source: hidden-markov-model
+    type: used_for
+    target: sequence-modeling
+
+  - source: principal-component-analysis
+    type: used_for
+    target: representation-learning
+
+  - source: recurrent-neural-network
+    type: used_for
+    target: sequence-modeling
+
+  - source: long-short-term-memory-network
+    type: used_for
+    target: sequence-modeling
+
+  - source: denoising-autoencoder
+    type: used_for
+    target: representation-learning
+
+  - source: variational-autoencoder
+    type: used_for
+    target: density-estimation
+
+  - source: variational-autoencoder
+    type: used_for
+    target: representation-learning
+
+  - source: normalizing-flow
+    type: used_for
+    target: density-estimation
+
+  - source: language-model
+    type: used_for
+    target: text-generation
+
+  - source: large-language-model
+    type: used_for
+    target: language-modeling
+
+  - source: causal-language-model
+    type: used_for
+    target: text-generation
+

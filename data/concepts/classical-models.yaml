@@ -12,6 +12,8 @@ concepts:
       probabilistic: sometimes
     typical_tasks:
       - regression
+    modalities:
+      - tabular-data
 
   - id: logistic-regression
     label: Logistic regression
@@ -23,6 +25,8 @@ concepts:
       probabilistic: always
     typical_tasks:
       - classification
+    modalities:
+      - tabular-data
 
   - id: generalized-linear-model
     label: Generalized linear model
@@ -65,6 +69,8 @@ concepts:
     typical_tasks:
       - classification
       - regression
+    modalities:
+      - tabular-data
 
   - id: random-forest
     label: Random forest
@@ -77,6 +83,8 @@ concepts:
     typical_tasks:
       - classification
       - regression
+    modalities:
+      - tabular-data
 
   - id: gradient-boosted-trees
     label: Gradient-boosted trees
@@ -89,6 +97,8 @@ concepts:
     typical_tasks:
       - classification
       - regression
+    modalities:
+      - tabular-data
 
   - id: support-vector-machine
     label: Support vector machine
@@ -103,6 +113,8 @@ concepts:
     typical_tasks:
       - classification
       - regression
+    modalities:
+      - tabular-data
 
   - id: kernel-method
     label: Kernel method
@@ -200,3 +212,5 @@ concepts:
       probabilistic: never
     typical_tasks:
       - clustering
+    modalities:
+      - tabular-data
