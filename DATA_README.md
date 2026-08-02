@@ -21,12 +21,14 @@ data/
     training.yaml
     systems.yaml
     products.yaml
+    infrastructure.yaml
   relationships/
     taxonomy.yaml
     architecture.yaml
     training.yaml
     applications.yaml
     products.yaml
+    infrastructure.yaml
 ```
 
 `manifest.yaml` defines the complete source set and its merge order.

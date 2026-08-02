@@ -63,6 +63,7 @@ $defs:
           - property
           - data_concept
           - evaluation_concept
+          - infrastructure
       description:
         type: string
         minLength: 1
