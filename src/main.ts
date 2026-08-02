@@ -1,5 +1,6 @@
 import "./style.css";
-import { buildGraphIndex, resolveConceptId } from "./graph.js";
+import { buildGraphIndex, resolveConceptId, type LevelCounts } from "./graph.js";
+import { renderLevelBar } from "./level-bar.js";
 import { render, renderAcronymCloud, renderAttributeBrowser, renderKindList, type RenderOptions } from "./render.js";
 import { initSearch } from "./search.js";
 import { initShareButton } from "./share.js";
@@ -10,14 +11,24 @@ const KIND_PARAM = "kind";
 const ATTR_PARAM = "attr";
 const TLA_PARAM = "tla";
 const HILITE_PARAM = "hilite";
+const LEVEL_PARAM = "level";
+const DEFAULT_LEVEL = 3;
+
+/** Parses and clamps the `level` query param, silently falling back to the default rather than erroring. */
+function parseLevel(raw: string | null): number {
+  const parsed = raw === null ? NaN : Number.parseInt(raw, 10);
+  return Number.isInteger(parsed) && parsed >= 1 && parsed <= 5 ? parsed : DEFAULT_LEVEL;
+}
 
 async function main() {
   const app = document.getElementById("app");
   const searchRoot = document.getElementById("search-root");
   const shareRoot = document.getElementById("share-root");
+  const levelBarRoot = document.getElementById("level-bar-root");
   if (!app) throw new Error("Missing #app container");
   if (!searchRoot) throw new Error("Missing #search-root container");
   if (!shareRoot) throw new Error("Missing #share-root container");
+  if (!levelBarRoot) throw new Error("Missing #level-bar-root container");
 
   const response = await fetch(`${import.meta.env.BASE_URL}graph.json`);
   if (!response.ok) {
@@ -28,53 +39,68 @@ async function main() {
   const index = buildGraphIndex(data);
   const conceptIds = [...index.conceptsById.keys()];
 
-  function navigateTo(conceptId: string): void {
+  /**
+   * Builds a URL for a navigation that replaces the view (concept/kind/attr/tla
+   * params), carrying the current `level` param along unchanged since it's a
+   * view-independent filter setting, not part of what identifies the view.
+   */
+  function navigationUrl(apply: (url: URL) => void): URL {
+    const currentLevel = new URLSearchParams(location.search).get(LEVEL_PARAM);
     const url = new URL(location.href);
     url.search = "";
-    url.searchParams.set(CONCEPT_PARAM, conceptId);
+    apply(url);
+    if (currentLevel !== null) url.searchParams.set(LEVEL_PARAM, currentLevel);
+    return url;
+  }
+
+  function navigateTo(conceptId: string): void {
+    const url = navigationUrl((u) => u.searchParams.set(CONCEPT_PARAM, conceptId));
     history.pushState(null, "", url);
     renderRoute(false);
   }
 
   function navigateToKind(kind: ConceptKind, conceptId: string): void {
-    const url = new URL(location.href);
-    url.search = "";
-    url.searchParams.set(KIND_PARAM, kind);
-    url.searchParams.set(HILITE_PARAM, conceptId);
+    const url = navigationUrl((u) => {
+      u.searchParams.set(KIND_PARAM, kind);
+      u.searchParams.set(HILITE_PARAM, conceptId);
+    });
     history.pushState(null, "", url);
     renderRoute(false);
   }
 
   function navigateToKindOnly(kind: ConceptKind): void {
-    const url = new URL(location.href);
-    url.search = "";
-    url.searchParams.set(KIND_PARAM, kind);
+    const url = navigationUrl((u) => u.searchParams.set(KIND_PARAM, kind));
     history.pushState(null, "", url);
     renderRoute(false);
   }
 
   function navigateToAttribute(attributeKey: string, conceptId: string): void {
-    const url = new URL(location.href);
-    url.search = "";
-    url.searchParams.set(ATTR_PARAM, attributeKey);
-    url.searchParams.set(HILITE_PARAM, conceptId);
+    const url = navigationUrl((u) => {
+      u.searchParams.set(ATTR_PARAM, attributeKey);
+      u.searchParams.set(HILITE_PARAM, conceptId);
+    });
     history.pushState(null, "", url);
     renderRoute(false);
   }
 
   function navigateToAttributeOnly(attributeKey: string): void {
-    const url = new URL(location.href);
-    url.search = "";
-    url.searchParams.set(ATTR_PARAM, attributeKey);
+    const url = navigationUrl((u) => u.searchParams.set(ATTR_PARAM, attributeKey));
     history.pushState(null, "", url);
     renderRoute(false);
   }
 
   function navigateToAcronym(acronym: string, conceptId: string): void {
+    const url = navigationUrl((u) => {
+      u.searchParams.set(TLA_PARAM, acronym);
+      u.searchParams.set(HILITE_PARAM, conceptId);
+    });
+    history.pushState(null, "", url);
+    renderRoute(false);
+  }
+
+  function navigateToLevel(level: number): void {
     const url = new URL(location.href);
-    url.search = "";
-    url.searchParams.set(TLA_PARAM, acronym);
-    url.searchParams.set(HILITE_PARAM, conceptId);
+    url.searchParams.set(LEVEL_PARAM, String(level));
     history.pushState(null, "", url);
     renderRoute(false);
   }
@@ -95,27 +121,23 @@ async function main() {
    * view (falling back to a random concept if `concept` is absent).
    * `rewriteUrl` is only passed true for the initial page load, matching the
    * existing convention of canonicalizing the URL once via `replaceState`
-   * rather than on every popstate.
+   * rather than on every popstate. Returns the drawn view's per-level concept
+   * counts, so the caller can render the level bar's annotations from them.
    */
-  function renderRoute(rewriteUrl: boolean): void {
-    const params = new URLSearchParams(location.search);
-
+  function renderCurrentView(params: URLSearchParams, level: number, rewriteUrl: boolean): LevelCounts {
     const kind = params.get(KIND_PARAM);
     if (kind !== null) {
-      renderKindList(app!, index, kind, params.get(HILITE_PARAM), renderOptions);
-      return;
+      return renderKindList(app!, index, kind, params.get(HILITE_PARAM), level, renderOptions);
     }
 
     const attr = params.get(ATTR_PARAM);
     if (attr !== null) {
-      renderAttributeBrowser(app!, index, attr, params.get(HILITE_PARAM), renderOptions);
-      return;
+      return renderAttributeBrowser(app!, index, attr, params.get(HILITE_PARAM), level, renderOptions);
     }
 
     const tla = params.get(TLA_PARAM);
     if (tla !== null) {
-      renderAcronymCloud(app!, index, tla, renderOptions);
-      return;
+      return renderAcronymCloud(app!, index, tla, level, renderOptions);
     }
 
     const requested = params.get(CONCEPT_PARAM);
@@ -130,10 +152,19 @@ async function main() {
       const url = new URL(location.href);
       url.search = "";
       url.searchParams.set(CONCEPT_PARAM, conceptId);
+      const currentLevel = params.get(LEVEL_PARAM);
+      if (currentLevel !== null) url.searchParams.set(LEVEL_PARAM, currentLevel);
       history.replaceState(null, "", url);
     }
 
-    render(app!, index, conceptId, renderOptions);
+    return render(app!, index, conceptId, level, renderOptions);
+  }
+
+  function renderRoute(rewriteUrl: boolean): void {
+    const params = new URLSearchParams(location.search);
+    const level = parseLevel(params.get(LEVEL_PARAM));
+    const counts = renderCurrentView(params, level, rewriteUrl);
+    renderLevelBar(levelBarRoot!, { level, counts, onChange: navigateToLevel });
   }
 
   window.addEventListener("popstate", () => renderRoute(false));

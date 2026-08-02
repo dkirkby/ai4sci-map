@@ -83,6 +83,18 @@ export function resolveConceptId(index: GraphIndex, query: string): string | und
   return undefined;
 }
 
+/** Concept counts by audience_level, indexed [level1, level2, level3, level4, level5]. */
+export type LevelCounts = [number, number, number, number, number];
+
+export function computeLevelCounts(concepts: Iterable<Concept>): LevelCounts {
+  const counts: LevelCounts = [0, 0, 0, 0, 0];
+  for (const concept of concepts) {
+    const index = concept.audience_level - 1;
+    if (index >= 0 && index < counts.length) counts[index] = counts[index]! + 1;
+  }
+  return counts;
+}
+
 /** All relationships whose two endpoints both lie within `satelliteIds`. */
 export function getSatelliteSatelliteRelationships(
   index: GraphIndex,

@@ -108,7 +108,7 @@ body {
   height: 100%;
   overflow-y: auto;
   margin: 0;
-  padding: 100px 12px 24px;
+  padding: 100px 12px 96px;
   list-style: none;
 }
 
@@ -149,7 +149,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 100px 24px 48px;
+  padding: 100px 24px 96px;
 }
 
 .attr-value-group {
@@ -447,4 +447,61 @@ body {
 
 .share-label {
   white-space: nowrap;
+}
+
+#level-bar-root {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+}
+
+.level-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  box-shadow: 0 4px 18px var(--shadow);
+}
+
+.level-tick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+}
+
+.level-tick:hover {
+  background: var(--highlight-bg);
+}
+
+.level-tick.is-current {
+  background: var(--accent);
+  color: #fff;
+  cursor: default;
+}
+
+.level-tick-number {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.level-tick-annotation {
+  font-size: 10px;
+  line-height: 1;
+  color: var(--muted);
 }

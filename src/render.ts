@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import cloud from "d3-cloud";
-import { getSatelliteSatelliteRelationships, type GraphIndex } from "./graph.js";
+import { computeLevelCounts, getSatelliteSatelliteRelationships, type GraphIndex, type LevelCounts } from "./graph.js";
 import { computeRadialLayout } from "./layout.js";
 import {
   allFamilyKeys,
@@ -19,6 +19,7 @@ const CARD_HEIGHT = 210;
 const CARD_HALF_WIDTH = CARD_WIDTH / 2;
 const CARD_HALF_HEIGHT = CARD_HEIGHT / 2;
 const LABEL_GAP = 6;
+const EMPTY_LEVEL_COUNTS: LevelCounts = [0, 0, 0, 0, 0];
 // Rough average glyph width (px) for the 12px sans-serif label font -- used only
 // to size the viewBox generously enough that satellite labels never clip against
 // its edge, not for precise text layout.
@@ -58,17 +59,29 @@ export function render(
   container: HTMLElement,
   index: GraphIndex,
   centerId: string,
+  level: number,
   options: RenderOptions,
-): void {
+): LevelCounts {
   container.innerHTML = "";
 
   const centerConcept = index.conceptsById.get(centerId);
   if (!centerConcept) {
     renderError(container, `Unknown concept: "${centerId}"`);
-    return;
+    return EMPTY_LEVEL_COUNTS;
   }
 
-  const edges = index.adjacency.get(centerId) ?? [];
+  // The center concept is always shown regardless of its own audience_level --
+  // only satellites are subject to the filter -- so counts are computed from
+  // the full, unfiltered satellite set before it's narrowed down below.
+  const allEdges = index.adjacency.get(centerId) ?? [];
+  const counts = computeLevelCounts(
+    allEdges.flatMap((e) => {
+      const concept = index.conceptsById.get(e.neighborId);
+      return concept ? [concept] : [];
+    }),
+  );
+
+  const edges = allEdges.filter((e) => (index.conceptsById.get(e.neighborId)?.audience_level ?? 0) <= level);
   const satelliteIds = new Set(edges.map((e) => e.neighborId));
   const satelliteSatelliteRelationships = getSatelliteSatelliteRelationships(index, satelliteIds);
   const placements = computeRadialLayout(edges, satelliteSatelliteRelationships);
@@ -286,6 +299,8 @@ export function render(
       .attr("stroke-width", 3);
     row.append("text").attr("class", "legend-label").attr("x", 28).attr("dy", "0.32em").text(entry.label);
   });
+
+  return counts;
 }
 
 function renderError(container: HTMLElement, message: string): void {
@@ -377,13 +392,14 @@ export function renderKindList(
   index: GraphIndex,
   kind: string,
   hiliteConceptId: string | null,
+  level: number,
   options: RenderOptions,
-): void {
+): LevelCounts {
   container.innerHTML = "";
 
   if (kind !== "" && !CONCEPT_KINDS.includes(kind as ConceptKind)) {
     renderError(container, `Unknown kind: "${kind}"`);
-    return;
+    return EMPTY_LEVEL_COUNTS;
   }
 
   const wrapper = document.createElement("div");
@@ -396,15 +412,19 @@ export function renderKindList(
   const content = document.createElement("div");
   content.className = "browser-content";
 
+  let counts: LevelCounts = EMPTY_LEVEL_COUNTS;
   if (kind !== "") {
-    const concepts = [...index.conceptsById.values()]
-      .filter((concept) => concept.kind === kind)
+    const allConcepts = [...index.conceptsById.values()].filter((concept) => concept.kind === kind);
+    counts = computeLevelCounts(allConcepts);
+    const concepts = allConcepts
+      .filter((concept) => concept.audience_level <= level)
       .sort((a, b) => a.label.localeCompare(b.label));
 
     if (concepts.length === 0) {
       const empty = document.createElement("p");
       empty.className = "concept-list-empty";
-      empty.textContent = "No concepts of this kind yet.";
+      empty.textContent =
+        allConcepts.length === 0 ? "No concepts of this kind yet." : "No concepts of this kind at this audience level.";
       content.appendChild(empty);
     } else {
       content.appendChild(buildConceptList(concepts, hiliteConceptId, options.onSelectConcept));
@@ -413,6 +433,7 @@ export function renderKindList(
 
   wrapper.appendChild(content);
   container.appendChild(wrapper);
+  return counts;
 }
 
 const FREQUENCY_VALUE_ORDER = ["always", "usually", "sometimes", "rarely", "never"];
@@ -452,15 +473,16 @@ export function renderAttributeBrowser(
   index: GraphIndex,
   attributeKey: string,
   hiliteConceptId: string | null,
+  level: number,
   options: RenderOptions,
-): void {
+): LevelCounts {
   container.innerHTML = "";
 
   const allAttributeKeys = collectAttributeKeys(index);
 
   if (attributeKey !== "" && !allAttributeKeys.includes(attributeKey)) {
     renderError(container, `Unknown attribute: "${attributeKey}"`);
-    return;
+    return EMPTY_LEVEL_COUNTS;
   }
 
   const wrapper = document.createElement("div");
@@ -469,12 +491,17 @@ export function renderAttributeBrowser(
   const content = document.createElement("div");
   content.className = "browser-content";
 
+  let counts: LevelCounts = EMPTY_LEVEL_COUNTS;
   if (attributeKey !== "") {
+    const allConcepts = [...index.conceptsById.values()].filter(
+      (concept) => concept.attributes?.[attributeKey] !== undefined,
+    );
+    counts = computeLevelCounts(allConcepts);
+
     const conceptsByValue = new Map<string, Concept[]>();
-    for (const concept of index.conceptsById.values()) {
-      const value = concept.attributes?.[attributeKey];
-      if (value === undefined) continue;
-      const valueKey = String(value);
+    for (const concept of allConcepts) {
+      if (concept.audience_level > level) continue;
+      const valueKey = String(concept.attributes![attributeKey]);
       const bucket = conceptsByValue.get(valueKey);
       if (bucket) bucket.push(concept);
       else conceptsByValue.set(valueKey, [concept]);
@@ -495,6 +522,13 @@ export function renderAttributeBrowser(
       group.appendChild(buildConceptList(concepts, hiliteConceptId, options.onSelectConcept));
       content.appendChild(group);
     }
+
+    if (allConcepts.length > 0 && conceptsByValue.size === 0) {
+      const empty = document.createElement("p");
+      empty.className = "concept-list-empty";
+      empty.textContent = "No concepts with this attribute at this audience level.";
+      content.appendChild(empty);
+    }
   }
 
   wrapper.appendChild(content);
@@ -502,6 +536,7 @@ export function renderAttributeBrowser(
     buildSidebar("right", allAttributeKeys, attributeKey === "" ? null : attributeKey, options.onSwitchAttribute),
   );
   container.appendChild(wrapper);
+  return counts;
 }
 
 const ACRONYM_CLOUD_WIDTH = 1200;
@@ -531,22 +566,39 @@ export function renderAcronymCloud(
   container: HTMLElement,
   index: GraphIndex,
   tla: string,
+  level: number,
   options: RenderOptions,
-): void {
+): LevelCounts {
   container.innerHTML = "";
 
-  const words: AcronymWord[] = [];
+  const allWords: AcronymWord[] = [];
   for (const concept of index.conceptsById.values()) {
     const degree = index.adjacency.get(concept.id)?.length ?? 0;
     for (const acronym of concept.acronyms ?? []) {
-      words.push({ text: acronym, conceptId: concept.id, size: degree });
+      allWords.push({ text: acronym, conceptId: concept.id, size: degree });
     }
   }
 
   const tlaLower = tla.toLowerCase();
-  if (tla !== "" && !words.some((word) => word.text.toLowerCase() === tlaLower)) {
+  if (tla !== "" && !allWords.some((word) => word.text.toLowerCase() === tlaLower)) {
     renderError(container, `Unknown acronym: "${tla}"`);
-    return;
+    return EMPTY_LEVEL_COUNTS;
+  }
+
+  const counts = computeLevelCounts(
+    allWords.flatMap((word) => {
+      const concept = index.conceptsById.get(word.conceptId);
+      return concept ? [concept] : [];
+    }),
+  );
+
+  const words = allWords.filter((word) => (index.conceptsById.get(word.conceptId)?.audience_level ?? 0) <= level);
+  if (words.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "concept-list-empty";
+    empty.textContent = "No acronyms at this audience level.";
+    container.appendChild(empty);
+    return counts;
   }
 
   const degrees = words.map((word) => word.size);
@@ -589,6 +641,8 @@ export function renderAcronymCloud(
         .text((word) => index.conceptsById.get(word.conceptId)?.label ?? word.conceptId);
     })
     .start();
+
+  return counts;
 }
 
 function relationshipTooltip(index: GraphIndex, relationshipTypeId: string): string {
