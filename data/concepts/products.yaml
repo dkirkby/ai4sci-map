@@ -83,7 +83,7 @@ concepts:
   - id: deepseek-model-family
     label: DeepSeek model family
     kind: model_family
-    audience_level: 2
+    audience_level: 1
     description: DeepSeek's family of language and reasoning-oriented models.
     aliases:
       - DeepSeek

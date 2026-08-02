@@ -22,7 +22,7 @@ concepts:
     label: Statistical learning
     kind: field
     audience_level: 4
-    description: The study of inference and prediction from data using statistical models and principles.
+    description: The study of inference and prediction from data, emphasizing interpretable models and statistical guarantees over predictive performance alone.
 
   - id: deep-learning
     label: Deep learning

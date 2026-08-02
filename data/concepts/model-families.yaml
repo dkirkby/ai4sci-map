@@ -82,7 +82,7 @@ concepts:
     label: Diffusion model
     kind: model_family
     audience_level: 3
-    description: A generative model that learns to reverse a gradual noising process.
+    description: A generative model that learns to reverse a gradual noising process; closely related to score-based generative models, which formulate the same idea via the gradient of the log density.
     attributes:
       deep: usually
       probabilistic: always
@@ -92,7 +92,7 @@ concepts:
     label: Score-based generative model
     kind: model_family
     audience_level: 5
-    description: A generative model based on estimating the gradient of the log density across noise levels.
+    description: A generative model based on estimating the gradient of the log density across noise levels; closely related to diffusion models, which formulate the same idea as reversing a noising process.
     attributes:
       deep: usually
       probabilistic: always

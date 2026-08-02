@@ -39,12 +39,12 @@ concepts:
       - classification
 
   - id: nearest-neighbor-model
-    label: Nearest-neighbor model
+    label: k-nearest neighbors
     kind: model_family
     audience_level: 4
     description: A nonparametric model that predicts using nearby examples under a chosen distance or similarity measure.
     aliases:
-      - k-nearest neighbors
+      - Nearest-neighbor model
     acronyms:
       - k-NN
     attributes:

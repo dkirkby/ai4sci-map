@@ -131,7 +131,7 @@ concepts:
   - id: backpropagation
     label: Backpropagation
     kind: training_method
-    audience_level: 4
+    audience_level: 3
     description: An efficient reverse-mode procedure for differentiating a composed computational graph.
 
   - id: optimizer
@@ -204,12 +204,12 @@ concepts:
     label: Target
     kind: data_concept
     audience_level: 5
-    description: A value or structure that a supervised model is trained to predict.
+    description: A value or structure that a supervised model is trained to predict; a categorical target is usually called a label.
 
   - id: token
     label: Token
     kind: data_concept
-    audience_level: 3
+    audience_level: 2
     description: A discrete unit used to represent text or another tokenized modality.
 
   - id: vocabulary

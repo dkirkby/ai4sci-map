@@ -49,7 +49,7 @@ concepts:
   - id: ai-agent
     label: AI agent
     kind: system
-    audience_level: 3
+    audience_level: 2
     description: A system that uses models and tools to select actions over multiple steps in pursuit of an objective.
 
   - id: chatbot
