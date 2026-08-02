@@ -105,3 +105,13 @@ relationship_types:
     label: has model family
     description: The target is a named family whose members belong to the source model class.
     inverse: family_of
+
+  - id: evaluates
+    label: evaluates
+    description: The source is a method or metric used to assess or measure the target.
+    inverse: evaluated_by
+
+  - id: evaluated_by
+    label: evaluated by
+    description: The source is assessed or measured using the target.
+    inverse: evaluates
