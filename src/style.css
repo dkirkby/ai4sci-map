@@ -502,6 +502,36 @@ body {
   }
 }
 
+/* On a phone turned sideways (short height, not just any wide window --
+   see LANDSCAPE_COMPACT_MAX_HEIGHT in render.ts, which reserves matching
+   space on the right for the ring/legend/card), move the bar from the
+   bottom -- where landscape is shortest on room -- to a vertical strip
+   against the right edge, where landscape has width to spare instead. */
+@media (orientation: landscape) and (max-height: 500px) {
+  #level-bar-root {
+    /* top matches the search bar/share button's height (TOP_SAFE_AREA in
+       render.ts) so the column centers in the space below them, not the
+       full viewport height -- otherwise its "Essential" label can collide
+       with the share button above. */
+    top: 84px;
+    bottom: 20px;
+    left: auto;
+    right: 20px;
+    transform: none;
+    display: flex;
+    align-items: center;
+  }
+
+  .level-bar-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .level-bar {
+    flex-direction: column;
+  }
+}
+
 .level-bar {
   display: flex;
   align-items: center;

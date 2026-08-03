@@ -112,11 +112,22 @@ function attachDrag(tickEls: HTMLButtonElement[], startIndex: number, onChange: 
     const tickRects = tickEls.map((tick) => tick.getBoundingClientRect());
     let activeIndex = startIndex;
 
-    const nearestIndex = (clientX: number): number => {
+    // The bar lays out horizontally in portrait/normal-landscape and
+    // vertically in compact landscape (see style.css) -- compare the first
+    // and last tick's centers to tell which axis actually varies here,
+    // rather than assuming, so the drag follows whichever way the ticks run.
+    const first = tickRects[0]!;
+    const last = tickRects[tickRects.length - 1]!;
+    const isVertical =
+      Math.abs(last.top - first.top) > Math.abs(last.left - first.left);
+    const centerOf = (rect: DOMRect): number => (isVertical ? rect.top + rect.height / 2 : rect.left + rect.width / 2);
+    const pointerCoord = (event: PointerEvent): number => (isVertical ? event.clientY : event.clientX);
+
+    const nearestIndex = (coord: number): number => {
       let closest = 0;
       let closestDistance = Infinity;
       tickRects.forEach((rect, i) => {
-        const distance = Math.abs(clientX - (rect.left + rect.width / 2));
+        const distance = Math.abs(coord - centerOf(rect));
         if (distance < closestDistance) {
           closestDistance = distance;
           closest = i;
@@ -133,7 +144,7 @@ function attachDrag(tickEls: HTMLButtonElement[], startIndex: number, onChange: 
     };
 
     const onPointerMove = (moveEvent: PointerEvent): void => {
-      setActive(nearestIndex(moveEvent.clientX));
+      setActive(nearestIndex(pointerCoord(moveEvent)));
     };
 
     const onPointerEnd = (): void => {

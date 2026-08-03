@@ -57,6 +57,13 @@ const BOTTOM_SAFE_AREA = 96;
 // Caps how tall/narrow the satellite ellipse can get on extreme aspect ratios
 // (e.g. a very short landscape phone), so it doesn't stretch absurdly.
 const MAX_RADIUS_Y_RATIO = 2.4;
+// Below this height, a wider-than-tall viewport is treated as a phone turned
+// sideways (not just a normal wide desktop window, which is "landscape" too
+// but has height to spare) -- matches the breakpoint in style.css that moves
+// the level bar from the bottom to a vertical strip on the right there,
+// freeing up the scarce vertical space instead.
+const LANDSCAPE_COMPACT_MAX_HEIGHT = 500;
+const RIGHT_SAFE_AREA_LANDSCAPE = 96;
 
 const ACRONYM_CLOUD_MIN_SIZE = 240;
 const ACRONYM_CLOUD_MIN_FONT = 16;
@@ -220,7 +227,15 @@ export function render(
   const containerRect = container.getBoundingClientRect();
   const viewWidth = containerRect.width || window.innerWidth;
   const viewHeight = containerRect.height || window.innerHeight;
-  const centerX = viewWidth / 2;
+
+  // On a short landscape phone, the level bar relocates to a vertical strip
+  // against the right edge (see style.css) instead of sitting at the bottom
+  // -- freeing up the scarce vertical space there, at the cost of reserving
+  // a strip on the right (where landscape has width to spare) instead.
+  const isCompactLandscape = viewWidth > viewHeight && viewHeight <= LANDSCAPE_COMPACT_MAX_HEIGHT;
+  const rightSafeArea = isCompactLandscape ? RIGHT_SAFE_AREA_LANDSCAPE : 0;
+  const usableWidth = viewWidth - rightSafeArea;
+  const centerX = usableWidth / 2;
 
   // The legend sits at the top, directly above where a satellite near the
   // "top" of the ring would otherwise land -- so the ring's own safe area
@@ -246,10 +261,10 @@ export function render(
   // level bar, not the full viewport, so the ring never lays out underneath
   // any of them.
   const safeTop = TOP_SAFE_AREA + legendHeight + (legendHeight > 0 ? 16 : 0);
-  const safeBottom = viewHeight - BOTTOM_SAFE_AREA;
+  const safeBottom = viewHeight - (isCompactLandscape ? VIEW_MARGIN : BOTTOM_SAFE_AREA);
   const centerY = (safeTop + safeBottom) / 2;
 
-  const cardHalfWidth = Math.min(CARD_WIDTH / 2, Math.max(CARD_MIN_HALF_WIDTH, viewWidth * 0.28));
+  const cardHalfWidth = Math.min(CARD_WIDTH / 2, Math.max(CARD_MIN_HALF_WIDTH, usableWidth * 0.28));
   const availableHeightBand = Math.max(0, safeBottom - safeTop);
   const cardHalfHeight = Math.min(CARD_HEIGHT / 2, Math.max(CARD_MIN_HALF_HEIGHT, availableHeightBand * 0.28));
   const minRadiusX = cardHalfWidth + RADIUS_CLEARANCE;
@@ -261,7 +276,7 @@ export function render(
   // extreme, which have little room to spill outward before the viewBox edge
   // (there's ample room on their inward side, towards center, so this margin
   // only has to cover the outward half of the label).
-  const availableHalfWidth = viewWidth / 2 - VIEW_MARGIN;
+  const availableHalfWidth = usableWidth / 2 - VIEW_MARGIN;
   const outerLabelMargin = MIN_LABEL_CHARS * CHAR_WIDTH_ESTIMATE;
   let radiusX = Math.max(minRadiusX, availableHalfWidth - SATELLITE_NODE_RADIUS - outerLabelMargin);
   const outerSlack = Math.max(outerLabelMargin, availableHalfWidth - SATELLITE_NODE_RADIUS - radiusX);
@@ -836,10 +851,12 @@ export function renderAcronymCloud(
   const containerRect = container.getBoundingClientRect();
   const viewWidth = containerRect.width || window.innerWidth;
   const viewHeight = containerRect.height || window.innerHeight;
+  const isCompactLandscape = viewWidth > viewHeight && viewHeight <= LANDSCAPE_COMPACT_MAX_HEIGHT;
+  const usableWidth = viewWidth - (isCompactLandscape ? RIGHT_SAFE_AREA_LANDSCAPE : 0);
   const safeTop = TOP_SAFE_AREA;
-  const safeBottom = viewHeight - BOTTOM_SAFE_AREA;
+  const safeBottom = viewHeight - (isCompactLandscape ? VIEW_MARGIN : BOTTOM_SAFE_AREA);
   const centerY = (safeTop + safeBottom) / 2;
-  const cloudWidth = Math.max(ACRONYM_CLOUD_MIN_SIZE, viewWidth - VIEW_MARGIN * 2);
+  const cloudWidth = Math.max(ACRONYM_CLOUD_MIN_SIZE, usableWidth - VIEW_MARGIN * 2);
   const cloudHeight = Math.max(ACRONYM_CLOUD_MIN_SIZE, safeBottom - safeTop - VIEW_MARGIN * 2);
 
   const degrees = words.map((word) => word.size);
@@ -867,7 +884,7 @@ export function renderAcronymCloud(
 
       svg
         .append("g")
-        .attr("transform", `translate(${viewWidth / 2}, ${centerY})`)
+        .attr("transform", `translate(${usableWidth / 2}, ${centerY})`)
         .selectAll("text")
         .data(placedWords)
         .join("text")
