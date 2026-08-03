@@ -29,6 +29,15 @@ const SATELLITE_NODE_RADIUS = 9;
 const SATELLITE_HIT_RADIUS = 22;
 const SATELLITE_HIT_HEIGHT = 32;
 const LABEL_GAP = 6;
+// A label wraps onto at most this many lines (breaking on word boundaries)
+// before the remainder gets truncated with an ellipsis -- lets narrow screens
+// show roughly twice the characters per satellite without needing per-satellite
+// vertical spacing (not currently modeled by the layout) to grow indefinitely.
+const MAX_LABEL_LINES = 2;
+const LABEL_LINE_HEIGHT_EM = 1.1;
+// Matches .satellite-label's font-size in em terms above; only used to grow
+// the invisible hit area to cover a second line, not for precise text layout.
+const LABEL_LINE_HEIGHT_PX = 13;
 const EMPTY_LEVEL_COUNTS: LevelCounts = [0, 0, 0, 0, 0];
 // Rough average glyph width (px) for the 12px sans-serif label font -- used only
 // to size label allowances and truncation, not for precise text layout.
@@ -86,6 +95,46 @@ function truncateLabel(label: string, maxChars: number): string {
   const ELLIPSIS = "…";
   const sliceLength = Math.max(1, maxChars - ELLIPSIS.length);
   return label.slice(0, sliceLength).trimEnd() + ELLIPSIS;
+}
+
+interface WrappedLabel {
+  lines: string[];
+  truncated: boolean;
+}
+
+/** Greedily packs words onto lines of at most `maxCharsPerLine`, always keeping at least one word per line. */
+function splitIntoLines(label: string, maxCharsPerLine: number): string[] {
+  const words = label.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word;
+    if (current === "" || candidate.length <= maxCharsPerLine) {
+      current = candidate;
+    } else {
+      lines.push(current);
+      current = word;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+/**
+ * Wraps `label` onto up to `MAX_LABEL_LINES` lines of at most `maxCharsPerLine`
+ * each, so a narrow screen can show roughly twice the characters it could on a
+ * single line. Anything left over after that many lines is folded into the
+ * last line and truncated with an ellipsis, rather than adding more lines.
+ */
+function wrapLabel(label: string, maxCharsPerLine: number): WrappedLabel {
+  const rawLines = splitIntoLines(label, maxCharsPerLine);
+  if (rawLines.length <= MAX_LABEL_LINES) {
+    return { lines: rawLines, truncated: false };
+  }
+  const kept = rawLines.slice(0, MAX_LABEL_LINES - 1);
+  const remainder = rawLines.slice(MAX_LABEL_LINES - 1).join(" ");
+  kept.push(truncateLabel(remainder, maxCharsPerLine));
+  return { lines: kept, truncated: true };
 }
 
 export function render(
@@ -292,7 +341,7 @@ export function render(
     if (!concept) continue;
     const pos = positionByConceptId.get(placement.conceptId)!;
     const rightHalf = Math.sin(placement.angle) >= 0;
-    const label = truncateLabel(concept.label, maxLabelChars);
+    const { lines, truncated } = wrapLabel(concept.label, maxLabelChars);
 
     const group = satellitesLayer
       .append("g")
@@ -303,17 +352,20 @@ export function render(
 
     // A generous invisible hit area, sized independently of the visible dot
     // and label, so the tap target stays usable everywhere touch happens
-    // (not just directly on the tiny dot or on painted glyph pixels).
-    const labelPixelWidth = label.length * CHAR_WIDTH_ESTIMATE;
+    // (not just directly on the tiny dot or on painted glyph pixels). Grows
+    // taller when the label wraps to a second line.
+    const longestLineLength = Math.max(...lines.map((line) => line.length));
+    const labelPixelWidth = longestLineLength * CHAR_WIDTH_ESTIMATE;
     const farReach = SATELLITE_NODE_RADIUS + LABEL_GAP + labelPixelWidth + SATELLITE_HIT_RADIUS / 2;
     const hitLeft = rightHalf ? -SATELLITE_HIT_RADIUS : -farReach;
     const hitRight = rightHalf ? farReach : SATELLITE_HIT_RADIUS;
+    const hitHeight = SATELLITE_HIT_HEIGHT + (lines.length - 1) * LABEL_LINE_HEIGHT_PX;
     group
       .append("rect")
       .attr("x", hitLeft)
-      .attr("y", -SATELLITE_HIT_HEIGHT / 2)
+      .attr("y", -hitHeight / 2)
       .attr("width", hitRight - hitLeft)
-      .attr("height", SATELLITE_HIT_HEIGHT)
+      .attr("height", hitHeight)
       .attr("fill", "transparent")
       .style("pointer-events", "all");
 
@@ -322,15 +374,18 @@ export function render(
       .attr("r", SATELLITE_NODE_RADIUS)
       .attr("fill", colorForRelationshipType(placement.edge.relationshipTypeId));
 
-    group
+    const labelX = rightHalf ? SATELLITE_NODE_RADIUS + LABEL_GAP : -(SATELLITE_NODE_RADIUS + LABEL_GAP);
+    const text = group
       .append("text")
       .attr("class", "satellite-label")
       .attr("text-anchor", rightHalf ? "start" : "end")
-      .attr("x", rightHalf ? SATELLITE_NODE_RADIUS + LABEL_GAP : -(SATELLITE_NODE_RADIUS + LABEL_GAP))
-      .attr("dy", "0.32em")
-      .text(label);
+      .attr("x", labelX);
+    lines.forEach((line, i) => {
+      const dy = i === 0 ? 0.32 - ((lines.length - 1) * LABEL_LINE_HEIGHT_EM) / 2 : LABEL_LINE_HEIGHT_EM;
+      text.append("tspan").attr("x", labelX).attr("dy", `${dy}em`).text(line);
+    });
 
-    const titleText = label === concept.label ? concept.description : `${concept.label}\n${concept.description}`;
+    const titleText = truncated ? `${concept.label}\n${concept.description}` : concept.description;
     group.append("title").text(titleText);
   }
 
