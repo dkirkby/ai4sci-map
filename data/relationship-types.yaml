@@ -115,3 +115,13 @@ relationship_types:
     label: evaluated by
     description: The source is assessed or measured using the target.
     inverse: evaluates
+
+  - id: encompasses
+    label: encompasses
+    description: The source field's scope includes research, systems, or techniques concerned with the target.
+    inverse: studied_within
+
+  - id: studied_within
+    label: studied within
+    description: The source is studied, developed, or applied within the scope of the target field.
+    inverse: encompasses

@@ -291,3 +291,158 @@ relationships:
     type: is_subfield_of
     target: artificial-intelligence
 
+  # Concepts studied within each field - most fields previously connected
+  # only to their parent field via is_subfield_of, with nothing pointing
+  # at what's actually in them.
+  - source: natural-language-processing
+    type: encompasses
+    target: language-model
+
+  - source: natural-language-processing
+    type: encompasses
+    target: large-language-model
+
+  - source: natural-language-processing
+    type: encompasses
+    target: machine-translation
+
+  - source: natural-language-processing
+    type: encompasses
+    target: question-answering
+
+  - source: natural-language-processing
+    type: encompasses
+    target: summarization
+
+  - source: natural-language-processing
+    type: encompasses
+    target: sentiment-analysis
+
+  - source: computer-vision
+    type: encompasses
+    target: convolutional-neural-network
+
+  - source: computer-vision
+    type: encompasses
+    target: facial-recognition
+
+  - source: computer-vision
+    type: encompasses
+    target: object-detection
+
+  - source: computer-vision
+    type: encompasses
+    target: image-generation
+
+  - source: computer-vision
+    type: encompasses
+    target: vision-foundation-model
+
+  - source: robotics
+    type: encompasses
+    target: control
+
+  - source: robotics
+    type: encompasses
+    target: planning
+
+  - source: robotics
+    type: encompasses
+    target: world-model
+
+  - source: robotics
+    type: encompasses
+    target: action
+
+  - source: recommendation-systems
+    type: encompasses
+    target: recommendation
+
+  - source: recommendation-systems
+    type: encompasses
+    target: embedding-model
+
+  - source: speech-and-audio-ml
+    type: encompasses
+    target: speech-recognition
+
+  - source: speech-and-audio-ml
+    type: encompasses
+    target: text-to-speech
+
+  - source: speech-and-audio-ml
+    type: encompasses
+    target: speech-foundation-model
+
+  - source: speech-and-audio-ml
+    type: encompasses
+    target: music-generation
+
+  - source: scientific-machine-learning
+    type: encompasses
+    target: surrogate-model
+
+  - source: generative-ai
+    type: encompasses
+    target: generative-model
+
+  - source: generative-ai
+    type: encompasses
+    target: diffusion-model
+
+  - source: generative-ai
+    type: encompasses
+    target: image-generation
+
+  - source: generative-ai
+    type: encompasses
+    target: text-generation
+
+  - source: generative-ai
+    type: encompasses
+    target: deepfake
+
+  - source: deep-learning
+    type: encompasses
+    target: neural-network
+
+  - source: deep-learning
+    type: encompasses
+    target: deep-neural-network
+
+  - source: deep-learning
+    type: encompasses
+    target: backpropagation
+
+  - source: statistical-learning
+    type: encompasses
+    target: generalized-linear-model
+
+  - source: statistical-learning
+    type: encompasses
+    target: bias-variance-tradeoff
+
+  - source: statistical-learning
+    type: encompasses
+    target: cross-validation
+
+  - source: artificial-general-intelligence
+    type: encompasses
+    target: foundation-model
+
+  - source: artificial-general-intelligence
+    type: encompasses
+    target: reasoning-model
+
+  - source: ai-safety
+    type: encompasses
+    target: hallucination
+
+  - source: machine-learning
+    type: encompasses
+    target: predictive-model
+
+  - source: machine-learning
+    type: encompasses
+    target: generative-model
+
