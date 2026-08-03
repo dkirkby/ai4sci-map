@@ -279,6 +279,22 @@ relationships:
     type: used_for
     target: alignment
 
+  - source: umap
+    type: used_for
+    target: dimensionality-reduction
+
+  - source: t-sne
+    type: used_for
+    target: dimensionality-reduction
+
+  - source: cross-validation
+    type: evaluates
+    target: predictive-model
+
+  - source: f1-score
+    type: evaluates
+    target: predictive-model
+
   - source: voice-assistant
     type: is_a
     target: ai-assistant

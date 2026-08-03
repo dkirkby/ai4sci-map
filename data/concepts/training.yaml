@@ -311,3 +311,49 @@ concepts:
     description: The amount of computation a model spends generating and refining its answer at inference time, as opposed to during training; increasing it is a way to trade inference cost for better answers.
     aliases:
       - Inference-time scaling
+
+  - id: kl-divergence
+    label: KL divergence
+    kind: mathematical_object
+    audience_level: 5
+    description: A measure of how much one probability distribution diverges from a second, reference distribution; not a true distance, since it isn't symmetric.
+    aliases:
+      - Kullback-Leibler divergence
+
+  - id: learning-rate
+    label: Learning rate
+    kind: mathematical_object
+    audience_level: 4
+    description: A hyperparameter controlling how large a step an optimizer takes when updating parameters in the direction that reduces the objective.
+
+  - id: cross-validation
+    label: Cross-validation
+    kind: evaluation_concept
+    audience_level: 4
+    description: A model-evaluation method that repeatedly splits data into training and held-out folds to estimate how well a model generalizes to unseen data.
+
+  - id: f1-score
+    label: F1 score
+    kind: evaluation_concept
+    audience_level: 5
+    description: A classification metric combining precision and recall into a single score via their harmonic mean, useful when the two need to be balanced.
+
+  - id: bias-variance-tradeoff
+    label: Bias-variance tradeoff
+    kind: property
+    audience_level: 4
+    description: The tension between a model's error from overly simple assumptions (bias) and its error from excessive sensitivity to the training data (variance); reducing one tends to increase the other.
+
+  - id: overfitting
+    label: Overfitting
+    kind: property
+    audience_level: 3
+    description: A model's tendency to fit the training data so closely, including its noise, that it performs worse on new, unseen data.
+
+  - id: underfitting
+    label: Underfitting
+    kind: property
+    audience_level: 4
+    description: A model's failure to capture the underlying pattern in the training data, resulting in poor performance on both training and new data.
+    aliases:
+      - Inference-time scaling

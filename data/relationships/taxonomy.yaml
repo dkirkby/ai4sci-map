@@ -275,3 +275,15 @@ relationships:
     type: is_a
     target: predictive-model
 
+  - source: learning-rate
+    type: is_a
+    target: hyperparameter
+
+  - source: umap
+    type: is_a
+    target: representation-model
+
+  - source: t-sne
+    type: is_a
+    target: representation-model
+

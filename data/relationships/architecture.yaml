@@ -385,3 +385,11 @@ relationships:
     type: uses
     target: test-time-compute
 
+  - source: transformer
+    type: uses
+    target: positional-embedding
+
+  - source: transformer
+    type: uses
+    target: layer-normalization
+

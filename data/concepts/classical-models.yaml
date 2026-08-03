@@ -214,3 +214,19 @@ concepts:
       - clustering
     modalities:
       - tabular-data
+
+  - id: umap
+    label: UMAP
+    kind: model_family
+    audience_level: 5
+    description: A dimensionality-reduction method that constructs a low-dimensional representation intended to preserve a dataset's local and global structure.
+    aliases:
+      - Uniform Manifold Approximation and Projection
+
+  - id: t-sne
+    label: t-SNE
+    kind: model_family
+    audience_level: 4
+    description: A dimensionality-reduction method that converts similarities between data points into probabilities and arranges points in low dimensions to preserve local neighborhoods, widely used to visualize high-dimensional data.
+    aliases:
+      - t-distributed stochastic neighbor embedding

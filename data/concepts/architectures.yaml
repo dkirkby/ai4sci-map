@@ -139,3 +139,15 @@ concepts:
     kind: architecture
     audience_level: 5
     description: A convolutional architecture with a contracting encoder and expanding decoder connected by skip connections, originally designed for biomedical image segmentation and now a common backbone inside image diffusion models.
+
+  - id: positional-embedding
+    label: Positional embedding
+    kind: architecture
+    audience_level: 5
+    description: A representation added to or combined with a transformer's input embeddings to encode each token's position in the sequence, since attention alone is order-agnostic.
+
+  - id: layer-normalization
+    label: Layer normalization
+    kind: architecture
+    audience_level: 5
+    description: A technique that rescales the activations within each layer to stabilize and speed up the training of deep networks.

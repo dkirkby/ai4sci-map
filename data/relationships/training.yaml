@@ -256,6 +256,32 @@ relationships:
     type: uses
     target: reward-model
 
+  - source: variational-autoencoder
+    type: uses
+    target: kl-divergence
+
+  - source: reinforcement-learning-from-human-feedback
+    type: typically_uses
+    target: kl-divergence
+    qualifiers:
+      frequency: usually
+
+  - source: optimizer
+    type: uses
+    target: learning-rate
+
+  - source: predictive-model
+    type: uses
+    target: bias-variance-tradeoff
+
+  - source: predictive-model
+    type: produces
+    target: overfitting
+
+  - source: predictive-model
+    type: produces
+    target: underfitting
+
   - source: chain-of-thought-prompting
     type: is_a
     target: prompt-engineering
