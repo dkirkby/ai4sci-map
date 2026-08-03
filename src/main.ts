@@ -20,6 +20,12 @@ const TLA_PARAM = "tla";
 const HILITE_PARAM = "hilite";
 const LEVEL_PARAM = "level";
 const DEFAULT_LEVEL = 3;
+// Debounces re-layout while a resize is still in progress (e.g. a dragged
+// window edge fires many times a second) rather than redrawing every frame.
+const RESIZE_DEBOUNCE_MS = 150;
+// Below this, a size change is layout noise (e.g. a scrollbar toggling), not
+// a real resize worth redrawing for.
+const RESIZE_EPSILON_PX = 1;
 
 /** Parses and clamps the `level` query param, silently falling back to the default rather than erroring. */
 function parseLevel(raw: string | null): number {
@@ -183,6 +189,41 @@ async function main() {
   }
 
   window.addEventListener("popstate", () => renderRoute(false));
+
+  // The radial layout's ellipse is sized from #app's own rendered pixels (see
+  // render.ts), which only stays correct if a viewport-size change (dragging
+  // a window edge, rotating a device, a mobile browser's chrome showing or
+  // hiding) triggers a redraw -- a plain `resize` listener would miss
+  // container-size changes that aren't a window resize, so this watches #app
+  // itself instead. Debounced, and the initial callback (which just reports
+  // #app's starting size, not a change) is skipped so it doesn't cause a
+  // redundant redraw right after the one below.
+  let lastObservedSize: { width: number; height: number } | null = null;
+  let resizeDebounceTimer: number | undefined;
+  const resizeObserver = new ResizeObserver((entries) => {
+    const entry = entries[0];
+    if (!entry) return;
+    const { width, height } = entry.contentRect;
+
+    if (lastObservedSize === null) {
+      lastObservedSize = { width, height };
+      return;
+    }
+    if (
+      Math.abs(width - lastObservedSize.width) < RESIZE_EPSILON_PX &&
+      Math.abs(height - lastObservedSize.height) < RESIZE_EPSILON_PX
+    ) {
+      return;
+    }
+    lastObservedSize = { width, height };
+
+    if (resizeDebounceTimer !== undefined) window.clearTimeout(resizeDebounceTimer);
+    resizeDebounceTimer = window.setTimeout(() => {
+      resizeDebounceTimer = undefined;
+      renderRoute(false);
+    }, RESIZE_DEBOUNCE_MS);
+  });
+  resizeObserver.observe(app);
 
   initSearch(searchRoot, [...index.conceptsById.values()], { onSelectConcept: navigateTo });
   initShareButton(shareRoot);
