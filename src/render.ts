@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 import cloud from "d3-cloud";
 import { computeLevelCounts, getSatelliteSatelliteRelationships, type GraphIndex, type LevelCounts } from "./graph.js";
-import { computeRadialLayout } from "./layout.js";
+import { computeRadialLayout, resolveSatellitePositions, type Point } from "./layout.js";
 import {
   allFamilyKeys,
   buildLegend,
@@ -121,11 +121,6 @@ export interface RenderOptions {
   onSelectAcronym: (acronym: string, conceptId: string) => void;
 }
 
-interface Point {
-  x: number;
-  y: number;
-}
-
 function pointTowards(from: Point, to: Point, distance: number): Point {
   const dx = to.x - from.x;
   const dy = to.y - from.y;
@@ -187,6 +182,33 @@ function wrapLabel(label: string, maxCharsPerLine: number): WrappedLabel {
   const remainder = rawLines.slice(MAX_LABEL_LINES - 1).join(" ");
   kept.push(truncateLabel(remainder, maxCharsPerLine));
   return { lines: kept, truncated: true };
+}
+
+interface SatelliteFootprint extends WrappedLabel {
+  /**
+   * Radius of a circle, centered on the satellite's node, big enough to
+   * contain its label block on whichever side (above or below the node) it
+   * ends up drawn -- used both to size that satellite's collision radius in
+   * the force layout (see `resolveSatellitePositions`) and, unscaled, its hit
+   * area below.
+   */
+  collideRadius: number;
+  /** Half-width of the invisible tap-target rect drawn under the label. */
+  halfHitWidth: number;
+  /** Distance from the node center to the far edge of its label block. */
+  labelBlockReach: number;
+}
+
+/** Wraps `label` and measures the resulting footprint -- see `SatelliteFootprint`. */
+function computeSatelliteFootprint(label: string, maxCharsPerLine: number): SatelliteFootprint {
+  const { lines, truncated } = wrapLabel(label, maxCharsPerLine);
+  const longestLineLength = Math.max(...lines.map((line) => line.length));
+  const halfHitWidth = Math.max(
+    SATELLITE_HIT_RADIUS,
+    (longestLineLength * CHAR_WIDTH_ESTIMATE) / 2 + SATELLITE_HIT_RADIUS / 2,
+  );
+  const labelBlockReach = SATELLITE_NODE_RADIUS + LABEL_GAP + lines.length * LABEL_LINE_HEIGHT_PX;
+  return { lines, truncated, halfHitWidth, labelBlockReach, collideRadius: Math.max(halfHitWidth, labelBlockReach) };
 }
 
 interface LegendPlacement {
@@ -326,34 +348,21 @@ export function render(
   // only has to cover the outward half of the label).
   const availableHalfWidth = usableWidth / 2 - VIEW_MARGIN;
   const outerLabelMargin = MIN_LABEL_CHARS * CHAR_WIDTH_ESTIMATE;
-  let radiusX = Math.max(minRadiusX, availableHalfWidth - SATELLITE_NODE_RADIUS - outerLabelMargin);
-  const outerSlack = Math.max(outerLabelMargin, availableHalfWidth - SATELLITE_NODE_RADIUS - radiusX);
+  const maxRadiusX = Math.max(minRadiusX, availableHalfWidth - SATELLITE_NODE_RADIUS - outerLabelMargin);
+  const outerSlack = Math.max(outerLabelMargin, availableHalfWidth - SATELLITE_NODE_RADIUS - maxRadiusX);
   const maxLabelChars = Math.max(MIN_LABEL_CHARS, Math.floor((outerSlack * 2) / CHAR_WIDTH_ESTIMATE));
 
-  // Similarly, a satellite near the top/bottom of the ellipse has its label
-  // stacked further outward still, so the ring's vertical reach needs to
-  // leave room for a full (worst-case two-line) label block before the
-  // legend/search bar or level bar.
+  // Similarly, a satellite near the top/bottom of the safe area has its label
+  // stacked further outward still, so the vertical reach needs to leave room
+  // for a full (worst-case two-line) label block before the legend/search bar
+  // or level bar.
   const labelBlockMargin = SATELLITE_NODE_RADIUS + LABEL_GAP + MAX_LABEL_LINES * LABEL_LINE_HEIGHT_PX;
   const availableHalfHeight = Math.max(0, safeBottom - safeTop) / 2 - VIEW_MARGIN - labelBlockMargin;
-  let radiusY = Math.min(Math.max(minRadiusY, availableHalfHeight), radiusX * MAX_RADIUS_Y_RATIO);
+  const maxRadiusY = Math.min(Math.max(minRadiusY, availableHalfHeight), maxRadiusX * MAX_RADIUS_Y_RATIO);
 
-  // Guarantee every satellite clears the card by at least RADIUS_CLEARANCE
-  // at *every* angle, not just the 4 cardinal ones: an ellipse sized to just
-  // clear the card horizontally and vertically still cuts back inside that
-  // clearance margin near the diagonals/corners (minRadiusX/minRadiusY here
-  // are the card's half-dimensions already padded by that clearance). Scale
-  // both radii up together (preserving their ratio, i.e. the ellipse's
-  // shape) just enough that the padded corner sits strictly inside the ring.
-  const cornerRatio = Math.sqrt((minRadiusX / radiusX) ** 2 + (minRadiusY / radiusY) ** 2);
-  if (cornerRatio > 1) {
-    radiusX *= cornerRatio;
-    radiusY *= cornerRatio;
-  }
-
-  const pointForAngle = (angle: number, radiusX: number, radiusY: number): Point => ({
-    x: centerX + radiusX * Math.sin(angle),
-    y: centerY - radiusY * Math.cos(angle),
+  const pointForAngle = (angle: number, radius: number): Point => ({
+    x: centerX + radius * Math.sin(angle),
+    y: centerY - radius * Math.cos(angle),
   });
 
   /** Where a ray from the card center toward `to` exits the center card's rectangle. */
@@ -367,9 +376,29 @@ export function render(
   };
 
   const angleByConceptId = new Map(placements.map((p) => [p.conceptId, p.angle]));
-  const positionByConceptId = new Map(
-    placements.map((p) => [p.conceptId, pointForAngle(p.angle, radiusX, radiusY)]),
+
+  // Each satellite's label needs to be wrapped/measured before layout runs --
+  // the force simulation below sizes its per-node collision radius from this
+  // same footprint, so a satellite with a taller or wider label claims more
+  // room from its neighbors rather than every satellite being forced onto one
+  // shared ring regardless of label length (see LAYOUT_UPGRADE.md part B).
+  const footprintByConceptId = new Map(
+    placements.flatMap((p) => {
+      const concept = index.conceptsById.get(p.conceptId);
+      return concept ? [[p.conceptId, computeSatelliteFootprint(concept.label, maxLabelChars)] as const] : [];
+    }),
   );
+  const collideRadiusByConceptId = new Map(
+    [...footprintByConceptId].map(([conceptId, footprint]) => [conceptId, footprint.collideRadius]),
+  );
+
+  const positionByConceptId = resolveSatellitePositions(placements, collideRadiusByConceptId, {
+    center: { x: centerX, y: centerY },
+    minRadiusX,
+    minRadiusY,
+    maxRadiusX,
+    maxRadiusY,
+  });
 
   const svg = d3
     .select(container)
@@ -423,7 +452,12 @@ export function render(
     const diff = normalizedAngleDiff(angleA, angleB);
     const midAngle = angleA + diff / 2;
     const bulgeFactor = 1 + 25 / 300 + (220 / 300) * (Math.abs(diff) / Math.PI);
-    const control = pointForAngle(midAngle, radiusX * bulgeFactor, radiusY * bulgeFactor);
+    // Bulges outward from whichever of the two satellites sits further from
+    // the center -- since satellites no longer share one ring (see part B of
+    // LAYOUT_UPGRADE.md), this is what keeps the arc routed outside both
+    // endpoints instead of cutting back through whichever one sits closer in.
+    const outerRadius = Math.max(Math.hypot(posA.x - centerX, posA.y - centerY), Math.hypot(posB.x - centerX, posB.y - centerY));
+    const control = pointForAngle(midAngle, outerRadius * bulgeFactor);
 
     const start = pointTowards(posA, control, SATELLITE_NODE_RADIUS);
     const end = pointTowards(posB, control, SATELLITE_NODE_RADIUS);
@@ -475,7 +509,7 @@ export function render(
     // ring's horizontal radius and left less room to keep satellites clear
     // of the card at diagonal angles).
     const aboveCenter = Math.cos(placement.angle) >= 0;
-    const { lines, truncated } = wrapLabel(concept.label, maxLabelChars);
+    const { lines, truncated, halfHitWidth, labelBlockReach } = footprintByConceptId.get(placement.conceptId)!;
 
     const group = satellitesLayer
       .append("g")
@@ -487,13 +521,10 @@ export function render(
     // A generous invisible hit area, sized independently of the visible dot
     // and label, so the tap target stays usable everywhere touch happens
     // (not just directly on the tiny dot or on painted glyph pixels). Grows
-    // to cover however many lines the label wrapped onto.
-    const longestLineLength = Math.max(...lines.map((line) => line.length));
-    const halfHitWidth = Math.max(
-      SATELLITE_HIT_RADIUS,
-      (longestLineLength * CHAR_WIDTH_ESTIMATE) / 2 + SATELLITE_HIT_RADIUS / 2,
-    );
-    const labelBlockReach = SATELLITE_NODE_RADIUS + LABEL_GAP + lines.length * LABEL_LINE_HEIGHT_PX;
+    // to cover however many lines the label wrapped onto (halfHitWidth/
+    // labelBlockReach were already computed pre-layout -- see
+    // computeSatelliteFootprint -- to size this same satellite's collision
+    // radius in the force simulation above).
     const hitTop = aboveCenter ? -labelBlockReach : -SATELLITE_HIT_RADIUS;
     const hitBottom = aboveCenter ? SATELLITE_HIT_RADIUS : labelBlockReach;
     group
