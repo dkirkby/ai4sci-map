@@ -306,19 +306,17 @@ export function resolveSatellitePositions(
   // card. Pad the card's half-dimensions by *this node's own* collision
   // radius (a circle-vs-rectangle clearance approximation, not exact but
   // conservative) so nodes with bigger label footprints get pushed
-  // correspondingly further out -- but capped at the safe-area envelope
-  // (the legend/level-bar are drawn on top of satellites, same as the card
-  // is, so overshooting that envelope trades one occlusion bug for another).
-  // In an extreme squeeze (a max-degree concept in compact landscape) this
-  // cap can win even over the card-clearance floor itself; that residual
-  // card overlap is the lesser failure when there simply isn't room for
-  // every label to clear both boundaries.
-  const minRadiusForNode = (node: Pick<SimNode, "r">, angle: number): number => {
-    const padded = cardClearanceRadius(angle, minRadiusX + node.r, minRadiusY + node.r);
-    const outer = ellipseRadiusAtAngle(angle, maxRadiusX, maxRadiusY);
-    const cardOnly = cardClearanceRadius(angle, minRadiusX, minRadiusY);
-    return Math.min(padded, Math.max(outer, cardOnly));
-  };
+  // correspondingly further out. Deliberately NOT capped at the safe-area
+  // envelope: an earlier version capped it there (reasoning that the
+  // legend/level-bar draw on top of satellites too, same as the card, so
+  // overshooting that envelope just trades one occlusion bug for another),
+  // but in practice the opaque center card hides far more text per
+  // occurrence than the thin legend/level-bar strip does -- card clearance
+  // wins unconditionally here; render.ts's final safe-area clamp is what
+  // handles the legend/level-bar case instead, and only when doing so
+  // wouldn't cost this same satellite its card clearance.
+  const minRadiusForNode = (node: Pick<SimNode, "r">, angle: number): number =>
+    cardClearanceRadius(angle, minRadiusX + node.r, minRadiusY + node.r);
   const maxRadiusForNode = (node: Pick<SimNode, "r">, angle: number): number =>
     // The outer bound must never fall below the inner one -- guards the
     // (small-viewport) case where the safe-area envelope, evaluated at this

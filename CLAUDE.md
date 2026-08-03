@@ -57,9 +57,9 @@ satellites" diagram:
   (2-pass) barycenter heuristic. This is a cheap approximation of crossing
   minimization, not an optimal solver — sized for the dataset's actual max degree
   (18), not for arbitrarily dense graphs.
-- **`src/style.ts`** — collapses the 20 declared relationship types (10 inverse
-  pairs) down to 10 color "families" via `d3.schemeTableau10`, so a relationship
-  and its inverse always render in the same color.
+- **`src/style.ts`** — collapses the 24 declared relationship types (12 inverse
+  pairs) down to 12 color "families", 10 from `d3.schemeTableau10` plus 2 more,
+  so a relationship and its inverse always render in the same color.
 - **`src/render.ts`** — D3/SVG rendering of the center card, spokes, satellite
   nodes, satellite-satellite arcs, and legend. The SVG `viewBox` is sized per
   redraw from the longest label among the concepts currently on screen (concept

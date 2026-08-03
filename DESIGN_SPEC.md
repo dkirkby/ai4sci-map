@@ -75,10 +75,11 @@ interconnected groups adjacent; within a group, satellites are ordered via a
 bounded (2-pass) barycenter heuristic. This is a cheap approximation, not an
 optimal crossing minimizer — adequate given the dataset's max degree of 18.
 
-**Rendering** (`src/render.ts`, `src/style.ts`): the 10 relationship-type inverse
-pairs are collapsed to 10 color "families" (`d3.schemeTableau10`); direction is
-shown via arrowheads. The SVG viewBox is sized per redraw based on the longest
-label among the concepts on screen, so long labels (some concept labels exceed 40
+**Rendering** (`src/render.ts`, `src/style.ts`): the 12 relationship-type inverse
+pairs are collapsed to 12 color "families" (10 from `d3.schemeTableau10`, plus 2
+more); direction is shown via arrowheads. The SVG viewBox is sized per redraw
+based on the longest label among the concepts on screen, so long labels (some
+concept labels exceed 40
 characters) never clip against the viewBox edge.
 
 **Search** (`src/search.ts`): matches against every concept's label, aliases, and

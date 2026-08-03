@@ -3,8 +3,18 @@ import type { RelationshipType } from "./types.js";
 
 /**
  * The data only ever stores one direction of each declared inverse pair (see
- * scripts/build-data.ts / src/graph.ts). Collapsing each pair to a single "family"
- * gives exactly 10 families for the 10 pairs, matching d3.schemeTableau10 1:1.
+ * scripts/build-data.ts / src/graph.ts). Collapsing each pair to a single
+ * "family" gives 12 families for the 12 pairs declared in
+ * data/relationship-types.yaml. This list must stay in sync with that file --
+ * a pair missing here falls through `familyKeyForRelationshipType`'s fallback
+ * (returning the raw, un-collapsed type id), which breaks two things
+ * silently: `colorForRelationshipType` still returns *some* color (d3's
+ * ordinal scale auto-extends its domain for an unrecognized key), but
+ * `markerIdForRelationshipType` names an arrowhead marker that was never
+ * defined (see render.ts's `defs`, which only iterates `allFamilyKeys()`), so
+ * the arrow silently renders without a head; `buildLegend` and `allFamilyKeys`
+ * only iterate this list too, so the family also goes missing from the
+ * legend entirely.
  */
 const RELATIONSHIP_FAMILIES: [string, string][] = [
   ["is_a", "has_subtype"],
@@ -17,6 +27,8 @@ const RELATIONSHIP_FAMILIES: [string, string][] = [
   ["produces", "produced_by"],
   ["product_uses_model_family", "model_family_powers_product"],
   ["family_of", "has_model_family"],
+  ["evaluates", "evaluated_by"],
+  ["encompasses", "studied_within"],
 ];
 
 const familyKeyByTypeId = new Map<string, string>();
@@ -26,7 +38,16 @@ for (const [forwardId, inverseId] of RELATIONSHIP_FAMILIES) {
 }
 
 const familyKeys = RELATIONSHIP_FAMILIES.map(([forwardId]) => forwardId);
-const colorScale = d3.scaleOrdinal<string, string>().domain(familyKeys).range(d3.schemeTableau10);
+// d3.schemeTableau10 only has 10 colors, so the last 2 families are given
+// colors outside that scheme -- chosen to read as distinct from all 10
+// Tableau colors and from each other, not algorithmically validated (a full
+// audit of this now-12-family palette is a separate, larger task -- see
+// LAYOUT_UPGRADE.md's sibling concerns around this diagram's visual design).
+const EXTRA_FAMILY_COLORS = ["#17becf", "#5254a3"];
+const colorScale = d3
+  .scaleOrdinal<string, string>()
+  .domain(familyKeys)
+  .range([...d3.schemeTableau10, ...EXTRA_FAMILY_COLORS]);
 
 export function familyKeyForRelationshipType(relationshipTypeId: string): string {
   return familyKeyByTypeId.get(relationshipTypeId) ?? relationshipTypeId;

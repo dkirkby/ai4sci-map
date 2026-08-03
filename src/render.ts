@@ -69,6 +69,16 @@ const VIEW_MARGIN = 24;
 // ellipsis), even on the narrowest screens -- a name that short stops being
 // useful for telling satellites apart.
 const MIN_LABEL_CHARS = 4;
+// Never wrap/truncate a label tighter than it needs on a very wide screen --
+// most concept labels fit or nearly fit in this many characters per line (the
+// dataset's median label length is 16 characters; this comfortably covers the
+// upper-median range too before wrapping is still needed for genuine outliers).
+const MAX_LABEL_CHARS = 26;
+// How much of the available half-width a satellite label's per-line budget
+// may claim -- the rest stays reserved for the ring's own outer radius (see
+// maxRadiusX below). Purely a trade-off between "labels wrap/truncate less"
+// and "satellites can spread further out"; not derived from anything else.
+const LABEL_WIDTH_FRACTION = 0.4;
 // The search bar (top) and level bar (bottom) are fixed overlays on every
 // view; the diagram lays out in the space between them, not underneath.
 const TOP_SAFE_AREA = 84;
@@ -340,17 +350,32 @@ export function render(
   const minRadiusX = cardHalfWidth + RADIUS_CLEARANCE;
   const minRadiusY = cardHalfHeight + RADIUS_CLEARANCE;
 
-  // Labels sit above/below each satellite rather than beside it (see the
-  // label block below), so the ring itself only needs to clear the node --
-  // plus a modest margin for labels on satellites near the left/right
-  // extreme, which have little room to spill outward before the viewBox edge
-  // (there's ample room on their inward side, towards center, so this margin
-  // only has to cover the outward half of the label).
+  // The label width budget scales with how much horizontal room is actually
+  // available, capped so labels don't grow unreasonably wide on very large
+  // screens -- computed independently of the ring's own outer radius (below),
+  // not derived *from* it: satellites no longer share one ring (see
+  // resolveSatellitePositions), and a satellite's actual radius can end up
+  // well inside maxRadiusX, so there's no single "leftover slack at the
+  // ring" to size labels from in the first place. (An earlier version of
+  // this derived the label budget from that leftover slack, which made it
+  // self-referential -- the ring was sized to consume exactly enough width
+  // to leave only a fixed minimum margin, by construction, however wide the
+  // viewport actually was.)
   const availableHalfWidth = usableWidth / 2 - VIEW_MARGIN;
-  const outerLabelMargin = MIN_LABEL_CHARS * CHAR_WIDTH_ESTIMATE;
+  const maxLabelChars = Math.min(
+    MAX_LABEL_CHARS,
+    Math.max(MIN_LABEL_CHARS, Math.floor((availableHalfWidth * LABEL_WIDTH_FRACTION) / CHAR_WIDTH_ESTIMATE)),
+  );
+
+  // Labels sit above/below each satellite rather than beside it (see the
+  // label block below), so the ring's outer bound only needs to clear the
+  // node -- plus a margin, sized from the label budget just computed, for
+  // labels on satellites near the left/right extreme, which have little room
+  // to spill outward before the viewBox edge (there's ample room on their
+  // inward side, towards center, so this margin only has to cover the
+  // outward half of the label).
+  const outerLabelMargin = maxLabelChars * CHAR_WIDTH_ESTIMATE;
   const maxRadiusX = Math.max(minRadiusX, availableHalfWidth - SATELLITE_NODE_RADIUS - outerLabelMargin);
-  const outerSlack = Math.max(outerLabelMargin, availableHalfWidth - SATELLITE_NODE_RADIUS - maxRadiusX);
-  const maxLabelChars = Math.max(MIN_LABEL_CHARS, Math.floor((outerSlack * 2) / CHAR_WIDTH_ESTIMATE));
 
   // Similarly, a satellite near the top/bottom of the safe area has its label
   // stacked further outward still, so the vertical reach needs to leave room
@@ -399,6 +424,52 @@ export function render(
     maxRadiusX,
     maxRadiusY,
   });
+
+  // Final exact safety clamp, vertical only: the force simulation
+  // approximates each satellite's footprint as a single circle (see
+  // collideRadiusByConceptId above), but a label's actual reach is
+  // asymmetric -- wide for a long single-line label, tall for a wrapped
+  // multi-line one -- so in an extreme squeeze (many satellites, little
+  // vertical room) that approximation can still leave a label spilling
+  // above the legend or below the level bar even though the *dot* stayed
+  // within the simulation's (also approximate, elliptical) bound. Both draw
+  // on top of satellites, so spillover there is a real occlusion, not just
+  // crowding. Vertical only, not horizontal too: unlike the legend/level
+  // bar, nothing else draws on top of a satellite that drifts horizontally
+  // near the viewBox edge, and clamping that axis as well was observed to
+  // push satellites on a narrow (portrait) viewport back into the card --
+  // trading a real occlusion bug for a worse one.
+  //
+  // Card clearance is non-negotiable here even though it already holds by
+  // construction (resolveSatellitePositions's own minRadius, unlike the
+  // safe-area bound, is never capped away -- see its comment): pulling a
+  // satellite toward center to dodge the legend must not cost it that
+  // clearance again, so each candidate move is checked against the card's
+  // exact rectangle -- using this satellite's own known label reach, not
+  // the simulation's circular approximation -- before being applied; if it
+  // would overlap, the satellite is left where the simulation put it and
+  // the (milder, still-legible-at-the-edges) legend spillover stands.
+  for (const placement of placements) {
+    const pos = positionByConceptId.get(placement.conceptId);
+    const footprint = footprintByConceptId.get(placement.conceptId);
+    if (!pos || !footprint) continue;
+    const aboveCenter = Math.cos(placement.angle) >= 0;
+    const y = aboveCenter
+      ? Math.max(pos.y, safeTop + footprint.labelBlockReach)
+      : Math.min(pos.y, safeBottom - footprint.labelBlockReach);
+    if (y === pos.y) continue;
+
+    const labelTop = aboveCenter ? y - footprint.labelBlockReach : y - SATELLITE_NODE_RADIUS;
+    const labelBottom = aboveCenter ? y + SATELLITE_NODE_RADIUS : y + footprint.labelBlockReach;
+    const labelLeft = pos.x - footprint.halfHitWidth;
+    const labelRight = pos.x + footprint.halfHitWidth;
+    const overlapsCard =
+      labelRight > centerX - cardHalfWidth &&
+      labelLeft < centerX + cardHalfWidth &&
+      labelBottom > centerY - cardHalfHeight &&
+      labelTop < centerY + cardHalfHeight;
+    if (!overlapsCard) positionByConceptId.set(placement.conceptId, { x: pos.x, y });
+  }
 
   const svg = d3
     .select(container)
