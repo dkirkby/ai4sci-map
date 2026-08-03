@@ -362,6 +362,39 @@ body {
   box-shadow: 0 4px 18px var(--shadow);
 }
 
+/* In compact landscape, the search bar collapses to an icon-only capsule
+   sharing a row with the legend instead of stacking above it (see the
+   vertical level bar and hidden share-button rules further down for the
+   same underlying scenario). Toggled by main.ts from render.ts's per-view
+   result rather than a media query alone, since views without a legend
+   (kind/attribute lists, the acronym cloud) have nothing to gain from it. */
+#search-root.is-compact {
+  left: 16px;
+  transform: none;
+  /* Centers the capsule on the legend block's own centerline (--legend-height
+     is set from render.ts's computed legend height, in the same terms as its
+     SEARCH_CAPSULE_SIZE/TOP_MARGIN constants): a one-row legend is shorter
+     than the capsule, a two/three-row one can be taller, but either way both
+     end up centered on the same line. */
+  top: calc(20px + (max(44px, var(--legend-height, 0px)) - 44px) / 2);
+}
+
+#search-root.is-compact .search-box {
+  width: 44px;
+  padding: 12px;
+  gap: 0;
+  transition:
+    width 0.18s ease,
+    padding 0.18s ease,
+    gap 0.18s ease;
+}
+
+#search-root.is-compact .search-box:focus-within {
+  width: min(440px, calc(100vw - 32px));
+  padding: 12px 20px;
+  gap: 10px;
+}
+
 .search-icon {
   flex-shrink: 0;
   width: 20px;

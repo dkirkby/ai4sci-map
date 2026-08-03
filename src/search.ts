@@ -61,6 +61,12 @@ export function initSearch(container: HTMLElement, concepts: Concept[], options:
   wrapper.append(icon, input, dropdown);
   container.appendChild(wrapper);
 
+  // In compact mode (see #search-root.is-compact in style.css) the input is
+  // squeezed to zero width until focused, so it has no clickable area of its
+  // own -- clicking anywhere on the visible capsule (really just the icon)
+  // needs to focus it manually to trigger the CSS expansion.
+  wrapper.addEventListener("click", () => input.focus());
+
   let matches: Concept[] = [];
   let highlightedIndex = -1;
 

@@ -1,7 +1,14 @@
 import "./style.css";
-import { buildGraphIndex, resolveConceptId, type LevelCounts } from "./graph.js";
+import { buildGraphIndex, resolveConceptId } from "./graph.js";
 import { renderLevelBar } from "./level-bar.js";
-import { render, renderAcronymCloud, renderAttributeBrowser, renderKindList, type RenderOptions } from "./render.js";
+import {
+  render,
+  renderAcronymCloud,
+  renderAttributeBrowser,
+  renderKindList,
+  type RenderOptions,
+  type ViewResult,
+} from "./render.js";
 import { initSearch } from "./search.js";
 import { initShareButton } from "./share.js";
 import type { ConceptKind, GraphData } from "./types.js";
@@ -122,9 +129,10 @@ async function main() {
    * `rewriteUrl` is only passed true for the initial page load, matching the
    * existing convention of canonicalizing the URL once via `replaceState`
    * rather than on every popstate. Returns the drawn view's per-level concept
-   * counts, so the caller can render the level bar's annotations from them.
+   * counts (for the level bar's annotations) and legend layout (for the
+   * search bar's compact-mode position, see renderRoute).
    */
-  function renderCurrentView(params: URLSearchParams, level: number, rewriteUrl: boolean): LevelCounts {
+  function renderCurrentView(params: URLSearchParams, level: number, rewriteUrl: boolean): ViewResult {
     const kind = params.get(KIND_PARAM);
     if (kind !== null) {
       return renderKindList(app!, index, kind, params.get(HILITE_PARAM), level, renderOptions);
@@ -163,8 +171,15 @@ async function main() {
   function renderRoute(rewriteUrl: boolean): void {
     const params = new URLSearchParams(location.search);
     const level = parseLevel(params.get(LEVEL_PARAM));
-    const counts = renderCurrentView(params, level, rewriteUrl);
-    renderLevelBar(levelBarRoot!, { level, counts, onChange: navigateToLevel });
+    const result = renderCurrentView(params, level, rewriteUrl);
+    renderLevelBar(levelBarRoot!, { level, counts: result.counts, onChange: navigateToLevel });
+
+    // In compact landscape, the search bar collapses to a capsule sharing a
+    // row with the legend (see render.ts); --legend-height lets its CSS
+    // position center it on that row regardless of how tall the current
+    // view's legend happens to be.
+    searchRoot!.classList.toggle("is-compact", result.searchSharesRow);
+    searchRoot!.style.setProperty("--legend-height", `${result.legendHeight}px`);
   }
 
   window.addEventListener("popstate", () => renderRoute(false));

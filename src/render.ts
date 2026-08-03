@@ -42,6 +42,25 @@ const LABEL_LINE_HEIGHT_PX = LABEL_LINE_HEIGHT_EM * SATELLITE_LABEL_FONT_SIZE;
 // baseline sits a sensible distance past the node/gap rather than right at it.
 const LABEL_BASELINE_OFFSET_EM = 0.75;
 const EMPTY_LEVEL_COUNTS: LevelCounts = [0, 0, 0, 0, 0];
+
+/**
+ * What a view-render function reports back to main.ts alongside the drawn
+ * DOM/SVG, so it can position the persistent (outside-#app) search bar:
+ * `legendHeight` (0 when the view has no legend) sizes the shared row when
+ * `searchSharesRow` says the search bar should collapse to a capsule beside
+ * it, rather than stack above it.
+ */
+export interface ViewResult {
+  counts: LevelCounts;
+  legendHeight: number;
+  searchSharesRow: boolean;
+}
+
+function viewResult(counts: LevelCounts, legendHeight = 0, searchSharesRow = false): ViewResult {
+  return { counts, legendHeight, searchSharesRow };
+}
+
+const EMPTY_VIEW_RESULT: ViewResult = viewResult(EMPTY_LEVEL_COUNTS);
 // Rough average glyph width (px) for the 12px sans-serif label font -- used only
 // to size label allowances and truncation, not for precise text layout.
 const CHAR_WIDTH_ESTIMATE = 6.6;
@@ -64,6 +83,15 @@ const MAX_RADIUS_Y_RATIO = 2.4;
 // freeing up the scarce vertical space instead.
 const LANDSCAPE_COMPACT_MAX_HEIGHT = 500;
 const RIGHT_SAFE_AREA_LANDSCAPE = 96;
+// Matches #search-root/#share-root/#level-bar-root's shared 20px edge
+// margin in style.css.
+const TOP_MARGIN = 20;
+// In compact landscape, the search bar collapses to an icon-only capsule
+// sharing one row with the legend instead of stacking above it -- this is
+// that capsule's diameter, and the gap before the legend content next to it.
+// Must match #search-root.is-compact's sizing in style.css.
+const SEARCH_CAPSULE_SIZE = 44;
+const SEARCH_CAPSULE_GAP = 12;
 
 const ACRONYM_CLOUD_MIN_SIZE = 240;
 const ACRONYM_CLOUD_MIN_FONT = 16;
@@ -195,13 +223,13 @@ export function render(
   centerId: string,
   level: number,
   options: RenderOptions,
-): LevelCounts {
+): ViewResult {
   container.innerHTML = "";
 
   const centerConcept = index.conceptsById.get(centerId);
   if (!centerConcept) {
     renderError(container, `Unknown concept: "${centerId}"`);
-    return EMPTY_LEVEL_COUNTS;
+    return EMPTY_VIEW_RESULT;
   }
 
   // The center concept is always shown regardless of its own audience_level --
@@ -246,21 +274,41 @@ export function render(
   ]);
   const legendEntries = buildLegend(index.relationshipTypesById, presentRelationshipTypeIds);
 
+  // In compact landscape, the search bar collapses to an icon-only capsule
+  // sharing one row with the legend (see style.css's #search-root.is-compact)
+  // instead of stacking above it, reclaiming the search bar's own dedicated
+  // band. The legend indents past the capsule on *every* row, not just the
+  // first -- a single legend row is shorter than the capsule, so indenting
+  // only the first row would let the capsule spill down into row 1.
+  const searchSharesRow = isCompactLandscape && legendEntries.length > 0;
+  const legendLeftInset = searchSharesRow ? SEARCH_CAPSULE_SIZE + SEARCH_CAPSULE_GAP : 0;
+
   // The legend spans the full width (rather than a narrow fixed-width box)
   // and flows entries left-to-right, wrapping to a new row once a row is
   // full -- each entry sized to its own text, not a fixed column width, so
   // one unusually long entry (a family where *both* directions are present,
   // so it keeps the combined "A / B" label) doesn't force every other entry
   // onto its own row too.
-  const legendAvailableWidth = Math.max(0, viewWidth - LEGEND_MARGIN * 2);
+  const legendAvailableWidth = Math.max(0, viewWidth - LEGEND_MARGIN * 2 - legendLeftInset);
   const legendPlacements = packLegendEntries(legendEntries, legendAvailableWidth);
   const legendRows = legendPlacements.reduce((max, p) => Math.max(max, p.row + 1), 0);
   const legendHeight = legendRows > 0 ? legendRows * LEGEND_ROW_HEIGHT + LEGEND_PADDING : 0;
 
+  // Where the legend's own top edge sits: vertically centered against the
+  // capsule when sharing its row (the capsule is usually taller than a
+  // one-row legend, sometimes shorter than a two/three-row one -- either
+  // way, centering on the shared row's height keeps both aligned on the same
+  // centerline), or its own fixed position below the full-size search bar
+  // otherwise.
+  const topRowHeight = Math.max(SEARCH_CAPSULE_SIZE, legendHeight);
+  const legendY = searchSharesRow ? TOP_MARGIN + (topRowHeight - legendHeight) / 2 : TOP_SAFE_AREA;
+
   // Center vertically within the space between the legend/search bar and the
   // level bar, not the full viewport, so the ring never lays out underneath
   // any of them.
-  const safeTop = TOP_SAFE_AREA + legendHeight + (legendHeight > 0 ? 16 : 0);
+  const safeTop = searchSharesRow
+    ? TOP_MARGIN + topRowHeight + 16
+    : TOP_SAFE_AREA + legendHeight + (legendHeight > 0 ? 16 : 0);
   const safeBottom = viewHeight - (isCompactLandscape ? VIEW_MARGIN : BOTTOM_SAFE_AREA);
   const centerY = (safeTop + safeBottom) / 2;
 
@@ -525,7 +573,7 @@ export function render(
   }
 
   // --- Legend ---
-  const legendGroup = legendLayer.attr("transform", `translate(${LEGEND_MARGIN}, ${TOP_SAFE_AREA})`);
+  const legendGroup = legendLayer.attr("transform", `translate(${LEGEND_MARGIN + legendLeftInset}, ${legendY})`);
   legendGroup
     .append("rect")
     .attr("class", "legend-background")
@@ -550,7 +598,7 @@ export function render(
       .text(entry.label);
   });
 
-  return counts;
+  return viewResult(counts, legendHeight, searchSharesRow);
 }
 
 function renderError(container: HTMLElement, message: string): void {
@@ -644,12 +692,12 @@ export function renderKindList(
   hiliteConceptId: string | null,
   level: number,
   options: RenderOptions,
-): LevelCounts {
+): ViewResult {
   container.innerHTML = "";
 
   if (kind !== "" && !CONCEPT_KINDS.includes(kind as ConceptKind)) {
     renderError(container, `Unknown kind: "${kind}"`);
-    return EMPTY_LEVEL_COUNTS;
+    return EMPTY_VIEW_RESULT;
   }
 
   const wrapper = document.createElement("div");
@@ -683,7 +731,7 @@ export function renderKindList(
 
   wrapper.appendChild(content);
   container.appendChild(wrapper);
-  return counts;
+  return viewResult(counts);
 }
 
 const FREQUENCY_VALUE_ORDER = ["always", "usually", "sometimes", "rarely", "never"];
@@ -725,14 +773,14 @@ export function renderAttributeBrowser(
   hiliteConceptId: string | null,
   level: number,
   options: RenderOptions,
-): LevelCounts {
+): ViewResult {
   container.innerHTML = "";
 
   const allAttributeKeys = collectAttributeKeys(index);
 
   if (attributeKey !== "" && !allAttributeKeys.includes(attributeKey)) {
     renderError(container, `Unknown attribute: "${attributeKey}"`);
-    return EMPTY_LEVEL_COUNTS;
+    return EMPTY_VIEW_RESULT;
   }
 
   const wrapper = document.createElement("div");
@@ -786,7 +834,7 @@ export function renderAttributeBrowser(
     buildSidebar("right", allAttributeKeys, attributeKey === "" ? null : attributeKey, options.onSwitchAttribute),
   );
   container.appendChild(wrapper);
-  return counts;
+  return viewResult(counts);
 }
 
 interface AcronymWord {
@@ -812,7 +860,7 @@ export function renderAcronymCloud(
   tla: string,
   level: number,
   options: RenderOptions,
-): LevelCounts {
+): ViewResult {
   container.innerHTML = "";
 
   const allWords: AcronymWord[] = [];
@@ -826,7 +874,7 @@ export function renderAcronymCloud(
   const tlaLower = tla.toLowerCase();
   if (tla !== "" && !allWords.some((word) => word.text.toLowerCase() === tlaLower)) {
     renderError(container, `Unknown acronym: "${tla}"`);
-    return EMPTY_LEVEL_COUNTS;
+    return EMPTY_VIEW_RESULT;
   }
 
   const counts = computeLevelCounts(
@@ -842,7 +890,7 @@ export function renderAcronymCloud(
     empty.className = "concept-list-empty";
     empty.textContent = "No acronyms at this audience level.";
     container.appendChild(empty);
-    return counts;
+    return viewResult(counts);
   }
 
   // Sized from the container's actual pixels (like the main diagram), rather
@@ -900,7 +948,7 @@ export function renderAcronymCloud(
     })
     .start();
 
-  return counts;
+  return viewResult(counts);
 }
 
 function relationshipTooltip(index: GraphIndex, relationshipTypeId: string): string {
