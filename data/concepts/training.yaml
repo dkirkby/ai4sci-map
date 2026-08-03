@@ -297,12 +297,12 @@ concepts:
     description: A large benchmark dataset of labeled images spanning thousands of categories; a 2012 breakthrough on its classification challenge is widely credited with launching the current deep-learning era.
 
   - id: rlvr
-    label: RLVR
+    label: Reinforcement learning with verifiable rewards
     kind: training_method
     audience_level: 5
     description: Reinforcement learning in which the reward is computed by automatically verifying correctness (such as passing a test or matching a known answer) rather than by a learned preference or reward model.
-    aliases:
-      - Reinforcement learning with verifiable rewards
+    acronyms:
+      - RLVR
 
   - id: test-time-compute
     label: Test-time compute
