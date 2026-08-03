@@ -477,6 +477,31 @@ body {
   z-index: 30;
 }
 
+.level-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.level-bar-edge-label {
+  font-size: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* The row's width is essentially fixed regardless of viewport (all children
+   are intrinsically sized, none of it scales down further -- the ticks are
+   already at the ~44px accessible-minimum touch target). Below this measured
+   width the edge labels no longer fit; drop them rather than shrink the
+   ticks or clip the text, keeping the core level control itself unaffected. */
+@media (max-width: 340px) {
+  .level-bar-edge-label {
+    display: none;
+  }
+}
+
 .level-bar {
   display: flex;
   align-items: center;
@@ -494,14 +519,17 @@ body {
   align-items: center;
   justify-content: center;
   gap: 1px;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border: none;
   border-radius: 50%;
   background: transparent;
   color: var(--fg);
   font: inherit;
   cursor: pointer;
+  /* The current tick is drag-to-preview (see level-bar.ts); this keeps that
+     gesture from also triggering the browser's own touch scroll/zoom. */
+  touch-action: none;
 }
 
 .level-tick:hover,
@@ -512,7 +540,11 @@ body {
 .level-tick.is-current {
   background: var(--accent);
   color: #fff;
-  cursor: default;
+  cursor: grab;
+}
+
+.level-tick.is-current:active {
+  cursor: grabbing;
 }
 
 .level-tick-number {
@@ -525,4 +557,8 @@ body {
   font-size: 10px;
   line-height: 1;
   color: var(--muted);
+}
+
+.level-tick-annotation--hidden {
+  visibility: hidden;
 }

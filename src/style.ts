@@ -47,18 +47,28 @@ export interface LegendEntry {
   markerId: string;
 }
 
-export function buildLegend(relationshipTypesById: Map<string, RelationshipType>): LegendEntry[] {
-  return RELATIONSHIP_FAMILIES.map(([forwardId, inverseId]) => {
-    const forward = relationshipTypesById.get(forwardId);
-    const inverse = relationshipTypesById.get(inverseId);
-    const label = forward && inverse ? `${forward.label} / ${inverse.label}` : forwardId;
-    return {
-      familyKey: forwardId,
-      label,
-      color: colorScale(forwardId),
-      markerId: `arrow-${forwardId}`,
-    };
-  });
+/**
+ * Builds one legend entry per relationship type actually drawn in the
+ * current view (`presentTypeIds`, the experienced types from both spokes and
+ * satellite-satellite arcs) -- never the combined "A / B" form, since any
+ * single drawn arrow is fully described by just its own direction (e.g. "is
+ * a" or "has subtype"), regardless of whether the view happens to also draw
+ * the other direction elsewhere in the same color. When both directions of a
+ * family are present, both get their own entry, sharing that family's color.
+ */
+export function buildLegend(
+  relationshipTypesById: Map<string, RelationshipType>,
+  presentTypeIds: ReadonlySet<string>,
+): LegendEntry[] {
+  const entries: LegendEntry[] = [];
+  for (const [forwardId, inverseId] of RELATIONSHIP_FAMILIES) {
+    for (const typeId of [forwardId, inverseId]) {
+      if (!presentTypeIds.has(typeId)) continue;
+      const label = relationshipTypesById.get(typeId)?.label ?? typeId;
+      entries.push({ familyKey: forwardId, label, color: colorScale(forwardId), markerId: `arrow-${forwardId}` });
+    }
+  }
+  return entries;
 }
 
 export function allFamilyKeys(): string[] {

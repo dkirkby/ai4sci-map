@@ -6,8 +6,8 @@ import {
   allFamilyKeys,
   buildLegend,
   colorForRelationshipType,
-  familyKeyForRelationshipType,
   markerIdForRelationshipType,
+  type LegendEntry,
 } from "./style.js";
 import { CONCEPT_KINDS, type Concept, type ConceptKind } from "./types.js";
 
@@ -62,6 +62,20 @@ const ACRONYM_CLOUD_MIN_SIZE = 240;
 const ACRONYM_CLOUD_MIN_FONT = 16;
 const ACRONYM_CLOUD_MAX_FONT = 72;
 const ACRONYM_CLOUD_PADDING = 6;
+
+// The legend spans the full available width and flows entries left-to-right,
+// wrapping to a new row once one is full, rather than a single narrow
+// fixed-width column -- trading unused horizontal space (especially on
+// mobile portrait) for less wasted vertical space above the ring.
+const LEGEND_MARGIN = 16;
+const LEGEND_ROW_HEIGHT = 20;
+const LEGEND_PADDING = 12;
+const LEGEND_SWATCH_WIDTH = 20;
+const LEGEND_TEXT_GAP = 8;
+const LEGEND_ENTRY_GAP = 16;
+// Rough average glyph width (px) for the 11px legend label font -- used only
+// to estimate how much horizontal room each legend entry needs.
+const LEGEND_CHAR_WIDTH_ESTIMATE = 6;
 
 export interface RenderOptions {
   onSelectConcept: (conceptId: string) => void;
@@ -140,6 +154,34 @@ function wrapLabel(label: string, maxCharsPerLine: number): WrappedLabel {
   return { lines: kept, truncated: true };
 }
 
+interface LegendPlacement {
+  entry: LegendEntry;
+  x: number;
+  row: number;
+}
+
+/**
+ * Flows legend entries left-to-right, each sized to its own label, wrapping
+ * to a new row once the current one is full -- rather than a fixed-width
+ * column grid, which one unusually long entry (see buildLegend) would force
+ * down to a single column even though every other entry is much shorter.
+ */
+function packLegendEntries(entries: LegendEntry[], availableWidth: number): LegendPlacement[] {
+  const placements: LegendPlacement[] = [];
+  let x = 0;
+  let row = 0;
+  for (const entry of entries) {
+    const width = LEGEND_SWATCH_WIDTH + LEGEND_TEXT_GAP + entry.label.length * LEGEND_CHAR_WIDTH_ESTIMATE;
+    if (x > 0 && x + width > availableWidth) {
+      row += 1;
+      x = 0;
+    }
+    placements.push({ entry, x, row });
+    x += width + LEGEND_ENTRY_GAP;
+  }
+  return placements;
+}
+
 export function render(
   container: HTMLElement,
   index: GraphIndex,
@@ -180,18 +222,25 @@ export function render(
   const viewHeight = containerRect.height || window.innerHeight;
   const centerX = viewWidth / 2;
 
-  // The legend sits top-left, directly above where a satellite near the "top"
-  // of the ring would otherwise land (the ring is horizontally centered, and
-  // the legend is wide enough to reach past center on narrow screens) -- so
-  // the ring's own safe area starts below the legend, not just below the
-  // search bar. The plain search-bar-only offset is still used for the
-  // legend's own position, below.
-  const legendEntries = buildLegend(index.relationshipTypesById).filter(
-    (entry) =>
-      edges.some((e) => familyKeyForRelationshipType(e.relationshipTypeId) === entry.familyKey) ||
-      satelliteSatelliteRelationships.some((r) => familyKeyForRelationshipType(r.type) === entry.familyKey),
-  );
-  const legendHeight = legendEntries.length > 0 ? legendEntries.length * 20 + 12 : 0;
+  // The legend sits at the top, directly above where a satellite near the
+  // "top" of the ring would otherwise land -- so the ring's own safe area
+  // starts below the legend, not just below the search bar.
+  const presentRelationshipTypeIds = new Set<string>([
+    ...edges.map((e) => e.relationshipTypeId),
+    ...satelliteSatelliteRelationships.map((r) => r.type),
+  ]);
+  const legendEntries = buildLegend(index.relationshipTypesById, presentRelationshipTypeIds);
+
+  // The legend spans the full width (rather than a narrow fixed-width box)
+  // and flows entries left-to-right, wrapping to a new row once a row is
+  // full -- each entry sized to its own text, not a fixed column width, so
+  // one unusually long entry (a family where *both* directions are present,
+  // so it keeps the combined "A / B" label) doesn't force every other entry
+  // onto its own row too.
+  const legendAvailableWidth = Math.max(0, viewWidth - LEGEND_MARGIN * 2);
+  const legendPlacements = packLegendEntries(legendEntries, legendAvailableWidth);
+  const legendRows = legendPlacements.reduce((max, p) => Math.max(max, p.row + 1), 0);
+  const legendHeight = legendRows > 0 ? legendRows * LEGEND_ROW_HEIGHT + LEGEND_PADDING : 0;
 
   // Center vertically within the space between the legend/search bar and the
   // level bar, not the full viewport, so the ring never lays out underneath
@@ -461,24 +510,29 @@ export function render(
   }
 
   // --- Legend ---
-  const legendGroup = legendLayer.attr("transform", `translate(16, ${TOP_SAFE_AREA})`);
+  const legendGroup = legendLayer.attr("transform", `translate(${LEGEND_MARGIN}, ${TOP_SAFE_AREA})`);
   legendGroup
     .append("rect")
     .attr("class", "legend-background")
-    .attr("width", 240)
+    .attr("width", legendAvailableWidth)
     .attr("height", legendHeight)
     .attr("rx", 6);
-  legendEntries.forEach((entry, i) => {
-    const row = legendGroup.append("g").attr("transform", `translate(10, ${16 + i * 20})`);
-    row
+  legendPlacements.forEach(({ entry, x, row }) => {
+    const cell = legendGroup.append("g").attr("transform", `translate(${10 + x}, ${16 + row * LEGEND_ROW_HEIGHT})`);
+    cell
       .append("line")
       .attr("x1", 0)
-      .attr("x2", 20)
+      .attr("x2", LEGEND_SWATCH_WIDTH)
       .attr("y1", 0)
       .attr("y2", 0)
       .attr("stroke", entry.color)
       .attr("stroke-width", 3);
-    row.append("text").attr("class", "legend-label").attr("x", 28).attr("dy", "0.32em").text(entry.label);
+    cell
+      .append("text")
+      .attr("class", "legend-label")
+      .attr("x", LEGEND_SWATCH_WIDTH + LEGEND_TEXT_GAP)
+      .attr("dy", "0.32em")
+      .text(entry.label);
   });
 
   return counts;
