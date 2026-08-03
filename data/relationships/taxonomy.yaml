@@ -287,3 +287,7 @@ relationships:
     type: is_a
     target: representation-model
 
+  - source: edge-ai
+    type: is_subfield_of
+    target: artificial-intelligence
+

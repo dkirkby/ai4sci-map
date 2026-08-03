@@ -295,6 +295,24 @@ relationships:
     type: evaluates
     target: predictive-model
 
+  - source: edge-ai
+    type: typically_uses
+    target: npu
+    qualifiers:
+      frequency: sometimes
+
+  - source: edge-ai
+    type: typically_uses
+    target: small-language-model
+    qualifiers:
+      frequency: sometimes
+
+  - source: edge-ai
+    type: typically_uses
+    target: quantization
+    qualifiers:
+      frequency: usually
+
   - source: voice-assistant
     type: is_a
     target: ai-assistant

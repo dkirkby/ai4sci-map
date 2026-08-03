@@ -355,5 +355,3 @@ concepts:
     kind: property
     audience_level: 4
     description: A model's failure to capture the underlying pattern in the training data, resulting in poor performance on both training and new data.
-    aliases:
-      - Inference-time scaling

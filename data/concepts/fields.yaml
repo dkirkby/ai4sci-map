@@ -155,3 +155,11 @@ concepts:
     kind: field
     audience_level: 3
     description: The area of AI concerned with making systems pursue the goals and values their designers or users intend, rather than pursuing unintended objectives.
+
+  - id: edge-ai
+    label: Edge AI
+    kind: field
+    audience_level: 3
+    description: The area of AI concerned with running inference directly on local devices rather than in the cloud, trading some capability for lower latency, offline operation, and data privacy.
+    aliases:
+      - On-device AI
