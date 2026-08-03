@@ -11,13 +11,13 @@ import {
 } from "./style.js";
 import { CONCEPT_KINDS, type Concept, type ConceptKind } from "./types.js";
 
-const CARD_WIDTH = 300;
+const CARD_WIDTH = 270;
 const CARD_HEIGHT = 210;
 // The card never needs to be wider/taller than about a third of the screen or
 // the space actually available between the fixed bars -- letting it shrink
 // there leaves room for the ring and satellite labels beside it, instead of
 // the ring (or the card itself) being squeezed against/behind those bars.
-const CARD_MIN_HALF_WIDTH = 110;
+const CARD_MIN_HALF_WIDTH = 100;
 const CARD_MIN_HALF_HEIGHT = 70;
 // Minimum gap between the (possibly shrunk) card's edge and the ring.
 const RADIUS_CLEARANCE = 12;
@@ -27,17 +27,20 @@ const SATELLITE_NODE_RADIUS = 9;
 // it stays close to the ~44px minimum recommended touch target on every
 // device instead of shrinking along with the visual layout.
 const SATELLITE_HIT_RADIUS = 22;
-const SATELLITE_HIT_HEIGHT = 32;
 const LABEL_GAP = 6;
 // A label wraps onto at most this many lines (breaking on word boundaries)
 // before the remainder gets truncated with an ellipsis -- lets narrow screens
 // show roughly twice the characters per satellite without needing per-satellite
-// vertical spacing (not currently modeled by the layout) to grow indefinitely.
+// horizontal spacing (not currently modeled by the layout) to grow indefinitely.
 const MAX_LABEL_LINES = 2;
 const LABEL_LINE_HEIGHT_EM = 1.1;
-// Matches .satellite-label's font-size in em terms above; only used to grow
-// the invisible hit area to cover a second line, not for precise text layout.
-const LABEL_LINE_HEIGHT_PX = 13;
+// Matches .satellite-label's font-size in style.css -- only used to convert
+// between em (for baseline positioning) and px (for hit-area sizing) below.
+const SATELLITE_LABEL_FONT_SIZE = 12;
+const LABEL_LINE_HEIGHT_PX = LABEL_LINE_HEIGHT_EM * SATELLITE_LABEL_FONT_SIZE;
+// Approximate ascent, in em, for the line closest to the node -- so its
+// baseline sits a sensible distance past the node/gap rather than right at it.
+const LABEL_BASELINE_OFFSET_EM = 0.75;
 const EMPTY_LEVEL_COUNTS: LevelCounts = [0, 0, 0, 0, 0];
 // Rough average glyph width (px) for the 12px sans-serif label font -- used only
 // to size label allowances and truncation, not for precise text layout.
@@ -203,24 +206,38 @@ export function render(
   const minRadiusX = cardHalfWidth + RADIUS_CLEARANCE;
   const minRadiusY = cardHalfHeight + RADIUS_CLEARANCE;
 
-  // Longest label sets how much horizontal room satellites need beyond the
-  // ring itself; clamp it so a very long label (or a narrow screen) shrinks
-  // the *label*, via truncation, rather than shrinking the whole ring.
+  // Labels sit above/below each satellite rather than beside it (see the
+  // label block below), so the ring itself only needs to clear the node --
+  // plus a modest margin for labels on satellites near the left/right
+  // extreme, which have little room to spill outward before the viewBox edge
+  // (there's ample room on their inward side, towards center, so this margin
+  // only has to cover the outward half of the label).
   const availableHalfWidth = viewWidth / 2 - VIEW_MARGIN;
-  const maxLabelAllowance = Math.max(
-    MIN_LABEL_CHARS * CHAR_WIDTH_ESTIMATE,
-    availableHalfWidth - SATELLITE_NODE_RADIUS - LABEL_GAP - minRadiusX,
-  );
-  const maxLabelLength = placements.reduce((max, p) => {
-    const label = index.conceptsById.get(p.conceptId)?.label ?? "";
-    return Math.max(max, label.length);
-  }, 0);
-  const labelAllowance = Math.min(maxLabelLength * CHAR_WIDTH_ESTIMATE, maxLabelAllowance);
-  const maxLabelChars = Math.max(MIN_LABEL_CHARS, Math.floor(labelAllowance / CHAR_WIDTH_ESTIMATE));
+  const outerLabelMargin = MIN_LABEL_CHARS * CHAR_WIDTH_ESTIMATE;
+  let radiusX = Math.max(minRadiusX, availableHalfWidth - SATELLITE_NODE_RADIUS - outerLabelMargin);
+  const outerSlack = Math.max(outerLabelMargin, availableHalfWidth - SATELLITE_NODE_RADIUS - radiusX);
+  const maxLabelChars = Math.max(MIN_LABEL_CHARS, Math.floor((outerSlack * 2) / CHAR_WIDTH_ESTIMATE));
 
-  const radiusX = Math.max(minRadiusX, availableHalfWidth - SATELLITE_NODE_RADIUS - LABEL_GAP - labelAllowance);
-  const availableHalfHeight = Math.max(0, safeBottom - safeTop) / 2 - VIEW_MARGIN;
-  const radiusY = Math.min(Math.max(minRadiusY, availableHalfHeight), radiusX * MAX_RADIUS_Y_RATIO);
+  // Similarly, a satellite near the top/bottom of the ellipse has its label
+  // stacked further outward still, so the ring's vertical reach needs to
+  // leave room for a full (worst-case two-line) label block before the
+  // legend/search bar or level bar.
+  const labelBlockMargin = SATELLITE_NODE_RADIUS + LABEL_GAP + MAX_LABEL_LINES * LABEL_LINE_HEIGHT_PX;
+  const availableHalfHeight = Math.max(0, safeBottom - safeTop) / 2 - VIEW_MARGIN - labelBlockMargin;
+  let radiusY = Math.min(Math.max(minRadiusY, availableHalfHeight), radiusX * MAX_RADIUS_Y_RATIO);
+
+  // Guarantee every satellite clears the card by at least RADIUS_CLEARANCE
+  // at *every* angle, not just the 4 cardinal ones: an ellipse sized to just
+  // clear the card horizontally and vertically still cuts back inside that
+  // clearance margin near the diagonals/corners (minRadiusX/minRadiusY here
+  // are the card's half-dimensions already padded by that clearance). Scale
+  // both radii up together (preserving their ratio, i.e. the ellipse's
+  // shape) just enough that the padded corner sits strictly inside the ring.
+  const cornerRatio = Math.sqrt((minRadiusX / radiusX) ** 2 + (minRadiusY / radiusY) ** 2);
+  if (cornerRatio > 1) {
+    radiusX *= cornerRatio;
+    radiusY *= cornerRatio;
+  }
 
   const pointForAngle = (angle: number, radiusX: number, radiusY: number): Point => ({
     x: centerX + radiusX * Math.sin(angle),
@@ -340,7 +357,12 @@ export function render(
     const concept = index.conceptsById.get(placement.conceptId);
     if (!concept) continue;
     const pos = positionByConceptId.get(placement.conceptId)!;
-    const rightHalf = Math.sin(placement.angle) >= 0;
+    // Labels sit above satellites in the top half of the ring and below
+    // satellites in the bottom half, so they always point outward, away from
+    // the card, rather than beside the node (which used to eat into the
+    // ring's horizontal radius and left less room to keep satellites clear
+    // of the card at diagonal angles).
+    const aboveCenter = Math.cos(placement.angle) >= 0;
     const { lines, truncated } = wrapLabel(concept.label, maxLabelChars);
 
     const group = satellitesLayer
@@ -353,19 +375,21 @@ export function render(
     // A generous invisible hit area, sized independently of the visible dot
     // and label, so the tap target stays usable everywhere touch happens
     // (not just directly on the tiny dot or on painted glyph pixels). Grows
-    // taller when the label wraps to a second line.
+    // to cover however many lines the label wrapped onto.
     const longestLineLength = Math.max(...lines.map((line) => line.length));
-    const labelPixelWidth = longestLineLength * CHAR_WIDTH_ESTIMATE;
-    const farReach = SATELLITE_NODE_RADIUS + LABEL_GAP + labelPixelWidth + SATELLITE_HIT_RADIUS / 2;
-    const hitLeft = rightHalf ? -SATELLITE_HIT_RADIUS : -farReach;
-    const hitRight = rightHalf ? farReach : SATELLITE_HIT_RADIUS;
-    const hitHeight = SATELLITE_HIT_HEIGHT + (lines.length - 1) * LABEL_LINE_HEIGHT_PX;
+    const halfHitWidth = Math.max(
+      SATELLITE_HIT_RADIUS,
+      (longestLineLength * CHAR_WIDTH_ESTIMATE) / 2 + SATELLITE_HIT_RADIUS / 2,
+    );
+    const labelBlockReach = SATELLITE_NODE_RADIUS + LABEL_GAP + lines.length * LABEL_LINE_HEIGHT_PX;
+    const hitTop = aboveCenter ? -labelBlockReach : -SATELLITE_HIT_RADIUS;
+    const hitBottom = aboveCenter ? SATELLITE_HIT_RADIUS : labelBlockReach;
     group
       .append("rect")
-      .attr("x", hitLeft)
-      .attr("y", -hitHeight / 2)
-      .attr("width", hitRight - hitLeft)
-      .attr("height", hitHeight)
+      .attr("x", -halfHitWidth)
+      .attr("y", hitTop)
+      .attr("width", halfHitWidth * 2)
+      .attr("height", hitBottom - hitTop)
       .attr("fill", "transparent")
       .style("pointer-events", "all");
 
@@ -374,15 +398,17 @@ export function render(
       .attr("r", SATELLITE_NODE_RADIUS)
       .attr("fill", colorForRelationshipType(placement.edge.relationshipTypeId));
 
-    const labelX = rightHalf ? SATELLITE_NODE_RADIUS + LABEL_GAP : -(SATELLITE_NODE_RADIUS + LABEL_GAP);
-    const text = group
-      .append("text")
-      .attr("class", "satellite-label")
-      .attr("text-anchor", rightHalf ? "start" : "end")
-      .attr("x", labelX);
+    const nearGapEm = (SATELLITE_NODE_RADIUS + LABEL_GAP) / SATELLITE_LABEL_FONT_SIZE;
+    const text = group.append("text").attr("class", "satellite-label").attr("text-anchor", "middle").attr("x", 0);
     lines.forEach((line, i) => {
-      const dy = i === 0 ? 0.32 - ((lines.length - 1) * LABEL_LINE_HEIGHT_EM) / 2 : LABEL_LINE_HEIGHT_EM;
-      text.append("tspan").attr("x", labelX).attr("dy", `${dy}em`).text(line);
+      const nearLineOffset = nearGapEm + LABEL_BASELINE_OFFSET_EM;
+      const dy =
+        i === 0
+          ? aboveCenter
+            ? -(nearLineOffset + (lines.length - 1) * LABEL_LINE_HEIGHT_EM)
+            : nearLineOffset
+          : LABEL_LINE_HEIGHT_EM;
+      text.append("tspan").attr("x", 0).attr("dy", `${dy}em`).text(line);
     });
 
     const titleText = truncated ? `${concept.label}\n${concept.description}` : concept.description;
