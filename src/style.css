@@ -539,10 +539,18 @@ body {
    longer fits the space between the search bar and bottom margin and
    starts overflowing upward into the share button (measured collision
    point: 344px) -- hide the button rather than let the slider's own
-   labels/ticks get clipped or the two overlap. */
+   labels/ticks get clipped or the two overlap. With the share button gone,
+   nothing else occupies the right edge (the search bar is centered, not
+   right-aligned), so the bar no longer needs to duck under it -- recenter
+   using the full height instead, or its bottom edge clips the same way. */
 @media (orientation: landscape) and (max-height: 350px) {
   #share-root {
     display: none;
+  }
+
+  #level-bar-root {
+    top: 20px;
+    bottom: 20px;
   }
 }
 
