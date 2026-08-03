@@ -502,11 +502,14 @@ body {
   }
 }
 
-/* On a phone turned sideways (short height, not just any wide window --
-   see LANDSCAPE_COMPACT_MAX_HEIGHT in render.ts, which reserves matching
-   space on the right for the ring/legend/card), move the bar from the
-   bottom -- where landscape is shortest on room -- to a vertical strip
-   against the right edge, where landscape has width to spare instead. */
+/* Below this height and wider than tall -- a phone turned sideways, but
+   this is purely dimension-based (see LANDSCAPE_COMPACT_MAX_HEIGHT in
+   render.ts, which reserves matching space on the right for the
+   ring/legend/card), so an unmaximized/short desktop window matching the
+   same thresholds gets the same treatment, not just a literal phone. Move
+   the bar from the bottom -- where landscape is shortest on room -- to a
+   vertical strip against the right edge, where landscape has width to
+   spare instead. */
 @media (orientation: landscape) and (max-height: 500px) {
   #level-bar-root {
     /* top matches the search bar/share button's height (TOP_SAFE_AREA in
@@ -529,6 +532,17 @@ body {
 
   .level-bar {
     flex-direction: column;
+  }
+}
+
+/* Below this height, the vertical bar's content (measured: 280px tall) no
+   longer fits the space between the search bar and bottom margin and
+   starts overflowing upward into the share button (measured collision
+   point: 344px) -- hide the button rather than let the slider's own
+   labels/ticks get clipped or the two overlap. */
+@media (orientation: landscape) and (max-height: 350px) {
+  #share-root {
+    display: none;
   }
 }
 
