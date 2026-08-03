@@ -263,3 +263,15 @@ relationships:
     type: is_subfield_of
     target: artificial-intelligence
 
+  - source: ai-safety
+    type: is_subfield_of
+    target: artificial-intelligence
+
+  - source: alignment
+    type: is_subfield_of
+    target: ai-safety
+
+  - source: reward-model
+    type: is_a
+    target: predictive-model
+

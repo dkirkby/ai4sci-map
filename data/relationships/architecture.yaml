@@ -381,3 +381,7 @@ relationships:
     type: typically_uses
     target: encoder-only-transformer
 
+  - source: reasoning-model
+    type: uses
+    target: test-time-compute
+

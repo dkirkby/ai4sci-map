@@ -91,3 +91,9 @@ concepts:
     kind: model_role
     audience_level: 5
     description: A comparatively inexpensive approximation to a costly process, experiment, or simulation.
+
+  - id: reward-model
+    label: Reward model
+    kind: model_role
+    audience_level: 5
+    description: A model trained to predict a scalar score for how well an output satisfies a target objective, such as human preference, used to guide reinforcement-learning-based training.

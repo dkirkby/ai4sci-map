@@ -275,6 +275,10 @@ relationships:
     type: used_for
     target: classification
 
+  - source: reinforcement-learning-from-human-feedback
+    type: used_for
+    target: alignment
+
   - source: voice-assistant
     type: is_a
     target: ai-assistant

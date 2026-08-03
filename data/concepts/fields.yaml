@@ -143,3 +143,15 @@ concepts:
     kind: data_concept
     audience_level: 1
     description: Synthetic image, audio, or video content generated or altered to convincingly depict people, speech, or events that are not real.
+
+  - id: ai-safety
+    label: AI safety
+    kind: field
+    audience_level: 3
+    description: The area of AI concerned with preventing harmful, unintended, or unsafe behavior from AI systems.
+
+  - id: alignment
+    label: Alignment
+    kind: field
+    audience_level: 3
+    description: The area of AI concerned with making systems pursue the goals and values their designers or users intend, rather than pursuing unintended objectives.

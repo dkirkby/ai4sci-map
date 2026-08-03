@@ -244,6 +244,18 @@ relationships:
     type: produces
     target: embedding
 
+  - source: rlvr
+    type: uses
+    target: reinforcement-learning
+
+  - source: reasoning-model
+    type: trained_by
+    target: rlvr
+
+  - source: reinforcement-learning-from-human-feedback
+    type: uses
+    target: reward-model
+
   - source: chain-of-thought-prompting
     type: is_a
     target: prompt-engineering
