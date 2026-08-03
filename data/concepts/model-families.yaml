@@ -222,3 +222,21 @@ concepts:
     description: A language model with a comparatively small parameter count, often designed to run efficiently on local or resource-constrained hardware.
     acronyms:
       - SLM
+
+  - id: word2vec
+    label: word2vec
+    kind: model_family
+    audience_level: 4
+    description: A method for learning dense vector representations of words from their surrounding context, one of the earliest widely-adopted word-embedding techniques.
+
+  - id: glove
+    label: GloVe
+    kind: model_family
+    audience_level: 5
+    description: A word-embedding method that learns vector representations from global word co-occurrence statistics across a corpus, developed as an alternative to word2vec.
+
+  - id: bert
+    label: BERT
+    kind: model_family
+    audience_level: 4
+    description: Google's landmark pretrained masked language model, whose 2018 release popularized transfer learning via large-scale pretraining across natural language processing.

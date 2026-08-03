@@ -277,3 +277,21 @@ concepts:
     kind: property
     audience_level: 2
     description: A model's total number of learnable parameters, often cited as a rough indicator of scale.
+
+  - id: mnist
+    label: MNIST
+    kind: data_concept
+    audience_level: 5
+    description: A benchmark dataset of 70,000 small grayscale images of handwritten digits, long used as the standard first test for image-classification methods.
+
+  - id: cifar-10
+    label: CIFAR-10
+    kind: data_concept
+    audience_level: 5
+    description: A benchmark dataset of 60,000 small color images across ten object categories, widely used to evaluate image-classification methods.
+
+  - id: imagenet
+    label: ImageNet
+    kind: data_concept
+    audience_level: 4
+    description: A large benchmark dataset of labeled images spanning thousands of categories; a 2012 breakthrough on its classification challenge is widely credited with launching the current deep-learning era.

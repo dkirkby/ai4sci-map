@@ -263,6 +263,18 @@ relationships:
     qualifiers:
       frequency: sometimes
 
+  - source: mnist
+    type: used_for
+    target: classification
+
+  - source: cifar-10
+    type: used_for
+    target: classification
+
+  - source: imagenet
+    type: used_for
+    target: classification
+
   - source: voice-assistant
     type: is_a
     target: ai-assistant

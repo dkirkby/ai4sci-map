@@ -349,3 +349,35 @@ relationships:
     type: uses
     target: parameter-count
 
+  - source: alexnet
+    type: is_a
+    target: convolutional-neural-network
+
+  - source: alexnet
+    type: uses
+    target: imagenet
+
+  - source: unet
+    type: is_a
+    target: convolutional-neural-network
+
+  - source: diffusion-model
+    type: typically_uses
+    target: unet
+
+  - source: word2vec
+    type: is_a
+    target: embedding-model
+
+  - source: glove
+    type: is_a
+    target: embedding-model
+
+  - source: bert
+    type: is_a
+    target: masked-language-model
+
+  - source: bert
+    type: typically_uses
+    target: encoder-only-transformer
+

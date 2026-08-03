@@ -220,6 +220,30 @@ relationships:
     qualifiers:
       frequency: sometimes
 
+  - source: mnist
+    type: is_a
+    target: dataset
+
+  - source: cifar-10
+    type: is_a
+    target: dataset
+
+  - source: imagenet
+    type: is_a
+    target: dataset
+
+  - source: imagenet
+    type: is_a
+    target: benchmark
+
+  - source: word2vec
+    type: produces
+    target: embedding
+
+  - source: glove
+    type: produces
+    target: embedding
+
   - source: chain-of-thought-prompting
     type: is_a
     target: prompt-engineering
