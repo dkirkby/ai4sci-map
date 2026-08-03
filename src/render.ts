@@ -11,20 +11,45 @@ import {
 } from "./style.js";
 import { CONCEPT_KINDS, type Concept, type ConceptKind } from "./types.js";
 
-const BASE_VIEW_SIZE = 1000;
-const RING_RADIUS = 300;
-const SATELLITE_NODE_RADIUS = 9;
 const CARD_WIDTH = 300;
 const CARD_HEIGHT = 210;
-const CARD_HALF_WIDTH = CARD_WIDTH / 2;
-const CARD_HALF_HEIGHT = CARD_HEIGHT / 2;
+// The card never needs to be wider/taller than about a third of the screen or
+// the space actually available between the fixed bars -- letting it shrink
+// there leaves room for the ring and satellite labels beside it, instead of
+// the ring (or the card itself) being squeezed against/behind those bars.
+const CARD_MIN_HALF_WIDTH = 110;
+const CARD_MIN_HALF_HEIGHT = 70;
+// Minimum gap between the (possibly shrunk) card's edge and the ring.
+const RADIUS_CLEARANCE = 12;
+const SATELLITE_NODE_RADIUS = 9;
+// Invisible tap-target padding around each satellite, sized independently of
+// the visible dot -- this is real CSS-pixel size (see viewBox note below), so
+// it stays close to the ~44px minimum recommended touch target on every
+// device instead of shrinking along with the visual layout.
+const SATELLITE_HIT_RADIUS = 22;
+const SATELLITE_HIT_HEIGHT = 32;
 const LABEL_GAP = 6;
 const EMPTY_LEVEL_COUNTS: LevelCounts = [0, 0, 0, 0, 0];
 // Rough average glyph width (px) for the 12px sans-serif label font -- used only
-// to size the viewBox generously enough that satellite labels never clip against
-// its edge, not for precise text layout.
+// to size label allowances and truncation, not for precise text layout.
 const CHAR_WIDTH_ESTIMATE = 6.6;
 const VIEW_MARGIN = 24;
+// Never truncate a satellite label shorter than this many characters (plus an
+// ellipsis), even on the narrowest screens -- a name that short stops being
+// useful for telling satellites apart.
+const MIN_LABEL_CHARS = 4;
+// The search bar (top) and level bar (bottom) are fixed overlays on every
+// view; the diagram lays out in the space between them, not underneath.
+const TOP_SAFE_AREA = 84;
+const BOTTOM_SAFE_AREA = 96;
+// Caps how tall/narrow the satellite ellipse can get on extreme aspect ratios
+// (e.g. a very short landscape phone), so it doesn't stretch absurdly.
+const MAX_RADIUS_Y_RATIO = 2.4;
+
+const ACRONYM_CLOUD_MIN_SIZE = 240;
+const ACRONYM_CLOUD_MIN_FONT = 16;
+const ACRONYM_CLOUD_MAX_FONT = 72;
+const ACRONYM_CLOUD_PADDING = 6;
 
 export interface RenderOptions {
   onSelectConcept: (conceptId: string) => void;
@@ -53,6 +78,14 @@ function normalizedAngleDiff(a: number, b: number): number {
   if (diff > Math.PI) diff -= twoPi;
   if (diff < -Math.PI) diff += twoPi;
   return diff;
+}
+
+/** Shortens `label` to `maxChars` (plus an ellipsis) when it's longer than that. */
+function truncateLabel(label: string, maxChars: number): string {
+  if (label.length <= maxChars) return label;
+  const ELLIPSIS = "…";
+  const sliceLength = Math.max(1, maxChars - ELLIPSIS.length);
+  return label.slice(0, sliceLength).trimEnd() + ELLIPSIS;
 }
 
 export function render(
@@ -86,43 +119,84 @@ export function render(
   const satelliteSatelliteRelationships = getSatelliteSatelliteRelationships(index, satelliteIds);
   const placements = computeRadialLayout(edges, satelliteSatelliteRelationships);
 
-  // Size the viewBox generously enough that even the longest satellite label
-  // (label lengths vary a lot across this dataset, e.g. "Reinforcement learning
-  // from human feedback") stays within it -- otherwise the SVG viewBox clips it.
+  // The viewBox is sized to the container's actual rendered pixels (1 SVG user
+  // unit == 1 CSS px), rather than a fixed constant that gets scaled down to
+  // fit -- this keeps satellite dots, labels, and tap targets a real, constant
+  // on-screen size on every device instead of shrinking on small screens.
+  const containerRect = container.getBoundingClientRect();
+  const viewWidth = containerRect.width || window.innerWidth;
+  const viewHeight = containerRect.height || window.innerHeight;
+  const centerX = viewWidth / 2;
+
+  // The legend sits top-left, directly above where a satellite near the "top"
+  // of the ring would otherwise land (the ring is horizontally centered, and
+  // the legend is wide enough to reach past center on narrow screens) -- so
+  // the ring's own safe area starts below the legend, not just below the
+  // search bar. The plain search-bar-only offset is still used for the
+  // legend's own position, below.
+  const legendEntries = buildLegend(index.relationshipTypesById).filter(
+    (entry) =>
+      edges.some((e) => familyKeyForRelationshipType(e.relationshipTypeId) === entry.familyKey) ||
+      satelliteSatelliteRelationships.some((r) => familyKeyForRelationshipType(r.type) === entry.familyKey),
+  );
+  const legendHeight = legendEntries.length > 0 ? legendEntries.length * 20 + 12 : 0;
+
+  // Center vertically within the space between the legend/search bar and the
+  // level bar, not the full viewport, so the ring never lays out underneath
+  // any of them.
+  const safeTop = TOP_SAFE_AREA + legendHeight + (legendHeight > 0 ? 16 : 0);
+  const safeBottom = viewHeight - BOTTOM_SAFE_AREA;
+  const centerY = (safeTop + safeBottom) / 2;
+
+  const cardHalfWidth = Math.min(CARD_WIDTH / 2, Math.max(CARD_MIN_HALF_WIDTH, viewWidth * 0.28));
+  const availableHeightBand = Math.max(0, safeBottom - safeTop);
+  const cardHalfHeight = Math.min(CARD_HEIGHT / 2, Math.max(CARD_MIN_HALF_HEIGHT, availableHeightBand * 0.28));
+  const minRadiusX = cardHalfWidth + RADIUS_CLEARANCE;
+  const minRadiusY = cardHalfHeight + RADIUS_CLEARANCE;
+
+  // Longest label sets how much horizontal room satellites need beyond the
+  // ring itself; clamp it so a very long label (or a narrow screen) shrinks
+  // the *label*, via truncation, rather than shrinking the whole ring.
+  const availableHalfWidth = viewWidth / 2 - VIEW_MARGIN;
+  const maxLabelAllowance = Math.max(
+    MIN_LABEL_CHARS * CHAR_WIDTH_ESTIMATE,
+    availableHalfWidth - SATELLITE_NODE_RADIUS - LABEL_GAP - minRadiusX,
+  );
   const maxLabelLength = placements.reduce((max, p) => {
     const label = index.conceptsById.get(p.conceptId)?.label ?? "";
     return Math.max(max, label.length);
   }, 0);
-  const labelAllowance = maxLabelLength * CHAR_WIDTH_ESTIMATE;
-  const requiredHalfSize =
-    RING_RADIUS + SATELLITE_NODE_RADIUS + LABEL_GAP + labelAllowance + VIEW_MARGIN;
-  const viewSize = Math.max(BASE_VIEW_SIZE, requiredHalfSize * 2);
-  const center = viewSize / 2;
+  const labelAllowance = Math.min(maxLabelLength * CHAR_WIDTH_ESTIMATE, maxLabelAllowance);
+  const maxLabelChars = Math.max(MIN_LABEL_CHARS, Math.floor(labelAllowance / CHAR_WIDTH_ESTIMATE));
 
-  const pointForAngle = (angle: number, radius: number): Point => ({
-    x: center + radius * Math.sin(angle),
-    y: center - radius * Math.cos(angle),
+  const radiusX = Math.max(minRadiusX, availableHalfWidth - SATELLITE_NODE_RADIUS - LABEL_GAP - labelAllowance);
+  const availableHalfHeight = Math.max(0, safeBottom - safeTop) / 2 - VIEW_MARGIN;
+  const radiusY = Math.min(Math.max(minRadiusY, availableHalfHeight), radiusX * MAX_RADIUS_Y_RATIO);
+
+  const pointForAngle = (angle: number, radiusX: number, radiusY: number): Point => ({
+    x: centerX + radiusX * Math.sin(angle),
+    y: centerY - radiusY * Math.cos(angle),
   });
 
   /** Where a ray from the card center toward `to` exits the center card's rectangle. */
   const cardExitPoint = (to: Point): Point => {
-    const dx = to.x - center;
-    const dy = to.y - center;
-    const tx = dx === 0 ? Infinity : CARD_HALF_WIDTH / Math.abs(dx);
-    const ty = dy === 0 ? Infinity : CARD_HALF_HEIGHT / Math.abs(dy);
+    const dx = to.x - centerX;
+    const dy = to.y - centerY;
+    const tx = dx === 0 ? Infinity : cardHalfWidth / Math.abs(dx);
+    const ty = dy === 0 ? Infinity : cardHalfHeight / Math.abs(dy);
     const t = Math.min(tx, ty);
-    return { x: center + dx * t, y: center + dy * t };
+    return { x: centerX + dx * t, y: centerY + dy * t };
   };
 
   const angleByConceptId = new Map(placements.map((p) => [p.conceptId, p.angle]));
   const positionByConceptId = new Map(
-    placements.map((p) => [p.conceptId, pointForAngle(p.angle, RING_RADIUS)]),
+    placements.map((p) => [p.conceptId, pointForAngle(p.angle, radiusX, radiusY)]),
   );
 
   const svg = d3
     .select(container)
     .append("svg")
-    .attr("viewBox", `0 0 ${viewSize} ${viewSize}`)
+    .attr("viewBox", `0 0 ${viewWidth} ${viewHeight}`)
     .attr("class", "concept-map");
 
   const defs = svg.append("defs");
@@ -141,11 +215,24 @@ export function render(
       .attr("fill", colorForRelationshipType(familyKey));
   }
 
-  const arcsLayer = svg.append("g").attr("class", "arcs-layer");
-  const spokesLayer = svg.append("g").attr("class", "spokes-layer");
-  const satellitesLayer = svg.append("g").attr("class", "satellites-layer");
-  const centerLayer = svg.append("g").attr("class", "center-layer");
+  // Arcs/spokes/satellites/center card live in a zoomable+pannable group so
+  // mobile users can pinch in on a crowded ring; the legend stays fixed.
+  const contentLayer = svg.append("g").attr("class", "content-layer");
+  const arcsLayer = contentLayer.append("g").attr("class", "arcs-layer");
+  const spokesLayer = contentLayer.append("g").attr("class", "spokes-layer");
+  const satellitesLayer = contentLayer.append("g").attr("class", "satellites-layer");
+  const centerLayer = contentLayer.append("g").attr("class", "center-layer");
   const legendLayer = svg.append("g").attr("class", "legend-layer");
+
+  const zoomBehavior = d3
+    .zoom<SVGSVGElement, unknown>()
+    .scaleExtent([1, 4])
+    .translateExtent([
+      [-viewWidth * 0.5, -viewHeight * 0.5],
+      [viewWidth * 1.5, viewHeight * 1.5],
+    ])
+    .on("zoom", (event) => contentLayer.attr("transform", event.transform.toString()));
+  svg.call(zoomBehavior);
 
   // --- Satellite-satellite arcs (drawn first, so they sit behind everything) ---
   for (const rel of satelliteSatelliteRelationships) {
@@ -157,8 +244,8 @@ export function render(
 
     const diff = normalizedAngleDiff(angleA, angleB);
     const midAngle = angleA + diff / 2;
-    const bulgeRadius = RING_RADIUS + 25 + 220 * (Math.abs(diff) / Math.PI);
-    const control = pointForAngle(midAngle, bulgeRadius);
+    const bulgeFactor = 1 + 25 / 300 + (220 / 300) * (Math.abs(diff) / Math.PI);
+    const control = pointForAngle(midAngle, radiusX * bulgeFactor, radiusY * bulgeFactor);
 
     const start = pointTowards(posA, control, SATELLITE_NODE_RADIUS);
     const end = pointTowards(posB, control, SATELLITE_NODE_RADIUS);
@@ -179,7 +266,7 @@ export function render(
   for (const placement of placements) {
     const satellitePos = positionByConceptId.get(placement.conceptId)!;
     const start = cardExitPoint(satellitePos);
-    const end = pointTowards(satellitePos, { x: center, y: center }, SATELLITE_NODE_RADIUS);
+    const end = pointTowards(satellitePos, { x: centerX, y: centerY }, SATELLITE_NODE_RADIUS);
     const color = colorForRelationshipType(placement.edge.relationshipTypeId);
     const isForward = placement.edge.direction === "forward";
 
@@ -205,6 +292,7 @@ export function render(
     if (!concept) continue;
     const pos = positionByConceptId.get(placement.conceptId)!;
     const rightHalf = Math.sin(placement.angle) >= 0;
+    const label = truncateLabel(concept.label, maxLabelChars);
 
     const group = satellitesLayer
       .append("g")
@@ -212,6 +300,22 @@ export function render(
       .attr("transform", `translate(${pos.x}, ${pos.y})`)
       .style("cursor", "pointer")
       .on("click", () => options.onSelectConcept(placement.conceptId));
+
+    // A generous invisible hit area, sized independently of the visible dot
+    // and label, so the tap target stays usable everywhere touch happens
+    // (not just directly on the tiny dot or on painted glyph pixels).
+    const labelPixelWidth = label.length * CHAR_WIDTH_ESTIMATE;
+    const farReach = SATELLITE_NODE_RADIUS + LABEL_GAP + labelPixelWidth + SATELLITE_HIT_RADIUS / 2;
+    const hitLeft = rightHalf ? -SATELLITE_HIT_RADIUS : -farReach;
+    const hitRight = rightHalf ? farReach : SATELLITE_HIT_RADIUS;
+    group
+      .append("rect")
+      .attr("x", hitLeft)
+      .attr("y", -SATELLITE_HIT_HEIGHT / 2)
+      .attr("width", hitRight - hitLeft)
+      .attr("height", SATELLITE_HIT_HEIGHT)
+      .attr("fill", "transparent")
+      .style("pointer-events", "all");
 
     group
       .append("circle")
@@ -224,18 +328,19 @@ export function render(
       .attr("text-anchor", rightHalf ? "start" : "end")
       .attr("x", rightHalf ? SATELLITE_NODE_RADIUS + LABEL_GAP : -(SATELLITE_NODE_RADIUS + LABEL_GAP))
       .attr("dy", "0.32em")
-      .text(concept.label);
+      .text(label);
 
-    group.append("title").text(concept.description);
+    const titleText = label === concept.label ? concept.description : `${concept.label}\n${concept.description}`;
+    group.append("title").text(titleText);
   }
 
   // --- Center card ---
   const foreignObject = centerLayer
     .append("foreignObject")
-    .attr("x", center - CARD_HALF_WIDTH)
-    .attr("y", center - CARD_HALF_HEIGHT)
-    .attr("width", CARD_WIDTH)
-    .attr("height", CARD_HEIGHT);
+    .attr("x", centerX - cardHalfWidth)
+    .attr("y", centerY - cardHalfHeight)
+    .attr("width", cardHalfWidth * 2)
+    .attr("height", cardHalfHeight * 2);
   const card = foreignObject.append("xhtml:div").attr("class", "center-card");
   card
     .append("div")
@@ -275,17 +380,12 @@ export function render(
   }
 
   // --- Legend ---
-  const legendEntries = buildLegend(index.relationshipTypesById).filter(
-    (entry) =>
-      edges.some((e) => familyKeyForRelationshipType(e.relationshipTypeId) === entry.familyKey) ||
-      satelliteSatelliteRelationships.some((r) => familyKeyForRelationshipType(r.type) === entry.familyKey),
-  );
-  const legendGroup = legendLayer.attr("transform", "translate(16, 16)");
+  const legendGroup = legendLayer.attr("transform", `translate(16, ${TOP_SAFE_AREA})`);
   legendGroup
     .append("rect")
     .attr("class", "legend-background")
     .attr("width", 240)
-    .attr("height", legendEntries.length * 20 + 12)
+    .attr("height", legendHeight)
     .attr("rx", 6);
   legendEntries.forEach((entry, i) => {
     const row = legendGroup.append("g").attr("transform", `translate(10, ${16 + i * 20})`);
@@ -539,12 +639,6 @@ export function renderAttributeBrowser(
   return counts;
 }
 
-const ACRONYM_CLOUD_WIDTH = 1200;
-const ACRONYM_CLOUD_HEIGHT = 800;
-const ACRONYM_CLOUD_MIN_FONT = 16;
-const ACRONYM_CLOUD_MAX_FONT = 72;
-const ACRONYM_CLOUD_PADDING = 6;
-
 interface AcronymWord {
   text: string;
   conceptId: string;
@@ -601,6 +695,18 @@ export function renderAcronymCloud(
     return counts;
   }
 
+  // Sized from the container's actual pixels (like the main diagram), rather
+  // than a fixed landscape-shaped canvas, so a portrait phone gets a tall
+  // cloud instead of a small band with most of the screen left empty.
+  const containerRect = container.getBoundingClientRect();
+  const viewWidth = containerRect.width || window.innerWidth;
+  const viewHeight = containerRect.height || window.innerHeight;
+  const safeTop = TOP_SAFE_AREA;
+  const safeBottom = viewHeight - BOTTOM_SAFE_AREA;
+  const centerY = (safeTop + safeBottom) / 2;
+  const cloudWidth = Math.max(ACRONYM_CLOUD_MIN_SIZE, viewWidth - VIEW_MARGIN * 2);
+  const cloudHeight = Math.max(ACRONYM_CLOUD_MIN_SIZE, safeBottom - safeTop - VIEW_MARGIN * 2);
+
   const degrees = words.map((word) => word.size);
   const fontScale = d3
     .scaleSqrt()
@@ -611,7 +717,7 @@ export function renderAcronymCloud(
   }
 
   cloud<AcronymWord>()
-    .size([ACRONYM_CLOUD_WIDTH, ACRONYM_CLOUD_HEIGHT])
+    .size([cloudWidth, cloudHeight])
     .words(words)
     .padding(ACRONYM_CLOUD_PADDING)
     .rotate(0)
@@ -621,12 +727,12 @@ export function renderAcronymCloud(
       const svg = d3
         .select(container)
         .append("svg")
-        .attr("viewBox", `0 0 ${ACRONYM_CLOUD_WIDTH} ${ACRONYM_CLOUD_HEIGHT}`)
+        .attr("viewBox", `0 0 ${viewWidth} ${viewHeight}`)
         .attr("class", "acronym-cloud");
 
       svg
         .append("g")
-        .attr("transform", `translate(${ACRONYM_CLOUD_WIDTH / 2}, ${ACRONYM_CLOUD_HEIGHT / 2})`)
+        .attr("transform", `translate(${viewWidth / 2}, ${centerY})`)
         .selectAll("text")
         .data(placedWords)
         .join("text")
