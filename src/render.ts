@@ -249,6 +249,83 @@ function packLegendEntries(entries: LegendEntry[], availableWidth: number): Lege
   return placements;
 }
 
+/**
+ * Builds the center card's content -- kind badge, title, acronyms,
+ * description, attributes -- as a child of `parent`. Used both for the real,
+ * visible card and, in `render()`, a throwaway hidden measurement pass that
+ * sizes the card to its actual content instead of a fixed viewport-fraction
+ * height, which otherwise left a concept with no acronyms, no displayable
+ * attributes, and a short description with a lot of dead vertical padding
+ * (the card was exactly as tall as one with the longest possible content,
+ * regardless of what a given concept actually has).
+ */
+function buildCenterCard<ParentElement extends d3.BaseType>(
+  parent: d3.Selection<ParentElement, unknown, null, undefined>,
+  centerConcept: Concept,
+  options: RenderOptions,
+): void {
+  const card = parent.append("xhtml:div").attr("class", "center-card");
+  card
+    .append("div")
+    .attr("class", "center-card-kind")
+    .text(centerConcept.kind.replace(/_/g, " "))
+    .on("click", () => options.onSelectKind(centerConcept.kind, centerConcept.id));
+  card.append("h2").attr("class", "center-card-label").text(centerConcept.label);
+
+  const acronyms = centerConcept.acronyms ?? [];
+  if (acronyms.length > 0) {
+    const acronymsRow = card.append("div").attr("class", "center-card-acronyms");
+    acronyms.forEach((acronym, i) => {
+      if (i > 0) acronymsRow.append("span").attr("class", "dot-separator").text(" · ");
+      acronymsRow
+        .append("span")
+        .attr("class", "acronym-link")
+        .text(acronym)
+        .on("click", () => options.onSelectAcronym(acronym, centerConcept.id));
+    });
+  }
+
+  card.append("p").attr("class", "center-card-description").text(centerConcept.description);
+
+  const displayableAttributes = Object.entries(centerConcept.attributes ?? {}).filter(
+    (entry): entry is [string, AttributeDisplayValue] => isDisplayableAttributeValue(entry[1]),
+  );
+  if (displayableAttributes.length > 0) {
+    const attributesRow = card.append("div").attr("class", "center-card-attributes");
+    displayableAttributes.forEach(([key, value], i) => {
+      if (i > 0) attributesRow.append("span").attr("class", "dot-separator").text(" · ");
+      attributesRow
+        .append("span")
+        .attr("class", `attribute attribute-${value}`)
+        .text(humanizeSnakeCase(key))
+        .on("click", () => options.onSelectAttribute(key, centerConcept.id));
+    });
+  }
+}
+
+/**
+ * Measures how tall the center card's content actually wants to be at a
+ * given width, by building it (via `buildCenterCard`) into a hidden,
+ * off-screen element and reading back its rendered height. `.center-card`
+ * inherits `height: 100%` from its class, which would resolve against
+ * `<body>`'s own explicit height (see `html, body { height: 100% }` in
+ * style.css) if left alone -- overridden inline to `auto` so it sizes to
+ * content instead.
+ */
+function measureCenterCardHeight(width: number, centerConcept: Concept, options: RenderOptions): number {
+  const host = document.createElement("div");
+  host.style.cssText = "position: fixed; top: -9999px; left: -9999px; visibility: hidden; pointer-events: none;";
+  document.body.appendChild(host);
+
+  const hostSelection = d3.select(host).style("width", `${width}px`);
+  buildCenterCard(hostSelection, centerConcept, options);
+  d3.select(host).select<HTMLDivElement>(".center-card").style("height", "auto");
+
+  const height = host.getBoundingClientRect().height;
+  document.body.removeChild(host);
+  return height;
+}
+
 export function render(
   container: HTMLElement,
   index: GraphIndex,
@@ -287,6 +364,22 @@ export function render(
   const containerRect = container.getBoundingClientRect();
   const viewWidth = containerRect.width || window.innerWidth;
   const viewHeight = containerRect.height || window.innerHeight;
+
+  // computeRadialLayout's default for a single satellite (the only member of
+  // its only group) places it straight down from the card. On a
+  // wider-than-tall viewport that squeezes the spoke into a short vertical
+  // gap -- especially now that the card is sized to its own content (see
+  // measureCenterCardHeight) rather than a fixed fraction of the viewport,
+  // that gap can be barely more than the arrowhead itself, which ends up
+  // rendered partly behind the card (centerLayer draws on top of spokes).
+  // A wide viewport has horizontal room to spare, so use that instead. This
+  // is deliberately narrow: more than one satellite still needs
+  // computeRadialLayout's grouping/ordering, and a taller-than-wide viewport
+  // has the same squeeze problem on its *horizontal* extent instead, which
+  // moving to the side wouldn't fix.
+  if (placements.length === 1 && viewWidth > viewHeight) {
+    placements[0]!.angle = Math.PI / 2;
+  }
 
   // On a short landscape phone, the level bar relocates to a vertical strip
   // against the right edge (see style.css) instead of sitting at the bottom
@@ -346,7 +439,16 @@ export function render(
 
   const cardHalfWidth = Math.min(CARD_WIDTH / 2, Math.max(CARD_MIN_HALF_WIDTH, usableWidth * 0.28));
   const availableHeightBand = Math.max(0, safeBottom - safeTop);
-  const cardHalfHeight = Math.min(CARD_HEIGHT / 2, Math.max(CARD_MIN_HALF_HEIGHT, availableHeightBand * 0.28));
+  // The card is sized to its own content's actual height (measured below),
+  // not a fixed viewport fraction -- capped at what the old fraction-only
+  // formula would have given, so a concept with an unusually long
+  // description still can't grow the card past what the viewport has room
+  // for (that's still bounded by the same CARD_HEIGHT/viewport-fraction
+  // ceiling as before; content longer than that continues to rely on
+  // center-card-description's line-clamp, same as it always has).
+  const cardHalfHeightCeiling = Math.min(CARD_HEIGHT / 2, Math.max(CARD_MIN_HALF_HEIGHT, availableHeightBand * 0.28));
+  const measuredCardHeight = measureCenterCardHeight(cardHalfWidth * 2, centerConcept, options);
+  const cardHalfHeight = Math.min(cardHalfHeightCeiling, Math.max(CARD_MIN_HALF_HEIGHT, measuredCardHeight / 2));
   const minRadiusX = cardHalfWidth + RADIUS_CLEARANCE;
   const minRadiusY = cardHalfHeight + RADIUS_CLEARANCE;
 
@@ -636,43 +738,7 @@ export function render(
     .attr("y", centerY - cardHalfHeight)
     .attr("width", cardHalfWidth * 2)
     .attr("height", cardHalfHeight * 2);
-  const card = foreignObject.append("xhtml:div").attr("class", "center-card");
-  card
-    .append("div")
-    .attr("class", "center-card-kind")
-    .text(centerConcept.kind.replace(/_/g, " "))
-    .on("click", () => options.onSelectKind(centerConcept.kind, centerConcept.id));
-  card.append("h2").attr("class", "center-card-label").text(centerConcept.label);
-
-  const acronyms = centerConcept.acronyms ?? [];
-  if (acronyms.length > 0) {
-    const acronymsRow = card.append("div").attr("class", "center-card-acronyms");
-    acronyms.forEach((acronym, i) => {
-      if (i > 0) acronymsRow.append("span").attr("class", "dot-separator").text(" · ");
-      acronymsRow
-        .append("span")
-        .attr("class", "acronym-link")
-        .text(acronym)
-        .on("click", () => options.onSelectAcronym(acronym, centerConcept.id));
-    });
-  }
-
-  card.append("p").attr("class", "center-card-description").text(centerConcept.description);
-
-  const displayableAttributes = Object.entries(centerConcept.attributes ?? {}).filter(
-    (entry): entry is [string, AttributeDisplayValue] => isDisplayableAttributeValue(entry[1]),
-  );
-  if (displayableAttributes.length > 0) {
-    const attributesRow = card.append("div").attr("class", "center-card-attributes");
-    displayableAttributes.forEach(([key, value], i) => {
-      if (i > 0) attributesRow.append("span").attr("class", "dot-separator").text(" · ");
-      attributesRow
-        .append("span")
-        .attr("class", `attribute attribute-${value}`)
-        .text(humanizeSnakeCase(key))
-        .on("click", () => options.onSelectAttribute(key, centerConcept.id));
-    });
-  }
+  buildCenterCard(foreignObject, centerConcept, options);
 
   // --- Legend ---
   const legendGroup = legendLayer.attr("transform", `translate(${LEGEND_MARGIN + legendLeftInset}, ${legendY})`);
