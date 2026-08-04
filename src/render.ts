@@ -820,11 +820,19 @@ const SORTED_CONCEPT_KINDS = [...CONCEPT_KINDS].sort((a, b) =>
   humanizeSnakeCase(a).localeCompare(humanizeSnakeCase(b)),
 );
 
-/** A vertical nav list of clickable items, used for both the kind and attribute sidebars. */
+/**
+ * A vertical nav list of clickable items, used for both the kind and
+ * attribute sidebars. `emptyAtLevel` entries (no associated concept visible
+ * at the current audience level -- see the two callers) render in faint
+ * text as a hint of that, same as an out-of-level search match, but stay
+ * clickable like every other entry: selecting one still navigates there and
+ * shows its own "no concepts at this level" message in the content pane.
+ */
 function buildSidebar<T extends string>(
   side: "left" | "right",
   entries: T[],
   activeEntry: T | null,
+  emptyAtLevel: ReadonlySet<T>,
   onSelect: (entry: T) => void,
 ): HTMLUListElement {
   const sidebar = document.createElement("ul");
@@ -834,6 +842,9 @@ function buildSidebar<T extends string>(
     item.className = "browser-sidebar-item";
     if (entry === activeEntry) {
       item.classList.add("is-active");
+    }
+    if (emptyAtLevel.has(entry)) {
+      item.classList.add("is-empty-at-level");
     }
 
     const button = document.createElement("button");
@@ -902,8 +913,20 @@ export function renderKindList(
   const wrapper = document.createElement("div");
   wrapper.className = "browser-view";
 
+  const kindsWithConceptsAtLevel = new Set<ConceptKind>();
+  for (const concept of index.conceptsById.values()) {
+    if (concept.audience_level <= level) kindsWithConceptsAtLevel.add(concept.kind);
+  }
+  const emptyKinds = new Set(SORTED_CONCEPT_KINDS.filter((k) => !kindsWithConceptsAtLevel.has(k)));
+
   wrapper.appendChild(
-    buildSidebar("left", SORTED_CONCEPT_KINDS, kind === "" ? null : (kind as ConceptKind), options.onSwitchKind),
+    buildSidebar(
+      "left",
+      SORTED_CONCEPT_KINDS,
+      kind === "" ? null : (kind as ConceptKind),
+      emptyKinds,
+      options.onSwitchKind,
+    ),
   );
 
   const content = document.createElement("div");
@@ -1028,9 +1051,24 @@ export function renderAttributeBrowser(
     }
   }
 
+  const attributesWithConceptsAtLevel = new Set<string>();
+  for (const concept of index.conceptsById.values()) {
+    if (concept.audience_level > level) continue;
+    for (const key of Object.keys(concept.attributes ?? {})) {
+      attributesWithConceptsAtLevel.add(key);
+    }
+  }
+  const emptyAttributes = new Set(allAttributeKeys.filter((k) => !attributesWithConceptsAtLevel.has(k)));
+
   wrapper.appendChild(content);
   wrapper.appendChild(
-    buildSidebar("right", allAttributeKeys, attributeKey === "" ? null : attributeKey, options.onSwitchAttribute),
+    buildSidebar(
+      "right",
+      allAttributeKeys,
+      attributeKey === "" ? null : attributeKey,
+      emptyAttributes,
+      options.onSwitchAttribute,
+    ),
   );
   container.appendChild(wrapper);
   return viewResult(counts);
