@@ -1,6 +1,5 @@
 import "./style.css";
 import { buildGraphIndex, resolveConceptId } from "./graph.js";
-import { initHideLandscapeChrome } from "./hide-landscape-chrome.js";
 import { renderLevelBar } from "./level-bar.js";
 import {
   render,
@@ -35,8 +34,6 @@ function parseLevel(raw: string | null): number {
 }
 
 async function main() {
-  initHideLandscapeChrome();
-
   const app = document.getElementById("app");
   const searchRoot = document.getElementById("search-root");
   const shareRoot = document.getElementById("share-root");
