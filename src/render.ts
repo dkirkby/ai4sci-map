@@ -29,10 +29,14 @@ const SATELLITE_NODE_RADIUS = 9;
 const SATELLITE_HIT_RADIUS = 22;
 const LABEL_GAP = 6;
 // A label wraps onto at most this many lines (breaking on word boundaries)
-// before the remainder gets truncated with an ellipsis -- lets narrow screens
-// show roughly twice the characters per satellite without needing per-satellite
-// horizontal spacing (not currently modeled by the layout) to grow indefinitely.
-const MAX_LABEL_LINES = 2;
+// before the remainder gets truncated with an ellipsis. 3 rather than 2:
+// on a wide viewport MAX_LABEL_CHARS already fits nearly every label
+// (including the dataset's longest, at 46 characters) on 1-2 lines, so the
+// third line mainly matters on a narrow viewport, where the per-line char
+// budget shrinks and a long label (or one whose concept has no acronym to
+// fall back to, see computeSatelliteFootprint) would otherwise truncate
+// despite the extra vertical room a force-resolved layout can usually spare.
+const MAX_LABEL_LINES = 3;
 const LABEL_LINE_HEIGHT_EM = 1.1;
 // Matches .satellite-label's font-size in style.css -- only used to convert
 // between em (for baseline positioning) and px (for hit-area sizing) below.
@@ -207,18 +211,42 @@ interface SatelliteFootprint extends WrappedLabel {
   halfHitWidth: number;
   /** Distance from the node center to the far edge of its label block. */
   labelBlockReach: number;
+  /** True when an acronym is shown in place of the concept's full label -- see `computeSatelliteFootprint`. */
+  isAcronym: boolean;
 }
 
-/** Wraps `label` and measures the resulting footprint -- see `SatelliteFootprint`. */
-function computeSatelliteFootprint(label: string, maxCharsPerLine: number): SatelliteFootprint {
-  const { lines, truncated } = wrapLabel(label, maxCharsPerLine);
+/**
+ * Wraps a satellite's display label and measures the resulting footprint --
+ * see `SatelliteFootprint`. Displays `concept.label` as-is when it already
+ * fits on one line; otherwise falls back to `concept.acronyms[0]` if the
+ * concept has one, on the theory that a short, recognizable acronym reads
+ * better than a wrapped or truncated full name (an acronym is a
+ * space-saving fallback, not a universal replacement -- a short label that
+ * already fits keeps displaying in full, the same way search/the center
+ * card's acronym row treat acronyms as a secondary, optional identifier,
+ * not the primary one). Concepts with multiple acronyms use the first, same
+ * as the center card's acronym row.
+ */
+function computeSatelliteFootprint(concept: Concept, maxCharsPerLine: number): SatelliteFootprint {
+  const fullLabelWrap = wrapLabel(concept.label, maxCharsPerLine);
+  const acronym = concept.acronyms?.[0];
+  const isAcronym = acronym !== undefined && fullLabelWrap.lines.length > 1;
+  const { lines, truncated } = isAcronym ? wrapLabel(acronym, maxCharsPerLine) : fullLabelWrap;
+
   const longestLineLength = Math.max(...lines.map((line) => line.length));
   const halfHitWidth = Math.max(
     SATELLITE_HIT_RADIUS,
     (longestLineLength * CHAR_WIDTH_ESTIMATE) / 2 + SATELLITE_HIT_RADIUS / 2,
   );
   const labelBlockReach = SATELLITE_NODE_RADIUS + LABEL_GAP + lines.length * LABEL_LINE_HEIGHT_PX;
-  return { lines, truncated, halfHitWidth, labelBlockReach, collideRadius: Math.max(halfHitWidth, labelBlockReach) };
+  return {
+    lines,
+    truncated,
+    halfHitWidth,
+    labelBlockReach,
+    isAcronym,
+    collideRadius: Math.max(halfHitWidth, labelBlockReach),
+  };
 }
 
 interface LegendPlacement {
@@ -512,7 +540,7 @@ export function render(
   const footprintByConceptId = new Map(
     placements.flatMap((p) => {
       const concept = index.conceptsById.get(p.conceptId);
-      return concept ? [[p.conceptId, computeSatelliteFootprint(concept.label, maxLabelChars)] as const] : [];
+      return concept ? [[p.conceptId, computeSatelliteFootprint(concept, maxLabelChars)] as const] : [];
     }),
   );
   const collideRadiusByConceptId = new Map(
@@ -682,7 +710,7 @@ export function render(
     // ring's horizontal radius and left less room to keep satellites clear
     // of the card at diagonal angles).
     const aboveCenter = Math.cos(placement.angle) >= 0;
-    const { lines, truncated, halfHitWidth, labelBlockReach } = footprintByConceptId.get(placement.conceptId)!;
+    const { lines, truncated, halfHitWidth, labelBlockReach, isAcronym } = footprintByConceptId.get(placement.conceptId)!;
 
     const group = satellitesLayer
       .append("g")
@@ -727,7 +755,10 @@ export function render(
       text.append("tspan").attr("x", 0).attr("dy", `${dy}em`).text(line);
     });
 
-    const titleText = truncated ? `${concept.label}\n${concept.description}` : concept.description;
+    // The full label is included whenever the visible text doesn't already
+    // say it in full -- either because it's an acronym standing in for it
+    // (isAcronym) or because wrapLabel itself had to truncate (truncated).
+    const titleText = isAcronym || truncated ? `${concept.label}\n${concept.description}` : concept.description;
     group.append("title").text(titleText);
   }
 
