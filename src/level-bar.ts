@@ -12,6 +12,13 @@ export interface LevelBarOptions {
   level: number;
   counts: LevelCounts;
   onChange: (level: number) => void;
+  /**
+   * Fired for every tick crossed mid-drag, ahead of the final `onChange`.
+   * Expected to redraw the view at that level without touching browser
+   * history, so the back button lands on whatever preceded the drag rather
+   * than on each level passed through en route.
+   */
+  onPreview: (level: number) => void;
 }
 
 /**
@@ -90,21 +97,28 @@ export function renderLevelBar(container: HTMLElement, options: LevelBarOptions)
 
   container.appendChild(row);
 
-  attachDrag(tickEls, options.level - 1, options.onChange);
+  attachDrag(tickEls, options.level - 1, options.onPreview, options.onChange);
 }
 
 /**
- * Lets the current tick be dragged left/right to preview a different level
- * (moving the highlight live, for touch as much as mouse) and only commits
- * -- via `onChange`, which triggers a full re-render and a history entry --
- * once the drag ends on a different tick. Move/up listeners live on
+ * Lets the current tick be dragged left/right, live-previewing each level
+ * crossed -- via `onPreview`, which redraws the view but leaves history
+ * alone -- and only commits a history entry -- via `onChange` -- once the
+ * drag ends on a level different from where it started. Since `onPreview`
+ * triggers a full re-render of the level bar itself, the highlighted tick is
+ * left to that redraw rather than toggled here. Move/up listeners live on
  * `document` rather than the tick itself so the drag survives the level bar
- * being torn down and rebuilt if `onChange` fires mid-gesture from some other
- * source, and so implicit touch pointer capture (which keeps events targeted
+ * being torn down and rebuilt mid-gesture (which it is, on every crossed
+ * tick), and so implicit touch pointer capture (which keeps events targeted
  * at the element under the finger at touchstart) doesn't affect the
  * coordinate-based hit-testing below.
  */
-function attachDrag(tickEls: HTMLButtonElement[], startIndex: number, onChange: (level: number) => void): void {
+function attachDrag(
+  tickEls: HTMLButtonElement[],
+  startIndex: number,
+  onPreview: (level: number) => void,
+  onChange: (level: number) => void,
+): void {
   const currentTick = tickEls[startIndex];
   if (!currentTick) return;
 
@@ -136,15 +150,11 @@ function attachDrag(tickEls: HTMLButtonElement[], startIndex: number, onChange: 
       return closest;
     };
 
-    const setActive = (index: number): void => {
-      if (index === activeIndex) return;
-      tickEls[activeIndex]?.classList.remove("is-current");
-      tickEls[index]?.classList.add("is-current");
-      activeIndex = index;
-    };
-
     const onPointerMove = (moveEvent: PointerEvent): void => {
-      setActive(nearestIndex(pointerCoord(moveEvent)));
+      const nextIndex = nearestIndex(pointerCoord(moveEvent));
+      if (nextIndex === activeIndex) return;
+      activeIndex = nextIndex;
+      onPreview(activeIndex + 1);
     };
 
     const onPointerEnd = (): void => {

@@ -174,11 +174,22 @@ async function main() {
     return render(app!, index, conceptId, level, renderOptions);
   }
 
-  function renderRoute(rewriteUrl: boolean): void {
+  /**
+   * Redraws the current view at `level` without touching browser history --
+   * used to live-preview each tick the level-bar drag crosses. The real URL
+   * still names whichever level preceded the drag, so if the gesture ends
+   * back where it started (or the tab is reloaded mid-drag), nothing here
+   * needs to be undone.
+   */
+  function previewLevel(level: number): void {
+    renderRoute(false, level);
+  }
+
+  function renderRoute(rewriteUrl: boolean, overrideLevel?: number): void {
     const params = new URLSearchParams(location.search);
-    const level = parseLevel(params.get(LEVEL_PARAM));
+    const level = overrideLevel ?? parseLevel(params.get(LEVEL_PARAM));
     const result = renderCurrentView(params, level, rewriteUrl);
-    renderLevelBar(levelBarRoot!, { level, counts: result.counts, onChange: navigateToLevel });
+    renderLevelBar(levelBarRoot!, { level, counts: result.counts, onChange: navigateToLevel, onPreview: previewLevel });
     setSearchLevel(level);
 
     // In compact landscape, the search bar collapses to a capsule sharing a
