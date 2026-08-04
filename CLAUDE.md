@@ -37,7 +37,10 @@ This app has two halves that only communicate through one generated file,
    under `data/` to see the change reflected in the app.
 
 The frontend (`src/`) renders one concept at a time as a radial "hub and
-satellites" diagram:
+satellites" diagram. `LAYOUT_UPGRADE.md` records the plan behind this layout
+-- resize handling, force-directed satellite placement, and label display --
+parts A-D are all implemented; only its explicitly-deferred "Future work"
+items remain open:
 
 - **`src/types.ts`** — types mirroring `data/schema.yaml`.
 - **`src/graph.ts`** — builds `GraphIndex` from the fetched `GraphData`: an
