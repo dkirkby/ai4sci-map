@@ -634,7 +634,7 @@ export function render(
 
   const zoomBehavior = d3
     .zoom<SVGSVGElement, unknown>()
-    .scaleExtent([1, 4])
+    .scaleExtent([0.25, 4])
     .translateExtent([
       [-viewWidth * 0.5, -viewHeight * 0.5],
       [viewWidth * 1.5, viewHeight * 1.5],
