@@ -441,6 +441,10 @@ body {
   cursor: pointer;
 }
 
+.search-suggestion.is-above-level {
+  color: var(--muted);
+}
+
 .search-suggestion.is-highlighted {
   background: var(--highlight-bg);
 }

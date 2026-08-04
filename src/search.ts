@@ -11,6 +11,19 @@ interface SearchEntry {
 
 const MAX_SUGGESTIONS = 8;
 const LISTBOX_ID = "search-listbox";
+// Defaults to never graying anything out, in case a match somehow renders
+// before main.ts's first call to setSearchLevel (see there) -- audience
+// levels only ever go up to 5, so this is equivalent to "no filter."
+let currentLevel = 5;
+
+/**
+ * Updates the level suggestions are compared against for graying-out (see
+ * `initSearch`) -- called by `main.ts` on every route render, since the
+ * level can change (via the level bar) without `initSearch` running again.
+ */
+export function setSearchLevel(level: number): void {
+  currentLevel = level;
+}
 
 /**
  * A search-as-you-type box that matches concepts by label, alias, or acronym (all 182
@@ -18,6 +31,13 @@ const LISTBOX_ID = "search-listbox";
  * id to `onSelectConcept` -- the same navigation path satellite clicks use. Built
  * once against a plain DOM node outside of #app, since #app's contents are fully
  * replaced on every graph redraw (see render.ts).
+ *
+ * Deliberately still searches (and lets the user jump to) concepts above the
+ * current level -- that's the whole value of a global search over one
+ * limited to what's on screen -- but a match whose own audience_level
+ * exceeds it (see `setSearchLevel`) renders in muted text as a hint that its
+ * satellites will mostly be filtered out on arrival, without blocking the
+ * click.
  */
 export function initSearch(container: HTMLElement, concepts: Concept[], options: SearchOptions): void {
   const entries: SearchEntry[] = concepts.map((concept) => ({
@@ -115,6 +135,7 @@ export function initSearch(container: HTMLElement, concepts: Concept[], options:
       const item = document.createElement("li");
       item.id = `${LISTBOX_ID}-option-${i}`;
       item.className = "search-suggestion";
+      item.classList.toggle("is-above-level", concept.audience_level > currentLevel);
       item.setAttribute("role", "option");
       item.textContent = concept.label;
       // preventDefault keeps the input focused, so the click lands before blur

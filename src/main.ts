@@ -9,7 +9,7 @@ import {
   type RenderOptions,
   type ViewResult,
 } from "./render.js";
-import { initSearch } from "./search.js";
+import { initSearch, setSearchLevel } from "./search.js";
 import { initShareButton } from "./share.js";
 import type { ConceptKind, GraphData } from "./types.js";
 
@@ -179,6 +179,7 @@ async function main() {
     const level = parseLevel(params.get(LEVEL_PARAM));
     const result = renderCurrentView(params, level, rewriteUrl);
     renderLevelBar(levelBarRoot!, { level, counts: result.counts, onChange: navigateToLevel });
+    setSearchLevel(level);
 
     // In compact landscape, the search bar collapses to a capsule sharing a
     // row with the legend (see render.ts); --legend-height lets its CSS
