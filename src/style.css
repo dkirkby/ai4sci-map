@@ -225,6 +225,18 @@ body {
   color: var(--muted);
 }
 
+/* The center card's shadow, cast by a plain SVG rect (see render.ts) rather
+   than a CSS box-shadow on the HTML card -- box-shadow on an element painted
+   inside an SVG foreignObject doesn't reliably follow that element's own
+   border-radius in Chromium/WebKit, leaving a sharp-cornered patch of shadow
+   poking past the rounded corner. fill matches the card so the blurred rect
+   reads as a shadow, not a visible flat-colored shape peeking out from
+   behind it. */
+.center-card-shadow {
+  fill: var(--card-bg);
+  filter: drop-shadow(0 4px 18px var(--shadow));
+}
+
 .center-card {
   width: 100%;
   height: 100%;
@@ -238,7 +250,6 @@ body {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 12px;
-  box-shadow: 0 4px 18px var(--shadow);
   overflow: hidden;
 }
 

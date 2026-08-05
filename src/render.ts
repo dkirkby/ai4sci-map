@@ -13,6 +13,8 @@ import { CONCEPT_KINDS, type Concept, type ConceptKind } from "./types.js";
 
 const CARD_WIDTH = 270;
 const CARD_HEIGHT = 280;
+// Must match .center-card's border-radius in style.css.
+const CARD_CORNER_RADIUS = 12;
 // The card never needs to be wider/taller than about a third of the screen or
 // the space actually available between the fixed bars -- letting it shrink
 // there leaves room for the ring and satellite labels beside it, instead of
@@ -807,12 +809,35 @@ export function render(
   }
 
   // --- Center card ---
+  // Rounded to integer pixels, same reasoning as the shadow rect below.
+  const cardX = Math.round(centerX - cardHalfWidth);
+  const cardY = Math.round(centerY - cardHalfHeight);
+  const cardWidth = Math.round(cardHalfWidth * 2);
+  const cardHeight = Math.round(cardHalfHeight * 2);
+
+  // Drawn as a genuine SVG rect, not a CSS box-shadow on the HTML card: a
+  // box-shadow on an element painted inside an SVG foreignObject does not
+  // reliably respect that element's own border-radius in Chromium/WebKit --
+  // the shadow's corners come out sharp instead of following the curve. An
+  // SVG rect with matching rx/ry, blurred via a CSS filter, doesn't have that
+  // problem because the rounding is baked into the shape being blurred
+  // rather than negotiated between two independent paint passes.
+  centerLayer
+    .append("rect")
+    .attr("class", "center-card-shadow")
+    .attr("x", cardX)
+    .attr("y", cardY)
+    .attr("width", cardWidth)
+    .attr("height", cardHeight)
+    .attr("rx", CARD_CORNER_RADIUS)
+    .attr("ry", CARD_CORNER_RADIUS);
+
   const foreignObject = centerLayer
     .append("foreignObject")
-    .attr("x", centerX - cardHalfWidth)
-    .attr("y", centerY - cardHalfHeight)
-    .attr("width", cardHalfWidth * 2)
-    .attr("height", cardHalfHeight * 2);
+    .attr("x", cardX)
+    .attr("y", cardY)
+    .attr("width", cardWidth)
+    .attr("height", cardHeight);
   buildCenterCard(foreignObject, centerConcept, options);
 
   // Two independent ways the card can be clipping its own content, so both
