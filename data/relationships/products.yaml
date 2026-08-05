@@ -42,6 +42,14 @@ relationships:
     type: family_of
     target: foundation-model
 
+  - source: gpt-model-family
+    type: family_of
+    target: pretrained-language-model
+
+  - source: gpt-model-family
+    type: family_of
+    target: generative-model
+
   - source: claude-model-family
     type: family_of
     target: large-language-model
