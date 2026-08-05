@@ -144,7 +144,7 @@ concepts:
     label: U-Net
     kind: architecture
     audience_level: 5
-    description: A convolutional architecture with a contracting encoder and expanding decoder connected by skip connections, originally designed for biomedical image segmentation and now a common backbone inside image diffusion models.
+    description: A convolutional architecture with a contracting encoder and expanding decoder joined by skip connections, originally for biomedical image segmentation and now common inside image diffusion models.
 
   - id: positional-embedding
     label: Positional embedding

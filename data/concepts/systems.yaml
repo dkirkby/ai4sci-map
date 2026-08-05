@@ -86,6 +86,6 @@ concepts:
     label: Open-source model
     kind: property
     audience_level: 2
-    description: A model whose weights, and often architecture and training details, are released publicly for anyone to download, run, and modify, in contrast to models accessible only through a proprietary API.
+    description: A model whose weights, and often its architecture and training details, are released publicly to download, run, and modify, unlike models reachable only through a proprietary API.
     aliases:
       - Open-weight model

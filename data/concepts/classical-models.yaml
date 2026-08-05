@@ -227,6 +227,6 @@ concepts:
     label: t-SNE
     kind: model_family
     audience_level: 4
-    description: A dimensionality-reduction method that converts similarities between data points into probabilities and arranges points in low dimensions to preserve local neighborhoods, widely used to visualize high-dimensional data.
+    description: A dimensionality-reduction method that converts similarities between points into probabilities and arranges them in low dimensions to preserve local neighborhoods, for visualizing high-dimensional data.
     aliases:
       - t-distributed stochastic neighbor embedding

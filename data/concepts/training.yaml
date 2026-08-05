@@ -101,7 +101,7 @@ concepts:
     label: Speculative decoding
     kind: training_method
     audience_level: 5
-    description: A decoding technique that uses a smaller draft model to propose multiple tokens which a larger target model verifies in parallel, reducing the number of sequential forward passes needed for generation.
+    description: A decoding technique in which a small draft model proposes tokens that a larger target model verifies in parallel, cutting the sequential forward passes needed for generation.
     introduced: 2023
 
   - id: loss-function
@@ -122,7 +122,7 @@ concepts:
     label: Cross-entropy
     kind: mathematical_object
     audience_level: 4
-    description: A measure of the average number of bits needed to encode outcomes from a true distribution using a code optimized for a different, predicted distribution; widely used as a training loss for classifiers and language models.
+    description: A measure of the average bits needed to encode outcomes from a true distribution using a code optimized for a different, predicted distribution; a common training loss for classifiers and language models.
     aliases:
       - Cross-entropy loss
 
@@ -159,7 +159,7 @@ concepts:
     label: Variational inference
     kind: training_method
     audience_level: 5
-    description: An approximate inference technique that replaces an intractable posterior distribution with the closest member of a simpler, tractable family, found by optimizing a divergence-based objective.
+    description: An approximate inference technique replacing an intractable posterior with the closest member of a simpler, tractable family, found via a divergence-based objective.
     acronyms:
       - VI
 
@@ -167,7 +167,7 @@ concepts:
     label: Markov chain Monte Carlo
     kind: training_method
     audience_level: 5
-    description: A family of algorithms that draw samples from a probability distribution by constructing a Markov chain whose stationary distribution matches the target, used when direct sampling or exact inference is intractable.
+    description: A family of algorithms that sample from a probability distribution by constructing a Markov chain whose stationary distribution matches the target; used when direct sampling or exact inference is intractable.
     acronyms:
       - MCMC
 
@@ -358,13 +358,13 @@ concepts:
     label: ImageNet
     kind: data_concept
     audience_level: 4
-    description: A large benchmark dataset of labeled images spanning thousands of categories; a 2012 breakthrough on its classification challenge is widely credited with launching the current deep-learning era.
+    description: A large benchmark dataset of labeled images spanning thousands of categories; a 2012 breakthrough on its classification challenge helped launch the current deep-learning era.
 
   - id: rlvr
     label: Reinforcement learning with verifiable rewards
     kind: training_method
     audience_level: 5
-    description: Reinforcement learning in which the reward is computed by automatically verifying correctness (such as passing a test or matching a known answer) rather than by a learned preference or reward model.
+    description: Reinforcement learning where the reward comes from automatically verifying correctness (such as passing a test or matching a known answer) rather than from a learned reward model.
     acronyms:
       - RLVR
 
@@ -372,7 +372,7 @@ concepts:
     label: Test-time compute
     kind: property
     audience_level: 4
-    description: The amount of computation a model spends generating and refining its answer at inference time, as opposed to during training; increasing it is a way to trade inference cost for better answers.
+    description: The computation a model spends generating and refining its answer at inference time, rather than during training; more of it trades inference cost for better answers.
     aliases:
       - Inference-time scaling
 
@@ -442,5 +442,5 @@ concepts:
     label: Double descent
     kind: property
     audience_level: 5
-    description: An empirical phenomenon in which a model's test error, as a function of model size or training time, first follows the classical U-shaped bias-variance curve, then decreases again once the model is large enough to interpolate the training data.
+    description: An empirical phenomenon in which test error, as model size or training time grows, follows the classical U-shaped bias-variance curve, then falls again once the model can interpolate the training data.
     introduced: 2019

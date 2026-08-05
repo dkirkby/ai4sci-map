@@ -92,7 +92,7 @@ concepts:
     label: Score-based generative model
     kind: model_family
     audience_level: 5
-    description: A generative model based on estimating the gradient of the log density across noise levels; closely related to diffusion models, which formulate the same idea as reversing a noising process.
+    description: A generative model that estimates the gradient of the log density across noise levels; closely related to diffusion models, which formulate the same idea as reversing a noising process.
     attributes:
       deep: usually
       probabilistic: always

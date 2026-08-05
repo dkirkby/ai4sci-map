@@ -12,7 +12,7 @@ import {
 import { CONCEPT_KINDS, type Concept, type ConceptKind } from "./types.js";
 
 const CARD_WIDTH = 270;
-const CARD_HEIGHT = 210;
+const CARD_HEIGHT = 280;
 // The card never needs to be wider/taller than about a third of the screen or
 // the space actually available between the fixed bars -- letting it shrink
 // there leaves room for the ring and satellite labels beside it, instead of
@@ -352,6 +352,50 @@ function measureCenterCardHeight(width: number, centerConcept: Concept, options:
   const height = host.getBoundingClientRect().height;
   document.body.removeChild(host);
   return height;
+}
+
+/**
+ * Opens a full-screen popover showing `concept`'s untruncated description --
+ * the fallback for descriptions the center card's own clamp/height limits
+ * still can't fully show (see the truncation check in `render()`). Appended
+ * inside `container` rather than as a `document`-level overlay so it's
+ * automatically torn down by the next redraw's `container.innerHTML = ""`,
+ * with no separate close-on-navigate handling needed.
+ */
+function showDescriptionPopover(container: HTMLElement, concept: Concept): void {
+  d3.select(container).selectAll(".description-popover-backdrop").remove();
+
+  const backdrop = d3
+    .select(container)
+    .append("div")
+    .attr("class", "description-popover-backdrop")
+    .attr("tabindex", "-1");
+
+  const close = () => backdrop.remove();
+  backdrop
+    .on("click", (event: MouseEvent) => {
+      if (event.target === backdrop.node()) close();
+    })
+    .on("keydown", (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+    });
+
+  const panel = backdrop
+    .append("div")
+    .attr("class", "description-popover")
+    .on("click", (event: MouseEvent) => event.stopPropagation());
+  panel
+    .append("button")
+    .attr("type", "button")
+    .attr("class", "description-popover-close")
+    .attr("aria-label", "Close")
+    .text("×")
+    .on("click", close);
+  panel.append("div").attr("class", "description-popover-kind").text(concept.kind.replace(/_/g, " "));
+  panel.append("h3").attr("class", "description-popover-label").text(concept.label);
+  panel.append("p").attr("class", "description-popover-text").text(concept.description);
+
+  backdrop.node()?.focus();
 }
 
 export function render(
@@ -770,6 +814,36 @@ export function render(
     .attr("width", cardHalfWidth * 2)
     .attr("height", cardHalfHeight * 2);
   buildCenterCard(foreignObject, centerConcept, options);
+
+  // Two independent ways the card can be clipping its own content, so both
+  // need checking: the description's own -webkit-line-clamp (its box is
+  // already sized to exactly the clamped height by the time it's laid out --
+  // the card around it is sized to match via measureCenterCardHeight, so
+  // *that* box never sees an overflow; only the paragraph's own scrollHeight
+  // vs. clientHeight exposes the text hidden past the clamp), and -- on a
+  // short viewport -- the card's own fixed height (cardHalfHeightCeiling
+  // above) clipping into content that wasn't clamped internally at all.
+  // Where either is true, tap opens the full text in a popover instead.
+  const cardNode = foreignObject.select<HTMLDivElement>(".center-card").node();
+  const descriptionNode = foreignObject.select<HTMLParagraphElement>(".center-card-description").node();
+  const isTruncated =
+    !!descriptionNode &&
+    (descriptionNode.scrollHeight > descriptionNode.clientHeight + 1 ||
+      (!!cardNode && cardNode.scrollHeight > cardNode.clientHeight + 1));
+  if (isTruncated && descriptionNode) {
+    d3.select(descriptionNode)
+      .classed("center-card-description--truncated", true)
+      .attr("tabindex", "0")
+      .attr("role", "button")
+      .attr("aria-label", "Show full description")
+      .on("click", () => showDescriptionPopover(container, centerConcept))
+      .on("keydown", (event: KeyboardEvent) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          showDescriptionPopover(container, centerConcept);
+        }
+      });
+  }
 
   // --- Legend ---
   const legendGroup = legendLayer.attr("transform", `translate(${LEGEND_MARGIN + legendLeftInset}, ${legendY})`);
