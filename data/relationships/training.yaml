@@ -46,6 +46,10 @@ relationships:
     type: is_a
     target: fine-tuning
 
+  - source: low-rank-adaptation
+    type: is_a
+    target: parameter-efficient-fine-tuning
+
   - source: reinforcement-learning-from-human-feedback
     type: is_a
     target: preference-optimization
@@ -126,6 +130,12 @@ relationships:
     qualifiers:
       frequency: sometimes
 
+  - source: large-language-model
+    type: trained_by
+    target: low-rank-adaptation
+    qualifiers:
+      frequency: sometimes
+
   - source: quantization
     type: used_for
     target: inference
@@ -133,6 +143,16 @@ relationships:
   - source: pruning
     type: used_for
     target: inference
+
+  - source: speculative-decoding
+    type: used_for
+    target: inference
+
+  - source: large-language-model
+    type: typically_uses
+    target: speculative-decoding
+    qualifiers:
+      frequency: sometimes
 
   - source: training
     type: typically_uses

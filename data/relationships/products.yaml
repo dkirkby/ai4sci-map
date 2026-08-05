@@ -90,6 +90,12 @@ relationships:
     type: family_of
     target: text-to-image-model
 
+  - source: stable-diffusion
+    type: typically_uses
+    target: low-rank-adaptation
+    qualifiers:
+      frequency: sometimes
+
   - source: dall-e
     type: family_of
     target: text-to-image-model

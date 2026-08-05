@@ -42,6 +42,15 @@ concepts:
     acronyms:
       - PEFT
 
+  - id: low-rank-adaptation
+    label: Low-rank adaptation
+    kind: training_method
+    audience_level: 3
+    description: A parameter-efficient fine-tuning technique that inserts small trainable low-rank matrices into a pretrained model's weights instead of updating the original weights directly.
+    acronyms:
+      - LoRA
+    introduced: 2021
+
   - id: reinforcement-learning-from-human-feedback
     label: Reinforcement learning from human feedback
     kind: training_method
@@ -87,6 +96,13 @@ concepts:
     kind: training_method
     audience_level: 4
     description: Applying a trained model to inputs without performing its main parameter-training process.
+
+  - id: speculative-decoding
+    label: Speculative decoding
+    kind: training_method
+    audience_level: 5
+    description: A decoding technique that uses a smaller draft model to propose multiple tokens which a larger target model verifies in parallel, reducing the number of sequential forward passes needed for generation.
+    introduced: 2023
 
   - id: loss-function
     label: Loss function

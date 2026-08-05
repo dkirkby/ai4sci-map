@@ -59,6 +59,22 @@ To type-check without emitting anything:
 npm run typecheck
 ```
 
+### Adding concepts
+
+The concept database in `data/` is hand-edited YAML — see
+[DATA_README.md](DATA_README.md) for the format and
+[AUDIENCE_LEVEL.md](AUDIENCE_LEVEL.md) for how `audience_level` is assigned.
+
+If you're using [Claude Code](https://claude.com/claude-code), the
+`add-concepts` skill (`.claude/skills/add-concepts/`) automates adding a batch
+of candidate concepts: it checks each one for duplicates or heavy overlap with
+the existing graph, flags anything out of scope or too unfamiliar to source
+confidently and asks whether to keep or drop it, drafts a definition and
+relationships for the rest, and validates the result with
+`npm run build:data`. Invoke it with `/add-concepts <comma-separated list>`,
+or just paste the list in your message and run `/add-concepts` with no
+arguments — it asks for the list if one isn't already in the conversation.
+
 ## Building for production
 
 ```bash
