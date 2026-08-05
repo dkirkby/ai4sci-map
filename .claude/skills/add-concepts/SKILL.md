@@ -23,6 +23,29 @@ If the list is long (roughly 15+ items), consider telling the user you'll work
 through it in batches so the review step stays manageable, rather than silently
 truncating anything.
 
+## Helper scripts
+
+`scripts/` in this skill directory has three read-only lookup tools that
+replace the ad hoc `python3`/`grep` one-liners this skill used to require.
+Each is referenced at the step it belongs to below, but the summary:
+
+- `find-candidates.ts "<name>" ...` — Step 1's duplicate/overlap screen.
+  Checks every candidate against every existing concept's label/aliases/
+  acronyms (hyphen/space-insensitive) and reports EXACT MATCH / possible
+  overlap / no match. Requires `public/graph.json` (Step 0).
+- `inspect.ts <concept-id> ...` — Steps 2-5. Prints a concept's full record
+  (kind, audience_level, description, aliases, ...) plus every relationship
+  touching it, as stored. Use it on comparable existing concepts to calibrate
+  a new one's audience_level/description and to see how peers are connected
+  before drafting relationships. Requires `public/graph.json` (Step 0).
+- `locate.ts <concept-id> ...` — Step 6. For existing concepts that are good
+  precedent for a new one, reports which `data/concepts/*.yaml` file defines
+  them and which `data/relationships/*.yaml` files reference them, grouped by
+  file. Reads `data/` directly; no build needed.
+
+Run them with `npx tsx .claude/skills/add-concepts/scripts/<name>.ts <args>`
+from the repo root.
+
 ## Step 0 — Load current graph state
 
 1. Run `npm run build:data`. If it fails, stop and show the user the errors —
@@ -39,8 +62,11 @@ truncating anything.
 
 ## Step 1 — Duplicate / overlap screen
 
-For every candidate, compare against every existing concept's `label`,
-`aliases`, and `acronyms` (case-insensitive):
+Run `npx tsx .claude/skills/add-concepts/scripts/find-candidates.ts "<candidate 1>" "<candidate 2>" ...`
+with the full candidate list. It compares every candidate against every
+existing concept's `label`, `aliases`, and `acronyms` (case- and
+hyphen/space-insensitive) so you don't have to eyeball a dump of 250+
+concepts by hand:
 
 - **Exact match** (same term, same sense): drop it from the list, and tell the
   user it already exists as `<id>` — don't ask, this isn't a judgment call.
@@ -114,7 +140,9 @@ will reject them.
   — rate *recognition of the term* by the reference general audience, not
   difficulty or importance; test level 1 first and stop at the first level that
   clearly fits; don't infer from parent/child concepts. Use its calibration
-  table as anchors.
+  table as anchors, and use `inspect.ts <id>` on a couple of comparable
+  existing concepts to check your number against a real peer rather than the
+  table alone.
 - **`aliases`** / **`acronyms`**: only if genuinely established alternate
   names (e.g. `MLP`, `RAG`) — omit rather than force one.
 - **`introduced`**: a year, only if you're confident of it.
@@ -161,12 +189,15 @@ improvising one.
 
 Aim for real connectivity, not just one link — at minimum an `is_a` /
 `is_subfield_of` placing it in the taxonomy, plus whatever `uses` /
-`used_for` / `trained_by` / etc. edges are actually true. Look at how similar
-existing concepts are connected (their neighbors in `public/graph.json`) for a
-sanity check on how densely to link. Don't fabricate a relationship just to hit
-a quota — omit it if you're not confident it's true. Every `source`/`target`
-must be a real concept id (a just-added one or an existing one); every triple
-must be unique (no duplicate `source type target`).
+`used_for` / `trained_by` / etc. edges are actually true. Run
+`inspect.ts <id>` on a few similar existing concepts to see their outbound
+and inbound edges — both for a sanity check on how densely to link, and to
+copy the *pattern* (which relationship type, which direction, which kind of
+target) for an analogous edge on your new concept rather than inventing one
+from scratch. Don't fabricate a relationship just to hit a quota — omit it if
+you're not confident it's true. Every `source`/`target` must be a real
+concept id (a just-added one or an existing one); every triple must be unique
+(no duplicate `source type target`).
 
 ## Step 5 — Review checkpoint
 
@@ -183,7 +214,13 @@ Once confirmed, add each concept to the best-fit file under `data/concepts/`
 and each relationship to the best-fit file under `data/relationships/`. Prefer
 matching where topically-similar existing entries already live over a rigid
 kind→file mapping — the files are organized thematically and some kinds are
-split across several. As a starting point:
+split across several. Run `locate.ts <id>` on a couple of the closest existing
+precedent concepts (e.g. a sibling concept of the same `kind`, or one already
+linked by a relationship type you're about to reuse) to see exactly which
+concept file and which relationship file(s) hold them — that's more reliable
+than the table below alone, especially for relationship files, where
+placement follows the relationship's *theme* more than either endpoint's
+`kind`. As a starting point:
 
 | concept file | typically holds |
 | --- | --- |
