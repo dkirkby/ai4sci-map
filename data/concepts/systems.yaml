@@ -81,3 +81,11 @@ concepts:
     kind: property
     audience_level: 1
     description: A generative model's tendency to produce fluent, confident output that is factually incorrect or unsupported by its input.
+
+  - id: open-source-model
+    label: Open-source model
+    kind: property
+    audience_level: 2
+    description: A model whose weights, and often architecture and training details, are released publicly for anyone to download, run, and modify, in contrast to models accessible only through a proprietary API.
+    aliases:
+      - Open-weight model

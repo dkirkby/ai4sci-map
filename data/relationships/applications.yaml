@@ -295,6 +295,14 @@ relationships:
     type: evaluates
     target: predictive-model
 
+  - source: roc
+    type: evaluates
+    target: predictive-model
+
+  - source: auc
+    type: evaluates
+    target: predictive-model
+
   - source: edge-ai
     type: typically_uses
     target: npu
@@ -310,6 +318,12 @@ relationships:
   - source: edge-ai
     type: typically_uses
     target: quantization
+    qualifiers:
+      frequency: usually
+
+  - source: scientific-machine-learning
+    type: typically_uses
+    target: jax
     qualifiers:
       frequency: usually
 
@@ -332,6 +346,38 @@ relationships:
   - source: coding-assistant
     type: used_for
     target: code-generation
+
+  - source: claude-code
+    type: is_a
+    target: coding-assistant
+
+  - source: claude-code
+    type: is_a
+    target: ai-agent
+
+  - source: claude-code
+    type: used_for
+    target: code-generation
+
+  - source: claude-code
+    type: typically_uses
+    target: tool-use
+
+  - source: openai-codex
+    type: is_a
+    target: coding-assistant
+
+  - source: openai-codex
+    type: is_a
+    target: ai-agent
+
+  - source: openai-codex
+    type: used_for
+    target: code-generation
+
+  - source: openai-codex
+    type: typically_uses
+    target: tool-use
 
   - source: perplexity
     type: is_a

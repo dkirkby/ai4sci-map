@@ -49,3 +49,22 @@ concepts:
     kind: infrastructure
     audience_level: 4
     description: An open-source machine-learning framework widely used for building and training neural networks, originally developed by Google.
+
+  - id: jax
+    label: JAX
+    kind: infrastructure
+    audience_level: 4
+    description: An open-source numerical computing library from Google that combines NumPy-like array operations with automatic differentiation and just-in-time compilation, widely used for high-performance machine learning and scientific research.
+    introduced: 2018
+
+  - id: cloud-computing
+    label: Cloud computing
+    kind: infrastructure
+    audience_level: 1
+    description: On-demand delivery of computing power, storage, and other IT resources over the internet from remote data centers, rather than from locally owned hardware.
+
+  - id: data-center
+    label: Data center
+    kind: infrastructure
+    audience_level: 2
+    description: A facility housing large numbers of networked servers and specialized hardware, providing the physical computing capacity behind cloud services and large-scale model training and inference.

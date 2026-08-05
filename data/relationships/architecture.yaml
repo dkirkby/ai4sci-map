@@ -18,6 +18,10 @@ relationships:
     type: is_a
     target: neural-network
 
+  - source: convolutional-neural-network
+    type: uses
+    target: batch-normalization
+
   - source: recurrent-neural-network
     type: is_a
     target: neural-network
@@ -33,6 +37,10 @@ relationships:
   - source: transformer
     type: uses
     target: attention-mechanism
+
+  - source: neural-network
+    type: uses
+    target: activation-function
 
   - source: encoder-only-transformer
     type: is_a
@@ -303,6 +311,10 @@ relationships:
     type: uses
     target: tabular-data
 
+  - source: decision-tree
+    type: uses
+    target: entropy
+
   - source: random-forest
     type: uses
     target: tabular-data
@@ -333,6 +345,10 @@ relationships:
     type: uses
     target: multilayer-perceptron
 
+  - source: multilayer-perceptron
+    type: uses
+    target: activation-function
+
   - source: reasoning-model
     type: is_a
     target: large-language-model
@@ -348,6 +364,10 @@ relationships:
   - source: deep-neural-network
     type: uses
     target: parameter-count
+
+  - source: deep-neural-network
+    type: uses
+    target: batch-normalization
 
   - source: alexnet
     type: is_a

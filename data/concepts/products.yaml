@@ -138,6 +138,22 @@ concepts:
     audience_level: 2
     description: An AI coding assistant that suggests and completes code within a developer's editor.
 
+  - id: claude-code
+    label: Claude Code
+    kind: product
+    audience_level: 3
+    description: Anthropic's command-line coding agent that reads, edits, and runs code within a developer's own repository and terminal, carrying out multi-step programming tasks autonomously.
+    introduced: 2025
+
+  - id: openai-codex
+    label: OpenAI Codex
+    kind: product
+    audience_level: 3
+    description: OpenAI's command-line coding agent that reads a repository, edits files, runs tests, and commits code changes to carry out multi-step programming tasks autonomously.
+    aliases:
+      - Codex
+    introduced: 2025
+
   - id: meta-ai
     label: Meta AI
     kind: product

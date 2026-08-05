@@ -110,6 +110,22 @@ concepts:
     audience_level: 4
     description: A function assigning a numerical penalty to predictions, model states, or parameter choices.
 
+  - id: entropy
+    label: Entropy
+    kind: mathematical_object
+    audience_level: 4
+    description: A measure, from information theory, of the average uncertainty or information content in a random variable's outcomes, given its probability distribution.
+    aliases:
+      - Shannon entropy
+
+  - id: cross-entropy
+    label: Cross-entropy
+    kind: mathematical_object
+    audience_level: 4
+    description: A measure of the average number of bits needed to encode outcomes from a true distribution using a code optimized for a different, predicted distribution; widely used as a training loss for classifiers and language models.
+    aliases:
+      - Cross-entropy loss
+
   - id: objective-function
     label: Objective function
     kind: mathematical_object
@@ -122,6 +138,15 @@ concepts:
     audience_level: 5
     description: A model's probability or density for observed data, regarded as a function of model parameters.
 
+  - id: bayes-rule
+    label: Bayes' rule
+    kind: mathematical_object
+    audience_level: 3
+    description: A formula for updating the probability of a hypothesis given new evidence, in terms of the hypothesis's prior probability, the evidence's likelihood, and the evidence's overall probability.
+    aliases:
+      - Bayes' theorem
+      - Bayes theorem
+
   - id: maximum-likelihood-estimation
     label: Maximum-likelihood estimation
     kind: training_method
@@ -129,6 +154,22 @@ concepts:
     description: Estimating parameters by maximizing the likelihood assigned to observed data.
     acronyms:
       - MLE
+
+  - id: variational-inference
+    label: Variational inference
+    kind: training_method
+    audience_level: 5
+    description: An approximate inference technique that replaces an intractable posterior distribution with the closest member of a simpler, tractable family, found by optimizing a divergence-based objective.
+    acronyms:
+      - VI
+
+  - id: markov-chain-monte-carlo
+    label: Markov chain Monte Carlo
+    kind: training_method
+    audience_level: 5
+    description: A family of algorithms that draw samples from a probability distribution by constructing a Markov chain whose stationary distribution matches the target, used when direct sampling or exact inference is intractable.
+    acronyms:
+      - MCMC
 
   - id: gradient-descent
     label: Gradient descent
@@ -161,6 +202,13 @@ concepts:
     kind: training_method
     audience_level: 5
     description: A constraint, penalty, or procedure intended to improve generalization or encode preferences among solutions.
+
+  - id: dropout
+    label: Dropout
+    kind: training_method
+    audience_level: 4
+    description: A regularization technique that randomly deactivates a fraction of a neural network's units during each training step, reducing co-adaptation between units and improving generalization.
+    introduced: 2014
 
   - id: parameter
     label: Parameter
@@ -354,6 +402,24 @@ concepts:
     audience_level: 5
     description: A classification metric combining precision and recall into a single score via their harmonic mean, useful when the two need to be balanced.
 
+  - id: roc
+    label: ROC
+    kind: evaluation_concept
+    audience_level: 5
+    description: A plot of a binary classifier's true positive rate against its false positive rate as its decision threshold varies, used to visualize the trade-off between sensitivity and specificity.
+    aliases:
+      - ROC curve
+      - Receiver operating characteristic curve
+
+  - id: auc
+    label: AUC
+    kind: evaluation_concept
+    audience_level: 5
+    description: The area under a classifier's ROC curve, condensed into a single number between 0 and 1 that summarizes how well the classifier separates positive from negative cases across all thresholds.
+    aliases:
+      - Area under the ROC curve
+      - AUROC
+
   - id: bias-variance-tradeoff
     label: Bias-variance tradeoff
     kind: property
@@ -371,3 +437,10 @@ concepts:
     kind: property
     audience_level: 4
     description: A model's failure to capture the underlying pattern in the training data, resulting in poor performance on both training and new data.
+
+  - id: double-descent
+    label: Double descent
+    kind: property
+    audience_level: 5
+    description: An empirical phenomenon in which a model's test error, as a function of model size or training time, first follows the classical U-shaped bias-variance curve, then decreases again once the model is large enough to interpolate the training data.
+    introduced: 2019

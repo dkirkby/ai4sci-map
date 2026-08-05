@@ -24,6 +24,12 @@ concepts:
     acronyms:
       - MLP
 
+  - id: activation-function
+    label: Activation function
+    kind: architecture
+    audience_level: 4
+    description: A nonlinear function applied to a neural network layer's weighted inputs, allowing the network to represent nonlinear relationships rather than reducing to a single linear transformation.
+
   - id: deep-neural-network
     label: Deep neural network
     kind: model_class
@@ -151,3 +157,12 @@ concepts:
     kind: architecture
     audience_level: 5
     description: A technique that rescales the activations within each layer to stabilize and speed up the training of deep networks.
+
+  - id: batch-normalization
+    label: Batch normalization
+    kind: architecture
+    audience_level: 5
+    description: A technique that normalizes each layer's activations using the mean and variance computed across a mini-batch, stabilizing and accelerating the training of deep networks.
+    aliases:
+      - Batch norm
+    introduced: 2015

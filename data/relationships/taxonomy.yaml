@@ -199,6 +199,10 @@ relationships:
     type: is_a
     target: generative-model
 
+  - source: naive-bayes-classifier
+    type: uses
+    target: bayes-rule
+
   - source: gaussian-process
     type: is_a
     target: probabilistic-model
@@ -231,6 +235,10 @@ relationships:
     type: is_a
     target: probabilistic-model
 
+  - source: bayesian-network
+    type: uses
+    target: bayes-rule
+
   - source: principal-component-analysis
     type: is_a
     target: representation-model
@@ -246,6 +254,10 @@ relationships:
   - source: support-vector-machine
     type: typically_uses
     target: kernel-method
+
+  - source: auc
+    type: uses
+    target: roc
 
   - source: zero-shot-learning
     type: is_a
@@ -413,6 +425,10 @@ relationships:
   - source: deep-learning
     type: encompasses
     target: backpropagation
+
+  - source: deep-learning
+    type: encompasses
+    target: double-descent
 
   - source: statistical-learning
     type: encompasses

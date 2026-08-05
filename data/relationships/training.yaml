@@ -78,6 +78,14 @@ relationships:
     type: is_a
     target: objective-function
 
+  - source: cross-entropy
+    type: is_a
+    target: loss-function
+
+  - source: cross-entropy
+    type: uses
+    target: entropy
+
   - source: optimizer
     type: optimizes
     target: objective-function
@@ -157,6 +165,16 @@ relationships:
   - source: training
     type: typically_uses
     target: regularization
+
+  - source: dropout
+    type: is_a
+    target: regularization
+
+  - source: neural-network
+    type: trained_by
+    target: dropout
+    qualifiers:
+      frequency: sometimes
 
   - source: training
     type: typically_uses
@@ -240,6 +258,24 @@ relationships:
     qualifiers:
       frequency: sometimes
 
+  - source: training
+    type: typically_uses
+    target: jax
+    qualifiers:
+      frequency: sometimes
+
+  - source: training
+    type: typically_uses
+    target: cloud-computing
+    qualifiers:
+      frequency: usually
+
+  - source: inference
+    type: typically_uses
+    target: cloud-computing
+    qualifiers:
+      frequency: usually
+
   - source: mnist
     type: is_a
     target: dataset
@@ -286,6 +322,34 @@ relationships:
     qualifiers:
       frequency: usually
 
+  - source: variational-autoencoder
+    type: trained_by
+    target: variational-inference
+
+  - source: variational-inference
+    type: optimizes
+    target: kl-divergence
+
+  - source: energy-based-model
+    type: trained_by
+    target: markov-chain-monte-carlo
+
+  - source: bayesian-network
+    type: trained_by
+    target: markov-chain-monte-carlo
+
+  - source: causal-language-model
+    type: typically_uses
+    target: cross-entropy
+    qualifiers:
+      frequency: usually
+
+  - source: masked-language-model
+    type: typically_uses
+    target: cross-entropy
+    qualifiers:
+      frequency: usually
+
   - source: optimizer
     type: uses
     target: learning-rate
@@ -301,6 +365,10 @@ relationships:
   - source: predictive-model
     type: produces
     target: underfitting
+
+  - source: deep-neural-network
+    type: produces
+    target: double-descent
 
   - source: chain-of-thought-prompting
     type: is_a

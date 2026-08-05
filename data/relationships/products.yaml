@@ -139,3 +139,27 @@ relationships:
   - source: deepseek-model-family
     type: family_of
     target: reasoning-model
+
+  - source: claude-code
+    type: product_uses_model_family
+    target: claude-model-family
+
+  - source: openai-codex
+    type: product_uses_model_family
+    target: gpt-model-family
+
+  - source: llama-model-family
+    type: uses
+    target: open-source-model
+
+  - source: mistral-model-family
+    type: uses
+    target: open-source-model
+
+  - source: qwen-model-family
+    type: uses
+    target: open-source-model
+
+  - source: deepseek-model-family
+    type: uses
+    target: open-source-model

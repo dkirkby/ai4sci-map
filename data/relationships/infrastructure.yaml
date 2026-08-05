@@ -17,3 +17,11 @@ relationships:
   - source: cuda
     type: uses
     target: gpu
+
+  - source: cloud-computing
+    type: uses
+    target: data-center
+
+  - source: data-center
+    type: uses
+    target: hardware-accelerator
