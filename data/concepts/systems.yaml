@@ -89,3 +89,82 @@ concepts:
     description: A model whose weights, and often its architecture and training details, are released publicly to download, run, and modify, unlike models reachable only through a proprietary API.
     aliases:
       - Open-weight model
+
+  - id: system-prompt
+    label: System prompt
+    kind: data_concept
+    audience_level: 3
+    description: An initial instruction given to a language model, separate from user messages, that sets its role, behavior, or constraints for a conversation.
+
+  - id: prompt-injection
+    label: Prompt injection
+    kind: property
+    audience_level: 3
+    description: A security vulnerability in which crafted input causes a language model to follow injected instructions instead of, or in addition to, its intended ones.
+
+  - id: jailbreak
+    label: Jailbreak
+    kind: property
+    audience_level: 2
+    description: A prompt or technique designed to bypass a language model's safety training and elicit outputs it was trained to refuse.
+    aliases:
+      - Jailbreaking
+
+  - id: ai-guardrails
+    label: AI guardrails
+    kind: system
+    audience_level: 2
+    description: Policies, filters, or technical controls layered around a model to constrain its inputs and outputs to acceptable behavior.
+
+  - id: ai-bias
+    label: AI bias
+    kind: property
+    audience_level: 2
+    description: Systematic skew in a model's predictions or outputs that disadvantages particular groups or inputs, typically traceable to training data or design choices.
+    aliases:
+      - Algorithmic bias
+
+  - id: data-poisoning
+    label: Data poisoning
+    kind: property
+    audience_level: 4
+    description: An attack that corrupts a model's training data to degrade its performance or implant hidden, attacker-chosen behavior.
+
+  - id: model-collapse
+    label: Model collapse
+    kind: property
+    audience_level: 3
+    description: Degradation in a generative model's quality and diversity that occurs when it is repeatedly trained on data produced by earlier generations of models rather than genuine data.
+    introduced: 2023
+
+  - id: interpretability
+    label: Interpretability
+    kind: property
+    audience_level: 4
+    description: The degree to which a model's internal workings or decisions can be understood by a human without additional tooling.
+
+  - id: knowledge-graph
+    label: Knowledge graph
+    kind: data_concept
+    audience_level: 3
+    description: A structured representation of entities and the relationships between them, often used to store and query factual knowledge.
+
+  - id: multi-agent-system
+    label: Multi-agent system
+    kind: system
+    audience_level: 4
+    description: A system composed of multiple interacting AI agents that coordinate, negotiate, or compete to accomplish tasks a single agent could not as effectively.
+
+  - id: autonomous-vehicle
+    label: Autonomous vehicle
+    kind: system
+    audience_level: 1
+    description: A vehicle that perceives its environment and controls its own steering, acceleration, and braking with little or no human input.
+    aliases:
+      - Self-driving car
+
+  - id: digital-twin
+    label: Digital twin
+    kind: system
+    audience_level: 3
+    description: A virtual model of a physical object, process, or system that is kept synchronized with its real-world counterpart for simulation, monitoring, or prediction.

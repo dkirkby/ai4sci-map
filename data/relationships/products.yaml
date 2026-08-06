@@ -171,3 +171,39 @@ relationships:
   - source: deepseek-model-family
     type: uses
     target: open-source-model
+
+  - source: alphafold
+    type: used_for
+    target: protein-structure-prediction
+
+  - source: sora
+    type: used_for
+    target: video-generation
+
+  - source: runway
+    type: used_for
+    target: video-generation
+
+  - source: elevenlabs
+    type: used_for
+    target: text-to-speech
+
+  - source: elevenlabs
+    type: used_for
+    target: voice-cloning
+
+  - source: suno
+    type: used_for
+    target: music-generation
+
+  - source: notebooklm
+    type: used_for
+    target: summarization
+
+  - source: notebooklm
+    type: used_for
+    target: question-answering
+
+  - source: notebooklm
+    type: product_uses_model_family
+    target: gemini-model-family

@@ -179,3 +179,83 @@ concepts:
     kind: task
     audience_level: 3
     description: Producing new musical audio or compositions, optionally conditioned on text or other input.
+
+  - id: content-moderation
+    label: Content moderation
+    kind: task
+    audience_level: 2
+    description: Detecting and filtering content that violates platform policies or safety guidelines, such as harassment, hate speech, or explicit material.
+
+  - id: optical-character-recognition
+    label: Optical character recognition
+    kind: task
+    audience_level: 2
+    description: Converting images of printed or handwritten text into machine-readable text.
+    acronyms:
+      - OCR
+
+  - id: image-classification
+    label: Image classification
+    kind: task
+    audience_level: 3
+    description: Assigning an image to one or more predefined categories.
+
+  - id: image-segmentation
+    label: Image segmentation
+    kind: task
+    audience_level: 4
+    description: Partitioning an image into regions, typically by assigning a class label to each pixel.
+
+  - id: image-captioning
+    label: Image captioning
+    kind: task
+    audience_level: 3
+    description: Generating a natural-language description of an image's content.
+
+  - id: voice-cloning
+    label: Voice cloning
+    kind: task
+    audience_level: 2
+    description: Synthesizing speech in a target person's voice from a sample of their recorded speech.
+
+  - id: audio-generation
+    label: Audio generation
+    kind: task
+    audience_level: 3
+    description: Producing new audio, such as speech, sound effects, or music, optionally conditioned on text or other input.
+
+  - id: document-understanding
+    label: Document understanding
+    kind: task
+    audience_level: 4
+    description: Extracting structure and meaning from documents, such as text, layout, tables, and fields, from formats like scans or PDFs.
+
+  - id: information-extraction
+    label: Information extraction
+    kind: task
+    audience_level: 4
+    description: Automatically pulling structured facts, entities, or relationships out of unstructured text or documents.
+
+  - id: vector-search
+    label: Vector search
+    kind: task
+    audience_level: 4
+    description: Finding the stored vectors most similar to a query vector, typically by approximate nearest-neighbor search.
+
+  - id: semantic-search
+    label: Semantic search
+    kind: task
+    audience_level: 3
+    description: Retrieving results by matching meaning rather than exact keywords, typically using embeddings to represent similarity.
+
+  - id: protein-structure-prediction
+    label: Protein structure prediction
+    kind: task
+    audience_level: 3
+    description: Predicting a protein's three-dimensional structure from its amino-acid sequence.
+
+  - id: drug-discovery
+    label: Drug discovery
+    kind: task
+    audience_level: 2
+    description: Identifying and optimizing chemical compounds with potential as new medicines.

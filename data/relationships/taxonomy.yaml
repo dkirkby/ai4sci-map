@@ -462,3 +462,167 @@ relationships:
     type: encompasses
     target: generative-model
 
+  - source: ai-safety
+    type: encompasses
+    target: prompt-injection
+
+  - source: ai-safety
+    type: encompasses
+    target: jailbreak
+
+  - source: ai-safety
+    type: encompasses
+    target: adversarial-example
+
+  - source: ai-safety
+    type: encompasses
+    target: data-poisoning
+
+  - source: ai-safety
+    type: encompasses
+    target: human-in-the-loop
+
+  - source: ai-safety
+    type: encompasses
+    target: content-moderation
+
+  - source: ai-safety
+    type: encompasses
+    target: red-teaming
+
+  - source: explainable-ai
+    type: is_subfield_of
+    target: artificial-intelligence
+
+  - source: explainable-ai
+    type: encompasses
+    target: interpretability
+
+  - source: ai-fairness
+    type: is_subfield_of
+    target: ai-safety
+
+  - source: ai-fairness
+    type: encompasses
+    target: ai-bias
+
+  - source: generative-ai
+    type: encompasses
+    target: model-collapse
+
+  - source: system-prompt
+    type: is_a
+    target: prompt
+
+  - source: agentic-ai
+    type: is_subfield_of
+    target: artificial-intelligence
+
+  - source: agentic-ai
+    type: encompasses
+    target: ai-agent
+
+  - source: agentic-ai
+    type: encompasses
+    target: multi-agent-system
+
+  - source: robotics
+    type: encompasses
+    target: autonomous-vehicle
+
+  - source: computer-vision
+    type: encompasses
+    target: optical-character-recognition
+
+  - source: computer-vision
+    type: encompasses
+    target: image-classification
+
+  - source: computer-vision
+    type: encompasses
+    target: image-segmentation
+
+  - source: computer-vision
+    type: encompasses
+    target: image-captioning
+
+  - source: natural-language-processing
+    type: encompasses
+    target: image-captioning
+
+  - source: natural-language-processing
+    type: encompasses
+    target: document-understanding
+
+  - source: natural-language-processing
+    type: encompasses
+    target: information-extraction
+
+  - source: image-classification
+    type: is_a
+    target: classification
+
+  - source: speech-and-audio-ml
+    type: encompasses
+    target: voice-cloning
+
+  - source: speech-and-audio-ml
+    type: encompasses
+    target: audio-generation
+
+  - source: generative-ai
+    type: encompasses
+    target: audio-generation
+
+  - source: music-generation
+    type: is_a
+    target: audio-generation
+
+  - source: text-to-speech
+    type: is_a
+    target: audio-generation
+
+  - source: recommendation-systems
+    type: encompasses
+    target: collaborative-filtering
+
+  - source: ai-for-science
+    type: is_subfield_of
+    target: artificial-intelligence
+
+  - source: ai-for-science
+    type: encompasses
+    target: scientific-machine-learning
+
+  - source: ai-for-science
+    type: encompasses
+    target: protein-structure-prediction
+
+  - source: ai-for-science
+    type: encompasses
+    target: drug-discovery
+
+  - source: ai-for-science
+    type: encompasses
+    target: digital-twin
+
+  - source: scientific-machine-learning
+    type: encompasses
+    target: digital-twin
+
+  - source: semantic-search
+    type: is_a
+    target: information-retrieval
+
+  - source: f1-score
+    type: uses
+    target: precision
+
+  - source: f1-score
+    type: uses
+    target: recall
+
+  - source: leaderboard
+    type: uses
+    target: benchmark
+

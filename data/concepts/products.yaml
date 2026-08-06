@@ -177,3 +177,45 @@ concepts:
     kind: product
     audience_level: 3
     description: A platform for creating and chatting with customizable AI-driven personas.
+
+  - id: alphafold
+    label: AlphaFold
+    kind: product
+    audience_level: 2
+    description: DeepMind's AI system that predicts protein three-dimensional structure from amino-acid sequence with high accuracy.
+
+  - id: sora
+    label: Sora
+    kind: product
+    audience_level: 2
+    description: OpenAI's text-to-video generation product.
+
+  - id: runway
+    label: Runway
+    kind: product
+    audience_level: 3
+    description: A generative video and creative-tools product used for text-to-video and video-editing AI features.
+
+  - id: elevenlabs
+    label: ElevenLabs
+    kind: product
+    audience_level: 3
+    description: A voice AI product for text-to-speech and voice cloning used to add synthetic speech to applications and media.
+
+  - id: suno
+    label: Suno
+    kind: product
+    audience_level: 3
+    description: An AI product that generates original songs, including vocals and instrumentation, from text prompts.
+
+  - id: notebooklm
+    label: NotebookLM
+    kind: product
+    audience_level: 3
+    description: Google's AI research and note-taking product that summarizes and answers questions over a user's own uploaded documents.
+
+  - id: cursor
+    label: Cursor
+    kind: product
+    audience_level: 3
+    description: An AI-powered code editor that uses language models to autocomplete, edit, and generate code within a developer's codebase.

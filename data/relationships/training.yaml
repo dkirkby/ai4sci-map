@@ -390,3 +390,35 @@ relationships:
     type: produces
     target: deepfake
 
+  - source: prompt-injection
+    type: uses
+    target: prompt
+
+  - source: predictive-model
+    type: produces
+    target: ai-bias
+
+  - source: generative-model
+    type: produces
+    target: model-collapse
+
+  - source: accuracy
+    type: uses
+    target: ground-truth
+
+  - source: benchmark
+    type: uses
+    target: ground-truth
+
+  - source: llm-as-a-judge
+    type: uses
+    target: large-language-model
+
+  - source: open-source-model
+    type: uses
+    target: model-weights
+
+  - source: reinforcement-learning-from-human-feedback
+    type: is_a
+    target: human-in-the-loop
+

@@ -240,3 +240,9 @@ concepts:
     kind: model_family
     audience_level: 4
     description: Google's landmark pretrained masked language model, whose 2018 release popularized transfer learning via large-scale pretraining across natural language processing.
+
+  - id: text-to-video-model
+    label: Text-to-video model
+    kind: model_class
+    audience_level: 2
+    description: A generative model that produces video conditioned on text.

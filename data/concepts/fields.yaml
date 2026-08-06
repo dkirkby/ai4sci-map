@@ -163,3 +163,33 @@ concepts:
     description: The area of AI concerned with running inference directly on local devices rather than in the cloud, trading some capability for lower latency, offline operation, and data privacy.
     aliases:
       - On-device AI
+
+  - id: explainable-ai
+    label: Explainable AI
+    kind: field
+    audience_level: 3
+    description: The area of AI concerned with making a model's decisions and internal reasoning understandable to humans.
+    acronyms:
+      - XAI
+
+  - id: ai-fairness
+    label: AI fairness
+    kind: field
+    audience_level: 3
+    description: The area of AI concerned with measuring and reducing unfair or discriminatory outcomes produced by models.
+    aliases:
+      - Algorithmic fairness
+
+  - id: agentic-ai
+    label: Agentic AI
+    kind: field
+    audience_level: 3
+    description: The area of AI concerned with designing systems that autonomously plan and take multi-step actions toward a goal with limited human intervention.
+
+  - id: ai-for-science
+    label: AI for science
+    kind: field
+    audience_level: 3
+    description: The area of AI concerned with accelerating scientific discovery and modeling across disciplines such as biology, chemistry, physics, and materials science.
+    aliases:
+      - AI4Science

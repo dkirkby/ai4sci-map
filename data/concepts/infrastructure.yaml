@@ -68,3 +68,9 @@ concepts:
     kind: infrastructure
     audience_level: 2
     description: A facility housing large numbers of networked servers and specialized hardware, providing the physical computing capacity behind cloud services and large-scale model training and inference.
+
+  - id: vector-database
+    label: Vector database
+    kind: infrastructure
+    audience_level: 4
+    description: A database optimized for storing embeddings and retrieving the most similar ones to a query vector.

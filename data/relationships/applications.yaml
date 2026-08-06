@@ -443,3 +443,119 @@ relationships:
     type: evaluates
     target: artificial-intelligence
 
+  - source: ai-assistant
+    type: typically_uses
+    target: ai-guardrails
+
+  - source: ai-guardrails
+    type: used_for
+    target: content-moderation
+
+  - source: classification
+    type: used_for
+    target: content-moderation
+
+  - source: red-teaming
+    type: evaluates
+    target: foundation-model
+
+  - source: cross-validation
+    type: evaluates
+    target: generalization
+
+  - source: precision
+    type: evaluates
+    target: predictive-model
+
+  - source: recall
+    type: evaluates
+    target: predictive-model
+
+  - source: leaderboard
+    type: evaluates
+    target: foundation-model
+
+  - source: llm-as-a-judge
+    type: evaluates
+    target: generative-model
+
+  - source: vector-database
+    type: uses
+    target: embedding
+
+  - source: vector-database
+    type: used_for
+    target: vector-search
+
+  - source: semantic-search
+    type: uses
+    target: embedding
+
+  - source: semantic-search
+    type: typically_uses
+    target: vector-search
+
+  - source: retrieval-augmented-generation
+    type: typically_uses
+    target: knowledge-graph
+
+  - source: knowledge-graph
+    type: used_for
+    target: question-answering
+
+  - source: multi-agent-system
+    type: uses
+    target: ai-agent
+
+  - source: autonomous-vehicle
+    type: used_for
+    target: control
+
+  - source: autonomous-vehicle
+    type: used_for
+    target: object-detection
+
+  - source: convolutional-neural-network
+    type: used_for
+    target: image-classification
+
+  - source: convolutional-neural-network
+    type: used_for
+    target: image-segmentation
+
+  - source: voice-cloning
+    type: uses
+    target: text-to-speech
+
+  - source: voice-cloning
+    type: typically_uses
+    target: speech-foundation-model
+
+  - source: text-to-video-model
+    type: used_for
+    target: video-generation
+
+  - source: document-understanding
+    type: uses
+    target: optical-character-recognition
+
+  - source: document-understanding
+    type: uses
+    target: information-extraction
+
+  - source: collaborative-filtering
+    type: used_for
+    target: recommendation
+
+  - source: protein-structure-prediction
+    type: used_for
+    target: drug-discovery
+
+  - source: cursor
+    type: is_a
+    target: coding-assistant
+
+  - source: cursor
+    type: used_for
+    target: code-generation
+

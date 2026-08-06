@@ -444,3 +444,65 @@ concepts:
     audience_level: 5
     description: An empirical phenomenon in which test error, as model size or training time grows, follows the classical U-shaped bias-variance curve, then falls again once the model can interpolate the training data.
     introduced: 2019
+
+  - id: red-teaming
+    label: Red teaming
+    kind: evaluation_concept
+    audience_level: 3
+    description: Deliberately probing a model or system with adversarial inputs to discover harmful, unsafe, or unintended behavior before deployment.
+
+  - id: ground-truth
+    label: Ground truth
+    kind: data_concept
+    audience_level: 3
+    description: The verified correct labels or outcomes against which a model's predictions are compared.
+
+  - id: generalization
+    label: Generalization
+    kind: property
+    audience_level: 3
+    description: A model's ability to perform well on new inputs not seen during training, as opposed to merely fitting its training data.
+
+  - id: precision
+    label: Precision
+    kind: evaluation_concept
+    audience_level: 4
+    description: The proportion of a model's positive predictions that are actually correct.
+
+  - id: recall
+    label: Recall
+    kind: evaluation_concept
+    audience_level: 4
+    description: The proportion of actual positive cases that a model correctly identifies.
+
+  - id: leaderboard
+    label: Leaderboard
+    kind: evaluation_concept
+    audience_level: 3
+    description: A ranked public comparison of models' scores on one or more benchmarks.
+
+  - id: llm-as-a-judge
+    label: LLM-as-a-judge
+    kind: evaluation_concept
+    audience_level: 5
+    description: Using a large language model to score or compare the outputs of other models, in place of or alongside human evaluation.
+
+  - id: model-weights
+    label: Model weights
+    kind: data_concept
+    audience_level: 3
+    description: The learned numerical parameters of a trained model that determine its computed outputs.
+    aliases:
+      - Weights
+
+  - id: adversarial-example
+    label: Adversarial example
+    kind: data_concept
+    audience_level: 4
+    description: An input deliberately perturbed, often imperceptibly to a human, to cause a model to produce an incorrect or unintended output.
+
+  - id: human-in-the-loop
+    label: Human-in-the-loop
+    kind: training_method
+    audience_level: 3
+    description: A design in which a human reviews, corrects, or approves a model's outputs or decisions during training or operation, rather than the model acting fully autonomously.

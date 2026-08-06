@@ -230,3 +230,9 @@ concepts:
     description: A dimensionality-reduction method that converts similarities between points into probabilities and arranges them in low dimensions to preserve local neighborhoods, for visualizing high-dimensional data.
     aliases:
       - t-distributed stochastic neighbor embedding
+
+  - id: collaborative-filtering
+    label: Collaborative filtering
+    kind: model_family
+    audience_level: 4
+    description: A recommendation technique that predicts a user's preferences from the preferences of similar users or the similarity between items, without needing content features.

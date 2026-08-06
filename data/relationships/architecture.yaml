@@ -417,3 +417,19 @@ relationships:
     type: uses
     target: layer-normalization
 
+  - source: text-to-video-model
+    type: is_a
+    target: conditional-model
+
+  - source: text-to-video-model
+    type: is_a
+    target: generative-model
+
+  - source: text-to-video-model
+    type: uses
+    target: text
+
+  - source: text-to-video-model
+    type: uses
+    target: video
+
