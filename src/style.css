@@ -15,9 +15,6 @@
   --highlight-bg: rgba(28, 28, 28, 0.06);
   --success: #2e7d32;
   --danger: #c62828;
-  --attr-always: #1b5e20;
-  --attr-usually: #388e3c;
-  --attr-sometimes: #7cb342;
   --accent: #1565c0;
 }
 
@@ -34,9 +31,6 @@
     --highlight-bg: rgba(255, 255, 255, 0.08);
     --success: #66bb6a;
     --danger: #ef5350;
-    --attr-always: #81c784;
-    --attr-usually: #66bb6a;
-    --attr-sometimes: #4b7350;
     --accent: #64b5f6;
   }
 }
@@ -148,14 +142,7 @@ body {
   margin: 0;
   padding: 100px 12px 96px;
   list-style: none;
-}
-
-.browser-sidebar--left {
   border-right: 1px solid var(--card-border);
-}
-
-.browser-sidebar--right {
-  border-left: 1px solid var(--card-border);
 }
 
 .browser-sidebar-button {
@@ -193,19 +180,6 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 100px 24px 96px;
-}
-
-.attr-value-group {
-  width: min(480px, 100%);
-  margin-bottom: 24px;
-}
-
-.attr-value-group-heading {
-  margin: 0 0 8px;
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
 }
 
 .concept-list-items {
@@ -343,34 +317,8 @@ body {
   outline-offset: -2px;
 }
 
-.center-card-attributes {
-  font-size: 11px;
-  line-height: 1.3;
-}
-
 .dot-separator {
   color: var(--muted);
-}
-
-.attribute {
-  cursor: pointer;
-}
-
-.attribute:hover,
-.attribute:active {
-  text-decoration: underline;
-}
-
-.attribute-always {
-  color: var(--attr-always);
-}
-
-.attribute-usually {
-  color: var(--attr-usually);
-}
-
-.attribute-sometimes {
-  color: var(--attr-sometimes);
 }
 
 .spoke {
@@ -434,7 +382,7 @@ body {
    vertical level bar and hidden share-button rules further down for the
    same underlying scenario). Toggled by main.ts from render.ts's per-view
    result rather than a media query alone, since views without a legend
-   (kind/attribute lists, the acronym cloud) have nothing to gain from it. */
+   (the kind list, the acronym cloud) have nothing to gain from it. */
 #search-root.is-compact {
   left: 16px;
   transform: none;

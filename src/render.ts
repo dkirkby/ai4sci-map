@@ -136,8 +136,6 @@ export interface RenderOptions {
   onSelectConcept: (conceptId: string) => void;
   onSelectKind: (kind: ConceptKind, conceptId: string) => void;
   onSwitchKind: (kind: ConceptKind) => void;
-  onSelectAttribute: (attributeKey: string, conceptId: string) => void;
-  onSwitchAttribute: (attributeKey: string) => void;
   onSelectAcronym: (acronym: string, conceptId: string) => void;
 }
 
@@ -285,13 +283,13 @@ function packLegendEntries(entries: LegendEntry[], availableWidth: number): Lege
 
 /**
  * Builds the center card's content -- kind badge, title, acronyms,
- * description, attributes -- as a child of `parent`. Used both for the real,
- * visible card and, in `render()`, a throwaway hidden measurement pass that
- * sizes the card to its actual content instead of a fixed viewport-fraction
- * height, which otherwise left a concept with no acronyms, no displayable
- * attributes, and a short description with a lot of dead vertical padding
- * (the card was exactly as tall as one with the longest possible content,
- * regardless of what a given concept actually has).
+ * description -- as a child of `parent`. Used both for the real, visible
+ * card and, in `render()`, a throwaway hidden measurement pass that sizes
+ * the card to its actual content instead of a fixed viewport-fraction
+ * height, which otherwise left a concept with no acronyms and a short
+ * description with a lot of dead vertical padding (the card was exactly as
+ * tall as one with the longest possible content, regardless of what a given
+ * concept actually has).
  */
 function buildCenterCard<ParentElement extends d3.BaseType>(
   parent: d3.Selection<ParentElement, unknown, null, undefined>,
@@ -320,21 +318,6 @@ function buildCenterCard<ParentElement extends d3.BaseType>(
   }
 
   card.append("p").attr("class", "center-card-description").text(centerConcept.description);
-
-  const displayableAttributes = Object.entries(centerConcept.attributes ?? {}).filter(
-    (entry): entry is [string, AttributeDisplayValue] => isDisplayableAttributeValue(entry[1]),
-  );
-  if (displayableAttributes.length > 0) {
-    const attributesRow = card.append("div").attr("class", "center-card-attributes");
-    displayableAttributes.forEach(([key, value], i) => {
-      if (i > 0) attributesRow.append("span").attr("class", "dot-separator").text(" · ");
-      attributesRow
-        .append("span")
-        .attr("class", `attribute attribute-${value}`)
-        .text(humanizeSnakeCase(key))
-        .on("click", () => options.onSelectAttribute(key, centerConcept.id));
-    });
-  }
 }
 
 /**
@@ -962,22 +945,21 @@ const SORTED_CONCEPT_KINDS = [...CONCEPT_KINDS].sort((a, b) =>
 );
 
 /**
- * A vertical nav list of clickable items, used for both the kind and
- * attribute sidebars. `emptyAtLevel` entries (no associated concept visible
- * at the current audience level -- see the two callers) render in faint
- * text as a hint of that, same as an out-of-level search match, but stay
- * clickable like every other entry: selecting one still navigates there and
- * shows its own "no concepts at this level" message in the content pane.
+ * A vertical nav list of clickable items, used for the kind sidebar in
+ * `renderKindList`. `emptyAtLevel` entries (no associated concept visible at
+ * the current audience level) render in faint text as a hint of that, same
+ * as an out-of-level search match, but stay clickable like every other
+ * entry: selecting one still navigates there and shows its own "no concepts
+ * at this level" message in the content pane.
  */
 function buildSidebar<T extends string>(
-  side: "left" | "right",
   entries: T[],
   activeEntry: T | null,
   emptyAtLevel: ReadonlySet<T>,
   onSelect: (entry: T) => void,
 ): HTMLUListElement {
   const sidebar = document.createElement("ul");
-  sidebar.className = `browser-sidebar browser-sidebar--${side}`;
+  sidebar.className = "browser-sidebar";
   for (const entry of entries) {
     const item = document.createElement("li");
     item.className = "browser-sidebar-item";
@@ -1062,7 +1044,6 @@ export function renderKindList(
 
   wrapper.appendChild(
     buildSidebar(
-      "left",
       SORTED_CONCEPT_KINDS,
       kind === "" ? null : (kind as ConceptKind),
       emptyKinds,
@@ -1097,124 +1078,6 @@ export function renderKindList(
   return viewResult(counts);
 }
 
-const FREQUENCY_VALUE_ORDER = ["always", "usually", "sometimes", "rarely", "never"];
-
-/** Frequency-like values (always/usually/.../never) sort first in that fixed order; anything else follows alphabetically. */
-function compareAttributeValues(a: string, b: string): number {
-  const indexA = FREQUENCY_VALUE_ORDER.indexOf(a.toLowerCase());
-  const indexB = FREQUENCY_VALUE_ORDER.indexOf(b.toLowerCase());
-  if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-  if (indexA !== -1) return -1;
-  if (indexB !== -1) return 1;
-  return a.localeCompare(b);
-}
-
-function collectAttributeKeys(index: GraphIndex): string[] {
-  const keys = new Set<string>();
-  for (const concept of index.conceptsById.values()) {
-    for (const key of Object.keys(concept.attributes ?? {})) {
-      keys.add(key);
-    }
-  }
-  return [...keys].sort((a, b) => humanizeSnakeCase(a).localeCompare(humanizeSnakeCase(b)));
-}
-
-/**
- * The two-pane view shown when an attribute badge on the center card is
- * clicked: on the left, every concept that declares `attributeKey`, grouped
- * by the value they declare it with; on the right, a sidebar listing every
- * attribute key found anywhere in the data (highlighting the current one).
- * Sides are swapped relative to `renderKindList` so the two views read as
- * visibly distinct. `attributeKey === ""` shows the sidebar only. Unlike
- * `kind`, there's no schema enum of valid attribute keys to fall back on, so
- * any key that isn't actually used by some concept is simply unknown.
- */
-export function renderAttributeBrowser(
-  container: HTMLElement,
-  index: GraphIndex,
-  attributeKey: string,
-  hiliteConceptId: string | null,
-  level: number,
-  options: RenderOptions,
-): ViewResult {
-  container.innerHTML = "";
-
-  const allAttributeKeys = collectAttributeKeys(index);
-
-  if (attributeKey !== "" && !allAttributeKeys.includes(attributeKey)) {
-    renderError(container, `Unknown attribute: "${attributeKey}"`);
-    return EMPTY_VIEW_RESULT;
-  }
-
-  const wrapper = document.createElement("div");
-  wrapper.className = "browser-view";
-
-  const content = document.createElement("div");
-  content.className = "browser-content";
-
-  let counts: LevelCounts = EMPTY_LEVEL_COUNTS;
-  if (attributeKey !== "") {
-    const allConcepts = [...index.conceptsById.values()].filter(
-      (concept) => concept.attributes?.[attributeKey] !== undefined,
-    );
-    counts = computeLevelCounts(allConcepts);
-
-    const conceptsByValue = new Map<string, Concept[]>();
-    for (const concept of allConcepts) {
-      if (concept.audience_level > level) continue;
-      const valueKey = String(concept.attributes![attributeKey]);
-      const bucket = conceptsByValue.get(valueKey);
-      if (bucket) bucket.push(concept);
-      else conceptsByValue.set(valueKey, [concept]);
-    }
-
-    const sortedValueKeys = [...conceptsByValue.keys()].sort(compareAttributeValues);
-    for (const valueKey of sortedValueKeys) {
-      const concepts = conceptsByValue.get(valueKey)!.sort((a, b) => a.label.localeCompare(b.label));
-
-      const group = document.createElement("div");
-      group.className = "attr-value-group";
-
-      const heading = document.createElement("h2");
-      heading.className = "attr-value-group-heading";
-      heading.textContent = humanizeSnakeCase(valueKey);
-      group.appendChild(heading);
-
-      group.appendChild(buildConceptList(concepts, hiliteConceptId, options.onSelectConcept));
-      content.appendChild(group);
-    }
-
-    if (allConcepts.length > 0 && conceptsByValue.size === 0) {
-      const empty = document.createElement("p");
-      empty.className = "concept-list-empty";
-      empty.textContent = "No concepts with this attribute at this audience level.";
-      content.appendChild(empty);
-    }
-  }
-
-  const attributesWithConceptsAtLevel = new Set<string>();
-  for (const concept of index.conceptsById.values()) {
-    if (concept.audience_level > level) continue;
-    for (const key of Object.keys(concept.attributes ?? {})) {
-      attributesWithConceptsAtLevel.add(key);
-    }
-  }
-  const emptyAttributes = new Set(allAttributeKeys.filter((k) => !attributesWithConceptsAtLevel.has(k)));
-
-  wrapper.appendChild(content);
-  wrapper.appendChild(
-    buildSidebar(
-      "right",
-      allAttributeKeys,
-      attributeKey === "" ? null : attributeKey,
-      emptyAttributes,
-      options.onSwitchAttribute,
-    ),
-  );
-  container.appendChild(wrapper);
-  return viewResult(counts);
-}
-
 /**
  * The word cloud shown when an acronym badge on the center card is clicked.
  * The layout itself -- every acronym's position and font size, font-sized by
@@ -1224,8 +1087,7 @@ export function renderAttributeBrowser(
  * fixed arrangement to fit the live viewport and colors/highlights it. `tla`
  * (non-empty) highlights the matching acronym; `?tla` with no value shows
  * the cloud with nothing highlighted. A non-empty `tla` that matches no
- * acronym anywhere in the dataset is an error, same as an unrecognized kind
- * or attribute.
+ * acronym anywhere in the dataset is an error, same as an unrecognized kind.
  */
 export function renderAcronymCloud(
   container: HTMLElement,
@@ -1325,13 +1187,7 @@ function relationshipTooltip(index: GraphIndex, relationshipTypeId: string): str
   return index.relationshipTypesById.get(relationshipTypeId)?.label ?? relationshipTypeId;
 }
 
-type AttributeDisplayValue = "always" | "usually" | "sometimes";
-
-function isDisplayableAttributeValue(value: unknown): value is AttributeDisplayValue {
-  return value === "always" || value === "usually" || value === "sometimes";
-}
-
-/** Turns a snake_case schema value (a `kind` or an attribute key) into display text. */
+/** Turns a snake_case schema value (a `kind`) into display text. */
 function humanizeSnakeCase(value: string): string {
   const words = value.replace(/_/g, " ");
   return words.charAt(0).toUpperCase() + words.slice(1);

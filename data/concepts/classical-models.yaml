@@ -7,9 +7,6 @@ concepts:
     kind: model_family
     audience_level: 3
     description: A regression model in which the predicted response is linear in the fitted parameters.
-    attributes:
-      deep: never
-      probabilistic: sometimes
     typical_tasks:
       - regression
     modalities:
@@ -20,9 +17,6 @@ concepts:
     kind: model_family
     audience_level: 4
     description: A linear probabilistic classifier that models class probabilities through a logistic link.
-    attributes:
-      deep: never
-      probabilistic: always
     typical_tasks:
       - classification
     modalities:
@@ -35,9 +29,6 @@ concepts:
     description: A family of regression models combining a linear predictor, response distribution, and link function.
     acronyms:
       - GLM
-    attributes:
-      deep: never
-      probabilistic: always
     typical_tasks:
       - regression
       - classification
@@ -51,9 +42,6 @@ concepts:
       - Nearest-neighbor model
     acronyms:
       - k-NN
-    attributes:
-      deep: never
-      probabilistic: sometimes
     typical_tasks:
       - classification
       - regression
@@ -63,9 +51,6 @@ concepts:
     kind: model_family
     audience_level: 3
     description: A model that recursively partitions inputs using a tree of feature-based decisions.
-    attributes:
-      deep: never
-      probabilistic: sometimes
     typical_tasks:
       - classification
       - regression
@@ -77,9 +62,6 @@ concepts:
     kind: model_family
     audience_level: 4
     description: An ensemble of randomized decision trees whose predictions are aggregated.
-    attributes:
-      deep: never
-      probabilistic: sometimes
     typical_tasks:
       - classification
       - regression
@@ -91,9 +73,6 @@ concepts:
     kind: model_family
     audience_level: 5
     description: An additive ensemble of decision trees fitted sequentially to reduce an objective function.
-    attributes:
-      deep: never
-      probabilistic: sometimes
     typical_tasks:
       - classification
       - regression
@@ -107,9 +86,6 @@ concepts:
     description: A margin-based model that can form linear or kernel-defined decision boundaries.
     acronyms:
       - SVM
-    attributes:
-      deep: never
-      probabilistic: never
     typical_tasks:
       - classification
       - regression
@@ -121,18 +97,12 @@ concepts:
     kind: model_family
     audience_level: 5
     description: A method that operates through pairwise kernel evaluations corresponding to an implicit feature space.
-    attributes:
-      deep: never
-      probabilistic: sometimes
 
   - id: naive-bayes-classifier
     label: Naive Bayes classifier
     kind: model_family
     audience_level: 4
     description: A probabilistic classifier based on Bayes' rule and conditional-independence assumptions.
-    attributes:
-      deep: never
-      probabilistic: always
     typical_tasks:
       - classification
 
@@ -143,9 +113,6 @@ concepts:
     description: A probabilistic model that places a joint Gaussian distribution over function values.
     acronyms:
       - GP
-    attributes:
-      deep: never
-      probabilistic: always
     typical_tasks:
       - regression
       - classification
@@ -158,9 +125,6 @@ concepts:
     description: A probabilistic density model representing a distribution as a weighted mixture of Gaussian components.
     acronyms:
       - GMM
-    attributes:
-      deep: never
-      probabilistic: always
     typical_tasks:
       - density-estimation
       - clustering
@@ -173,9 +137,6 @@ concepts:
     description: A sequential probabilistic model with latent states satisfying a Markov dependence assumption.
     acronyms:
       - HMM
-    attributes:
-      deep: never
-      probabilistic: always
     typical_tasks:
       - sequence-modeling
 
@@ -184,9 +145,6 @@ concepts:
     kind: model_family
     audience_level: 4
     description: A directed acyclic graph that factorizes a joint probability distribution through conditional dependencies.
-    attributes:
-      deep: never
-      probabilistic: always
 
   - id: principal-component-analysis
     label: Principal component analysis
@@ -195,9 +153,6 @@ concepts:
     description: A linear method that projects data onto directions of decreasing sample variance.
     acronyms:
       - PCA
-    attributes:
-      deep: never
-      probabilistic: sometimes
     typical_tasks:
       - dimensionality-reduction
       - representation-learning
@@ -207,9 +162,6 @@ concepts:
     kind: model_family
     audience_level: 4
     description: A clustering method that assigns observations to clusters represented by their centroids.
-    attributes:
-      deep: never
-      probabilistic: never
     typical_tasks:
       - clustering
     modalities:

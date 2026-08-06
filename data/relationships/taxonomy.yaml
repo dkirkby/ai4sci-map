@@ -175,17 +175,33 @@ relationships:
     type: is_a
     target: predictive-model
 
+  - source: nearest-neighbor-model
+    type: is_a
+    target: probabilistic-model
+
   - source: decision-tree
     type: is_a
     target: predictive-model
+
+  - source: decision-tree
+    type: is_a
+    target: probabilistic-model
 
   - source: random-forest
     type: is_a
     target: predictive-model
 
+  - source: random-forest
+    type: is_a
+    target: probabilistic-model
+
   - source: gradient-boosted-trees
     type: is_a
     target: predictive-model
+
+  - source: gradient-boosted-trees
+    type: is_a
+    target: probabilistic-model
 
   - source: support-vector-machine
     type: is_a
@@ -242,6 +258,14 @@ relationships:
   - source: principal-component-analysis
     type: is_a
     target: representation-model
+
+  - source: principal-component-analysis
+    type: is_a
+    target: probabilistic-model
+
+  - source: kernel-method
+    type: is_a
+    target: probabilistic-model
 
   - source: k-means-clustering
     type: is_a

@@ -37,8 +37,6 @@ concepts:
     description: A neural network containing multiple successive learned representation layers.
     acronyms:
       - DNN
-    attributes:
-      deep: always
 
   - id: convolutional-neural-network
     label: Convolutional neural network
@@ -77,8 +75,6 @@ concepts:
     audience_level: 3
     description: A neural-network architecture based primarily on attention and position-wise transformations.
     introduced: 2017
-    attributes:
-      deep: always
     modalities:
       - text
       - image

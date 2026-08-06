@@ -7,9 +7,6 @@ concepts:
     kind: model_family
     audience_level: 4
     description: A neural network trained to reconstruct its input through an intermediate representation.
-    attributes:
-      deep: usually
-      probabilistic: sometimes
     typical_tasks:
       - representation-learning
       - dimensionality-reduction
@@ -19,9 +16,6 @@ concepts:
     kind: model_family
     audience_level: 5
     description: An autoencoder trained to reconstruct clean data from corrupted inputs.
-    attributes:
-      deep: usually
-      probabilistic: sometimes
     typical_tasks:
       - representation-learning
 
@@ -34,8 +28,6 @@ concepts:
       - VAE
     introduced: 2013
     attributes:
-      deep: usually
-      probabilistic: always
       likelihood_evaluation: approximate-bound
     typical_tasks:
       - density-estimation
@@ -50,8 +42,6 @@ concepts:
       - GAN
     introduced: 2014
     attributes:
-      deep: usually
-      probabilistic: implicit
       likelihood_evaluation: unavailable
 
   - id: autoregressive-generative-model
@@ -60,7 +50,6 @@ concepts:
     audience_level: 5
     description: A generative model that produces variables sequentially using conditional predictions.
     attributes:
-      probabilistic: always
       likelihood_evaluation: usually-exact
 
   - id: normalizing-flow
@@ -71,8 +60,6 @@ concepts:
     aliases:
       - normalizing flow model
     attributes:
-      deep: usually
-      probabilistic: always
       invertible: always
       likelihood_evaluation: exact
     typical_tasks:
@@ -84,8 +71,6 @@ concepts:
     audience_level: 3
     description: A generative model that learns to reverse a gradual noising process; closely related to score-based generative models, which formulate the same idea via the gradient of the log density.
     attributes:
-      deep: usually
-      probabilistic: always
       sampling_process: iterative-denoising
 
   - id: score-based-generative-model
@@ -94,8 +79,6 @@ concepts:
     audience_level: 5
     description: A generative model that estimates the gradient of the log density across noise levels; closely related to diffusion models, which formulate the same idea as reversing a noising process.
     attributes:
-      deep: usually
-      probabilistic: always
       sampling_process: iterative
 
   - id: energy-based-model
@@ -103,8 +86,6 @@ concepts:
     kind: model_family
     audience_level: 5
     description: A model that assigns an unnormalized scalar energy to configurations of variables.
-    attributes:
-      probabilistic: usually
 
   - id: language-model
     label: Language model
@@ -124,10 +105,6 @@ concepts:
     description: A language model with substantial scale and broad capabilities acquired through training on large corpora.
     acronyms:
       - LLM
-    attributes:
-      deep: always
-      probabilistic: usually
-      foundation_model: usually
     modalities:
       - text
     typical_tasks:

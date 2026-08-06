@@ -32,7 +32,7 @@ relationships:
 
   - source: transformer
     type: is_a
-    target: neural-network
+    target: deep-neural-network
 
   - source: transformer
     type: uses
@@ -64,11 +64,15 @@ relationships:
 
   - source: autoencoder
     type: is_a
-    target: neural-network
+    target: deep-neural-network
 
   - source: autoencoder
     type: is_a
     target: representation-model
+
+  - source: autoencoder
+    type: is_a
+    target: probabilistic-model
 
   - source: denoising-autoencoder
     type: is_a
@@ -99,6 +103,14 @@ relationships:
     target: generative-model
 
   - source: generative-adversarial-network
+    type: is_a
+    target: deep-neural-network
+
+  - source: generative-adversarial-network
+    type: is_a
+    target: probabilistic-model
+
+  - source: generative-adversarial-network
     type: typically_uses
     target: neural-network
 
@@ -125,6 +137,10 @@ relationships:
     target: probabilistic-model
 
   - source: normalizing-flow
+    type: is_a
+    target: deep-neural-network
+
+  - source: normalizing-flow
     type: typically_uses
     target: neural-network
 
@@ -137,6 +153,10 @@ relationships:
     target: probabilistic-model
 
   - source: diffusion-model
+    type: is_a
+    target: deep-neural-network
+
+  - source: diffusion-model
     type: typically_uses
     target: neural-network
 
@@ -147,6 +167,10 @@ relationships:
   - source: score-based-generative-model
     type: is_a
     target: probabilistic-model
+
+  - source: score-based-generative-model
+    type: is_a
+    target: deep-neural-network
 
   - source: score-based-generative-model
     type: typically_uses
@@ -169,6 +193,14 @@ relationships:
   - source: large-language-model
     type: is_a
     target: language-model
+
+  - source: large-language-model
+    type: is_a
+    target: deep-neural-network
+
+  - source: large-language-model
+    type: is_a
+    target: foundation-model
 
   - source: large-language-model
     type: typically_uses

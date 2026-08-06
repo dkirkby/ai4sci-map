@@ -4,7 +4,6 @@ import { renderLevelBar } from "./level-bar.js";
 import {
   render,
   renderAcronymCloud,
-  renderAttributeBrowser,
   renderKindList,
   type RenderOptions,
   type ViewResult,
@@ -15,7 +14,6 @@ import type { ConceptKind, GraphData } from "./types.js";
 
 const CONCEPT_PARAM = "concept";
 const KIND_PARAM = "kind";
-const ATTR_PARAM = "attr";
 const TLA_PARAM = "tla";
 const HILITE_PARAM = "hilite";
 const LEVEL_PARAM = "level";
@@ -53,7 +51,7 @@ async function main() {
   const conceptIds = [...index.conceptsById.keys()];
 
   /**
-   * Builds a URL for a navigation that replaces the view (concept/kind/attr/tla
+   * Builds a URL for a navigation that replaces the view (concept/kind/tla
    * params), carrying the current `level` param along unchanged since it's a
    * view-independent filter setting, not part of what identifies the view.
    */
@@ -87,21 +85,6 @@ async function main() {
     renderRoute(false);
   }
 
-  function navigateToAttribute(attributeKey: string, conceptId: string): void {
-    const url = navigationUrl((u) => {
-      u.searchParams.set(ATTR_PARAM, attributeKey);
-      u.searchParams.set(HILITE_PARAM, conceptId);
-    });
-    history.pushState(null, "", url);
-    renderRoute(false);
-  }
-
-  function navigateToAttributeOnly(attributeKey: string): void {
-    const url = navigationUrl((u) => u.searchParams.set(ATTR_PARAM, attributeKey));
-    history.pushState(null, "", url);
-    renderRoute(false);
-  }
-
   function navigateToAcronym(acronym: string, conceptId: string): void {
     const url = navigationUrl((u) => {
       u.searchParams.set(TLA_PARAM, acronym);
@@ -122,16 +105,14 @@ async function main() {
     onSelectConcept: navigateTo,
     onSelectKind: navigateToKind,
     onSwitchKind: navigateToKindOnly,
-    onSelectAttribute: navigateToAttribute,
-    onSwitchAttribute: navigateToAttributeOnly,
     onSelectAcronym: navigateToAcronym,
   };
 
   /**
    * Draws whichever view the current URL's query params describe: a kind
-   * listing if `kind` is present, an attribute listing if `attr` is present,
-   * an acronym word cloud if `tla` is present, otherwise the normal concept
-   * view (falling back to a random concept if `concept` is absent).
+   * listing if `kind` is present, an acronym word cloud if `tla` is present,
+   * otherwise the normal concept view (falling back to a random concept if
+   * `concept` is absent).
    * `rewriteUrl` is only passed true for the initial page load, matching the
    * existing convention of canonicalizing the URL once via `replaceState`
    * rather than on every popstate. Returns the drawn view's per-level concept
@@ -142,11 +123,6 @@ async function main() {
     const kind = params.get(KIND_PARAM);
     if (kind !== null) {
       return renderKindList(app!, index, kind, params.get(HILITE_PARAM), level, renderOptions);
-    }
-
-    const attr = params.get(ATTR_PARAM);
-    if (attr !== null) {
-      return renderAttributeBrowser(app!, index, attr, params.get(HILITE_PARAM), level, renderOptions);
     }
 
     const tla = params.get(TLA_PARAM);
