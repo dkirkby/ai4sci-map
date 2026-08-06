@@ -13,7 +13,7 @@ concepts:
   - id: machine-learning
     label: Machine learning
     kind: field
-    audience_level: 2
+    audience_level: 1
     description: The field concerned with systems whose behavior or parameters are learned from data or experience.
     acronyms:
       - ML

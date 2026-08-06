@@ -125,7 +125,7 @@ concepts:
   - id: speech-recognition
     label: Speech recognition
     kind: task
-    audience_level: 1
+    audience_level: 2
     description: Converting spoken audio into written text.
     acronyms:
       - ASR

@@ -120,7 +120,7 @@ concepts:
   - id: large-language-model
     label: Large language model
     kind: model_class
-    audience_level: 2
+    audience_level: 1
     description: A language model with substantial scale and broad capabilities acquired through training on large corpora.
     acronyms:
       - LLM
@@ -138,7 +138,7 @@ concepts:
   - id: pretrained-language-model
     label: Pretrained language model
     kind: model_class
-    audience_level: 4
+    audience_level: 3
     description: A language model trained on a broad corpus before task-specific adaptation or use.
 
   - id: masked-language-model
