@@ -1,10 +1,10 @@
 import * as d3 from "d3";
-import cloud from "d3-cloud";
 import { computeLevelCounts, getSatelliteSatelliteRelationships, type GraphIndex, type LevelCounts } from "./graph.js";
 import { computeRadialLayout, resolveSatellitePositions, type Point } from "./layout.js";
 import {
   allFamilyKeys,
   buildLegend,
+  colorForAcronymWord,
   colorForRelationshipType,
   legendMarkerIdForRelationshipType,
   markerIdForRelationshipType,
@@ -110,10 +110,6 @@ const TOP_MARGIN = 20;
 const SEARCH_CAPSULE_SIZE = 44;
 const SEARCH_CAPSULE_GAP = 12;
 
-const ACRONYM_CLOUD_MIN_SIZE = 240;
-const ACRONYM_CLOUD_MIN_FONT = 16;
-const ACRONYM_CLOUD_MAX_FONT = 72;
-const ACRONYM_CLOUD_PADDING = 6;
 
 // The legend spans the full available width and flows entries left-to-right,
 // wrapping to a new row once one is full, rather than a single narrow
@@ -1219,22 +1215,17 @@ export function renderAttributeBrowser(
   return viewResult(counts);
 }
 
-interface AcronymWord {
-  text: string;
-  conceptId: string;
-  size: number;
-  x?: number;
-  y?: number;
-  rotate?: number;
-}
-
 /**
- * The word cloud shown when an acronym badge on the center card is clicked:
- * every acronym in the dataset, font-sized by its concept's relationship
- * count (graph degree) and linking to that concept. `tla` (non-empty)
- * highlights the matching acronym; `?tla` with no value shows the cloud with
- * nothing highlighted. A non-empty `tla` that matches no acronym is an error,
- * same as an unrecognized kind or attribute.
+ * The word cloud shown when an acronym badge on the center card is clicked.
+ * The layout itself -- every acronym's position and font size, font-sized by
+ * its concept's graph degree -- is precomputed offline per cumulative
+ * audience level by scripts/build-data.ts (see AcronymCloudLevel in
+ * types.ts) rather than packed on the fly; this function only scales that
+ * fixed arrangement to fit the live viewport and colors/highlights it. `tla`
+ * (non-empty) highlights the matching acronym; `?tla` with no value shows
+ * the cloud with nothing highlighted. A non-empty `tla` that matches no
+ * acronym anywhere in the dataset is an error, same as an unrecognized kind
+ * or attribute.
  */
 export function renderAcronymCloud(
   container: HTMLElement,
@@ -1245,13 +1236,10 @@ export function renderAcronymCloud(
 ): ViewResult {
   container.innerHTML = "";
 
-  const allWords: AcronymWord[] = [];
-  for (const concept of index.conceptsById.values()) {
-    const degree = index.adjacency.get(concept.id)?.length ?? 0;
-    for (const acronym of concept.acronyms ?? []) {
-      allWords.push({ text: acronym, conceptId: concept.id, size: degree });
-    }
-  }
+  // Level 5 is cumulative over every audience_level, so its word list is
+  // already the full universe of acronyms -- no separate "all words" list
+  // needs to be stored.
+  const allWords = index.acronymCloudsByLevel.get(5)!.words;
 
   const tlaLower = tla.toLowerCase();
   if (tla !== "" && !allWords.some((word) => word.text.toLowerCase() === tlaLower)) {
@@ -1266,8 +1254,8 @@ export function renderAcronymCloud(
     }),
   );
 
-  const words = allWords.filter((word) => (index.conceptsById.get(word.conceptId)?.audience_level ?? 0) <= level);
-  if (words.length === 0) {
+  const cloudLevel = index.acronymCloudsByLevel.get(level)!;
+  if (cloudLevel.words.length === 0) {
     const empty = document.createElement("p");
     empty.className = "concept-list-empty";
     empty.textContent = "No acronyms at this audience level.";
@@ -1275,9 +1263,9 @@ export function renderAcronymCloud(
     return viewResult(counts);
   }
 
-  // Sized from the container's actual pixels (like the main diagram), rather
-  // than a fixed landscape-shaped canvas, so a portrait phone gets a tall
-  // cloud instead of a small band with most of the screen left empty.
+  // Sized from the container's actual pixels (like the main diagram), so the
+  // precomputed cloud below scales to fill whatever space is actually
+  // available rather than a fixed constant.
   const containerRect = container.getBoundingClientRect();
   const viewWidth = containerRect.width || window.innerWidth;
   const viewHeight = containerRect.height || window.innerHeight;
@@ -1285,50 +1273,50 @@ export function renderAcronymCloud(
   const usableWidth = viewWidth - (isCompactLandscape ? RIGHT_SAFE_AREA_LANDSCAPE : 0);
   const safeTop = TOP_SAFE_AREA;
   const safeBottom = viewHeight - (isCompactLandscape ? VIEW_MARGIN : BOTTOM_SAFE_AREA);
+  const centerX = usableWidth / 2;
   const centerY = (safeTop + safeBottom) / 2;
-  const cloudWidth = Math.max(ACRONYM_CLOUD_MIN_SIZE, usableWidth - VIEW_MARGIN * 2);
-  const cloudHeight = Math.max(ACRONYM_CLOUD_MIN_SIZE, safeBottom - safeTop - VIEW_MARGIN * 2);
+  const safeWidth = usableWidth - VIEW_MARGIN * 2;
+  const safeHeight = safeBottom - safeTop - VIEW_MARGIN * 2;
+  // The precomputed arrangement never changes shape -- only this scale factor
+  // adapts it to the current viewport, the same "fixed content, responsive
+  // viewBox" idiom the rest of this file uses for the main diagram.
+  const scale = Math.min(safeWidth / cloudLevel.width, safeHeight / cloudLevel.height);
 
-  const degrees = words.map((word) => word.size);
-  const fontScale = d3
-    .scaleSqrt()
-    .domain([Math.min(...degrees), Math.max(...degrees)])
-    .range([ACRONYM_CLOUD_MIN_FONT, ACRONYM_CLOUD_MAX_FONT]);
-  for (const word of words) {
-    word.size = fontScale(word.size);
-  }
+  const fontSizes = cloudLevel.words.map((word) => word.fontSize);
+  const minFontSize = Math.min(...fontSizes);
+  const maxFontSize = Math.max(...fontSizes);
 
-  cloud<AcronymWord>()
-    .size([cloudWidth, cloudHeight])
-    .words(words)
-    .padding(ACRONYM_CLOUD_PADDING)
-    .rotate(0)
-    .font("sans-serif")
-    .fontSize((word) => word.size)
-    .on("end", (placedWords) => {
-      const svg = d3
-        .select(container)
-        .append("svg")
-        .attr("viewBox", `0 0 ${viewWidth} ${viewHeight}`)
-        .attr("class", "acronym-cloud");
+  const svg = d3
+    .select(container)
+    .append("svg")
+    .attr("viewBox", `0 0 ${viewWidth} ${viewHeight}`)
+    .attr("class", "acronym-cloud");
 
-      svg
-        .append("g")
-        .attr("transform", `translate(${usableWidth / 2}, ${centerY})`)
-        .selectAll("text")
-        .data(placedWords)
-        .join("text")
-        .attr("class", (word) => (word.text.toLowerCase() === tlaLower ? "acronym-word is-hilited" : "acronym-word"))
-        .attr("text-anchor", "middle")
-        .attr("dy", "0.35em")
-        .attr("transform", (word) => `translate(${word.x}, ${word.y})`)
-        .style("font-size", (word) => `${word.size}px`)
-        .text((word) => word.text)
-        .on("click", (_event, word) => options.onSelectConcept(word.conceptId))
-        .append("title")
-        .text((word) => index.conceptsById.get(word.conceptId)?.label ?? word.conceptId);
-    })
-    .start();
+  svg
+    .append("g")
+    .attr("transform", `translate(${centerX}, ${centerY}) scale(${scale})`)
+    .selectAll("text")
+    .data(cloudLevel.words)
+    .join("text")
+    .attr("class", (word) => (word.text.toLowerCase() === tlaLower ? "acronym-word is-hilited" : "acronym-word"))
+    .attr("text-anchor", "middle")
+    .attr("dy", "0.35em")
+    // The hilite's size bump has to live in this attribute rather than a CSS
+    // `transform: scale(...)` rule -- CSS transform on an SVG element wins
+    // outright over the transform *attribute* instead of composing with it,
+    // which would drop this translate(x, y) entirely and collapse the word
+    // to the cloud's origin.
+    .attr("transform", (word) =>
+      word.text.toLowerCase() === tlaLower
+        ? `translate(${word.x}, ${word.y}) scale(1.15)`
+        : `translate(${word.x}, ${word.y})`,
+    )
+    .style("font-size", (word) => `${word.fontSize}px`)
+    .style("fill", (word) => colorForAcronymWord(level, word.fontSize, minFontSize, maxFontSize))
+    .text((word) => word.text)
+    .on("click", (_event, word) => options.onSelectConcept(word.conceptId))
+    .append("title")
+    .text((word) => index.conceptsById.get(word.conceptId)?.label ?? word.conceptId);
 
   return viewResult(counts);
 }

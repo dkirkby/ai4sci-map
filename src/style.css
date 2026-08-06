@@ -68,6 +68,23 @@ body {
   touch-action: none;
 }
 
+/* Bundled instead of a system font stack so the glyph metrics
+   scripts/build-data.ts measures at build time (via this same file, loaded
+   into @napi-rs/canvas) are byte-identical to what every viewer's browser
+   renders, regardless of OS or installed fonts -- a generic "sans-serif"
+   alias resolves to a different actual typeface in Node than in any given
+   browser, which is exactly what could reintroduce overlap the precomputed
+   layout was meant to avoid. font-display: block (rather than the default
+   swap-to-fallback) avoids briefly painting with a differently-metriced
+   fallback font, which would show as transient overlap until the real font
+   swaps in. */
+@font-face {
+  font-family: "AcronymCloud";
+  src: url("./assets/fonts/ArchivoBlack-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: block;
+}
+
 .acronym-cloud {
   display: block;
   width: 100%;
@@ -75,19 +92,29 @@ body {
 }
 
 .acronym-word {
-  fill: var(--fg);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  /* Fill comes from each word's inline style (colorForAcronymWord in
+     style.ts) -- color now encodes audience level, not a flat constant.
+     font-family/font-weight must match ACRONYM_CLOUD_FONT_FAMILY/
+     ACRONYM_CLOUD_FONT_WEIGHT in scripts/build-data.ts exactly (see the
+     @font-face comment above). */
+  font-family: "AcronymCloud", sans-serif;
+  font-weight: 400;
   cursor: pointer;
 }
 
+/* Color is spoken for (it encodes level), so hover/hilite feedback uses a
+   glow instead of a fill change. Scale is applied in the SVG `transform`
+   attribute in render.ts, not here as a CSS `transform` -- CSS `transform`
+   on an SVG element takes precedence over (rather than composing with) the
+   `transform` attribute, which would silently discard each word's
+   translate(x, y) positioning and collapse it to the cloud's origin. */
 .acronym-word:hover,
 .acronym-word:active {
-  fill: var(--accent);
+  filter: drop-shadow(0 0 4px var(--accent));
 }
 
 .acronym-word.is-hilited {
-  fill: var(--accent);
-  font-weight: 700;
+  filter: drop-shadow(0 0 2px var(--accent)) drop-shadow(0 0 8px var(--accent));
 }
 
 .concept-error {

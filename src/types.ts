@@ -79,9 +79,32 @@ export interface RelationshipType {
   transitive?: boolean;
 }
 
+/** One word's precomputed, non-overlapping placement within its level's canonical cloud box. */
+export interface AcronymCloudWord {
+  text: string;
+  conceptId: string;
+  fontSize: number;
+  x: number;
+  y: number;
+}
+
+/**
+ * A fully laid-out acronym cloud for one cumulative audience level (`words`
+ * covers every acronym with `audience_level <= level`). Computed offline by
+ * scripts/build-data.ts -- the frontend never runs the packing algorithm, it
+ * only scales this fixed arrangement to fit the live viewport.
+ */
+export interface AcronymCloudLevel {
+  level: number;
+  width: number;
+  height: number;
+  words: AcronymCloudWord[];
+}
+
 export interface GraphData {
   schemaVersion: 1;
   concepts: Concept[];
   relationships: Relationship[];
   relationshipTypes: RelationshipType[];
+  acronymClouds: AcronymCloudLevel[];
 }

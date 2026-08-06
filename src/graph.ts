@@ -1,4 +1,4 @@
-import type { Concept, GraphData, Relationship, RelationshipType } from "./types.js";
+import type { AcronymCloudLevel, Concept, GraphData, Relationship, RelationshipType } from "./types.js";
 
 export type EdgeDirection = "forward" | "backward";
 
@@ -20,6 +20,7 @@ export interface GraphIndex {
   relationshipTypesById: Map<string, RelationshipType>;
   adjacency: Map<string, Edge[]>;
   relationshipsByConceptId: Map<string, Relationship[]>;
+  acronymCloudsByLevel: Map<number, AcronymCloudLevel>;
 }
 
 function addToListMap<K, V>(map: Map<K, V[]>, key: K, value: V): void {
@@ -62,7 +63,9 @@ export function buildGraphIndex(data: GraphData): GraphIndex {
     }
   }
 
-  return { conceptsById, relationshipTypesById, adjacency, relationshipsByConceptId };
+  const acronymCloudsByLevel = new Map(data.acronymClouds.map((level) => [level.level, level]));
+
+  return { conceptsById, relationshipTypesById, adjacency, relationshipsByConceptId, acronymCloudsByLevel };
 }
 
 /**
