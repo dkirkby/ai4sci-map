@@ -17,6 +17,13 @@ There is no lint config and no test suite in this repo yet. `npm run dev` and
 `npm run build` both run `build:data` first (via `predev`/`prebuild`); it does not
 need to be run separately in normal workflows.
 
+## Working conventions
+
+For UI/frontend changes, don't launch headless browsers or use Playwright (or
+similar automated-browser tooling) to visually verify the result. The user
+prefers to do visual checks themselves — start the dev server and describe
+what to check, but leave the actual look in a browser to them.
+
 ## Architecture
 
 This app has two halves that only communicate through one generated file,
