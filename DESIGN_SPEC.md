@@ -65,8 +65,12 @@ This is a Node-side build step, not something the browser does at runtime.
 
 **Direction handling.** The data only ever stores one direction of each inverse
 relationship-type pair (e.g. `is_a`, never the inverse `has_subtype`). `src/graph.ts`
-resolves, per concept, which relationship type and arrow direction it experiences
-depending on whether it is the stored `source` or `target`.
+resolves, per concept, which relationship type it experiences depending on whether
+it is the stored `source` or `target` — used by `layout.ts` to group satellites.
+Rendering ignores this resolution: `render.ts` draws each spoke's arrowhead at the
+edge's raw stored `target` and labels it with the raw stored `type`, so the arrow
+and label always read as one true sentence regardless of which end is centered,
+and each relationship-type pair needs only one legend entry, not one per direction.
 
 **Satellite layout** (`src/layout.ts`): satellites are grouped by their
 center-relative relationship type; groups are ordered via a greedy max-weight
@@ -77,7 +81,8 @@ optimal crossing minimizer — adequate given the dataset's max degree of 18.
 
 **Rendering** (`src/render.ts`, `src/style.ts`): the 12 relationship-type inverse
 pairs are collapsed to 12 color "families" (10 from `d3.schemeTableau10`, plus 2
-more); direction is shown via arrowheads. The SVG viewBox is sized per redraw
+more); each family's raw stored direction is shown via arrowheads, including in
+the legend swatch itself. The SVG viewBox is sized per redraw
 based on the longest label among the concepts on screen, so long labels (some
 concept labels exceed 40
 characters) never clip against the viewBox edge.

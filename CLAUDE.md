@@ -50,9 +50,13 @@ items remain open:
   is). When a concept is the stored `target` of a relationship, `graph.ts` resolves
   the type it *experiences* to the declared inverse (via `relationship-types.yaml`'s
   `inverse` field) and marks the edge direction `"backward"`; the stored `source`
-  always experiences the type as-stored, direction `"forward"`. Rendering and
-  layout code work entirely in terms of this per-concept experienced view, not the
-  raw stored `source`/`type`/`target` triple.
+  always experiences the type as-stored, direction `"forward"`. `layout.ts` groups
+  satellites by this per-concept experienced view (see below), but `render.ts`
+  draws each spoke from the edge's raw stored `relationship` instead: the
+  arrowhead always points at the stored `target` and the label/tooltip always use
+  the stored `type`, regardless of which end is centered, so a relationship-type
+  pair only ever needs one legend entry (`src/style.ts`'s `buildLegend`) rather
+  than one per direction.
 - **`src/layout.ts`** — given a center concept's edges, groups satellites by their
   experienced relationship type, orders the groups with a greedy max-weight
   chaining heuristic (to keep satellite-groups that are cross-linked to each other

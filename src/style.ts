@@ -61,6 +61,11 @@ export function markerIdForRelationshipType(relationshipTypeId: string): string 
   return `arrow-${familyKeyForRelationshipType(relationshipTypeId)}`;
 }
 
+/** Id of the legend-only marker variant -- see render.ts's `defs` for why it's separate from `markerIdForRelationshipType`. */
+export function legendMarkerIdForRelationshipType(relationshipTypeId: string): string {
+  return `legend-arrow-${familyKeyForRelationshipType(relationshipTypeId)}`;
+}
+
 export interface LegendEntry {
   familyKey: string;
   label: string;
@@ -69,13 +74,16 @@ export interface LegendEntry {
 }
 
 /**
- * Builds one legend entry per relationship type actually drawn in the
- * current view (`presentTypeIds`, the experienced types from both spokes and
- * satellite-satellite arcs) -- never the combined "A / B" form, since any
- * single drawn arrow is fully described by just its own direction (e.g. "is
- * a" or "has subtype"), regardless of whether the view happens to also draw
- * the other direction elsewhere in the same color. When both directions of a
- * family are present, both get their own entry, sharing that family's color.
+ * Builds one legend entry per relationship-type *family* present in the
+ * current view (`presentTypeIds`, from both spokes and satellite-satellite
+ * arcs) -- always using the family's canonical (stored) label, e.g. "is a
+ * subfield of", never its inverse "has subfield", even when only the inverse
+ * direction is present among the drawn edges. A single label suffices because
+ * `render.ts` always points a relationship's arrowhead at its raw stored
+ * `target` (see the spoke-drawing loop), regardless of which end is
+ * currently centered -- so "X [label] Y" is always true read in the
+ * direction the arrow points, and the legend's own swatch carries an
+ * arrowhead to make that reading convention visible at a glance.
  */
 export function buildLegend(
   relationshipTypesById: Map<string, RelationshipType>,
@@ -83,11 +91,14 @@ export function buildLegend(
 ): LegendEntry[] {
   const entries: LegendEntry[] = [];
   for (const [forwardId, inverseId] of RELATIONSHIP_FAMILIES) {
-    for (const typeId of [forwardId, inverseId]) {
-      if (!presentTypeIds.has(typeId)) continue;
-      const label = relationshipTypesById.get(typeId)?.label ?? typeId;
-      entries.push({ familyKey: forwardId, label, color: colorScale(forwardId), markerId: `arrow-${forwardId}` });
-    }
+    if (!presentTypeIds.has(forwardId) && !presentTypeIds.has(inverseId)) continue;
+    const label = relationshipTypesById.get(forwardId)?.label ?? forwardId;
+    entries.push({
+      familyKey: forwardId,
+      label,
+      color: colorScale(forwardId),
+      markerId: legendMarkerIdForRelationshipType(forwardId),
+    });
   }
   return entries;
 }

@@ -6,6 +6,7 @@ import {
   allFamilyKeys,
   buildLegend,
   colorForRelationshipType,
+  legendMarkerIdForRelationshipType,
   markerIdForRelationshipType,
   type LegendEntry,
 } from "./style.js";
@@ -122,6 +123,13 @@ const LEGEND_MARGIN = 16;
 const LEGEND_ROW_HEIGHT = 20;
 const LEGEND_PADDING = 12;
 const LEGEND_SWATCH_WIDTH = 20;
+// How much of the swatch's width the legend-only arrowhead marker (see
+// `defs`'s legendMarkerIdForRelationshipType) occupies -- the swatch line
+// itself is drawn only up to LEGEND_SWATCH_WIDTH - LEGEND_ARROW_LENGTH, so
+// its stroke stops exactly where the arrowhead's own base starts, instead of
+// running underneath the (comparably thick, at this small size) arrowhead
+// and blunting its point. Must match that marker's markerWidth.
+const LEGEND_ARROW_LENGTH = 6;
 const LEGEND_TEXT_GAP = 8;
 const LEGEND_ENTRY_GAP = 16;
 // Rough average glyph width (px) for the 11px legend label font -- used only
@@ -667,6 +675,35 @@ export function render(
       .append("path")
       .attr("d", "M 0 0 L 10 5 L 0 10 z")
       .attr("fill", colorForRelationshipType(familyKey));
+
+    // A second, separately-sized marker for the legend swatch line: the
+    // above marker's default `markerUnits="strokeWidth"` scales it against
+    // whatever stroke-width the referencing line uses, which is appropriate
+    // for spokes/arcs (2px/1.25px, chosen for the diagram's scale) but makes
+    // it oversized against the legend swatch's bolder 3px line -- at 7 units
+    // that's a 21px arrowhead nearly swallowing the swatch's own 20px
+    // length. `userSpaceOnUse` fixes an absolute size instead, independent
+    // of the swatch's stroke-width. `refX` is 0, not 9 like the marker
+    // above: that anchors the marker at the *base* of the triangle rather
+    // than near its tip, so the whole arrowhead is placed *after* the line's
+    // endpoint instead of mostly overlapping it -- at this small a marker
+    // size relative to the 3px-thick swatch line, that overlap was enough to
+    // blunt the triangle's point into a squared-off blob. The swatch line
+    // itself is shortened by LEGEND_ARROW_LENGTH to match, so its stroke
+    // stops exactly where this marker's base begins.
+    defs
+      .append("marker")
+      .attr("id", legendMarkerIdForRelationshipType(familyKey))
+      .attr("viewBox", "0 0 10 10")
+      .attr("refX", 0)
+      .attr("refY", 5)
+      .attr("markerWidth", LEGEND_ARROW_LENGTH)
+      .attr("markerHeight", LEGEND_ARROW_LENGTH)
+      .attr("markerUnits", "userSpaceOnUse")
+      .attr("orient", "auto-start-reverse")
+      .append("path")
+      .attr("d", "M 0 0 L 10 5 L 0 10 z")
+      .attr("fill", colorForRelationshipType(familyKey));
   }
 
   // Arcs/spokes/satellites/center card live in a zoomable+pannable group so
@@ -727,8 +764,16 @@ export function render(
     const start = cardExitPoint(satellitePos);
     const end = pointTowards(satellitePos, { x: centerX, y: centerY }, SATELLITE_NODE_RADIUS);
     const color = colorForRelationshipType(placement.edge.relationshipTypeId);
-    const isForward = placement.edge.direction === "forward";
 
+    // The arrowhead is always drawn at the edge's raw stored `target`, and
+    // the label/tooltip always use the raw stored `type` (never the inverse
+    // `graph.ts` resolves for a backward edge) -- so every edge in a family
+    // reads as one true sentence, "source [canonical label] target", no
+    // matter which of its two ends happens to be centered. This is what lets
+    // `buildLegend` show a single entry per family instead of one per
+    // direction.
+    const canonicalTypeId = placement.edge.relationship.type;
+    const isRawSource = placement.edge.direction === "forward";
     const line = spokesLayer
       .append("line")
       .attr("class", "spoke")
@@ -737,12 +782,12 @@ export function render(
       .attr("x2", end.x)
       .attr("y2", end.y)
       .attr("stroke", color);
-    if (isForward) {
-      line.attr("marker-end", `url(#${markerIdForRelationshipType(placement.edge.relationshipTypeId)})`);
+    if (isRawSource) {
+      line.attr("marker-end", `url(#${markerIdForRelationshipType(canonicalTypeId)})`);
     } else {
-      line.attr("marker-start", `url(#${markerIdForRelationshipType(placement.edge.relationshipTypeId)})`);
+      line.attr("marker-start", `url(#${markerIdForRelationshipType(canonicalTypeId)})`);
     }
-    line.append("title").text(relationshipTooltip(index, placement.edge.relationshipTypeId));
+    line.append("title").text(relationshipTooltip(index, canonicalTypeId));
   }
 
   // --- Satellite nodes ---
@@ -883,11 +928,12 @@ export function render(
     cell
       .append("line")
       .attr("x1", 0)
-      .attr("x2", LEGEND_SWATCH_WIDTH)
+      .attr("x2", LEGEND_SWATCH_WIDTH - LEGEND_ARROW_LENGTH)
       .attr("y1", 0)
       .attr("y2", 0)
       .attr("stroke", entry.color)
-      .attr("stroke-width", 3);
+      .attr("stroke-width", 3)
+      .attr("marker-end", `url(#${entry.markerId})`);
     cell
       .append("text")
       .attr("class", "legend-label")
