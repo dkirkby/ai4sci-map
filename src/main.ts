@@ -224,3 +224,13 @@ main().catch((err) => {
   const app = document.getElementById("app");
   if (app) app.textContent = "Failed to initialize the concept browser.";
 });
+
+// Registered only in production builds: a dev-mode service worker would
+// cache Vite's dev assets and fight with HMR's own reloading.
+if (import.meta.env.PROD && "serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch((err) => {
+      console.error("Service worker registration failed", err);
+    });
+  });
+}
