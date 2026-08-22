@@ -1,0 +1,94 @@
+name: Suggest a new concept
+description: Suggest an AI/ML term to add to the concept map.
+title: "[Concept] "
+labels: ["concept-suggestion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping grow the map! You don't need any GitHub or coding
+        experience to fill this in — just answer what you can and leave the
+        rest blank if you're not sure.
+  - type: input
+    id: concept-name
+    attributes:
+      label: Concept name
+      description: The term as it's normally written or spoken.
+      placeholder: e.g. Retrieval-augmented generation
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What is it?
+      description: A sentence or two explaining the concept, as if to someone learning about AI/ML.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why should it be on the map?
+      description: What makes this worth including — how common it is, why it matters, or what prompted the suggestion.
+    validations:
+      required: false
+  - type: dropdown
+    id: audience-level
+    attributes:
+      label: How widely recognized is this term?
+      description: Optional — leave as "Not sure" if you're unsure. 1 is recognized by the general public, 5 is specialist terminology.
+      options:
+        - "Not sure"
+        - "1 - Widely recognized"
+        - "2 - Commonly encountered"
+        - "3 - Familiar to an interested audience"
+        - "4 - Mainly technical"
+        - "5 - Specialist"
+      default: 0
+    validations:
+      required: false
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What category does it best fit?
+      description: Optional — leave as "Not sure" if it's unclear.
+      options:
+        - "Not sure"
+        - "Field (e.g. computer vision)"
+        - "Learning paradigm (e.g. supervised learning)"
+        - "Model role (e.g. discriminator)"
+        - "Model class (e.g. neural network)"
+        - "Model family (e.g. GPT)"
+        - "Architecture (e.g. transformer)"
+        - "Training method (e.g. backpropagation)"
+        - "Mathematical object (e.g. tensor)"
+        - "Task (e.g. image classification)"
+        - "System (e.g. AlphaGo)"
+        - "Product (e.g. ChatGPT)"
+        - "Property (e.g. interpretability)"
+        - "Data concept (e.g. embedding)"
+        - "Evaluation concept (e.g. benchmark)"
+      default: 0
+    validations:
+      required: false
+  - type: textarea
+    id: related
+    attributes:
+      label: Related concepts already on the map
+      description: Anything this connects to and how, e.g. "is a type of Neural network", "used by Diffusion model".
+    validations:
+      required: false
+  - type: input
+    id: aliases
+    attributes:
+      label: Aliases or acronyms
+      description: Other names or abbreviations it's commonly known by, comma-separated.
+      placeholder: e.g. RAG
+    validations:
+      required: false
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources or links (optional)
+      description: Anything that would help write an accurate description.
+    validations:
+      required: false

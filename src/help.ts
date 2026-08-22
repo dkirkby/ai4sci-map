@@ -4,6 +4,11 @@ import { CONCEPT_KINDS } from "./types.js";
 
 const GITHUB_REPO_URL = "https://github.com/dkirkby/ai4sci-map";
 const GITHUB_ISSUES_URL = `${GITHUB_REPO_URL}/issues`;
+// Deep-links straight to the structured issue form (.github/ISSUE_TEMPLATE/
+// concept-suggestion.yml) instead of a blank issue -- a blank GitHub issue
+// assumes familiarity with the tracker that most people suggesting a
+// concept won't have; a form with labeled fields doesn't.
+const GITHUB_SUGGEST_CONCEPT_URL = `${GITHUB_ISSUES_URL}/new?template=concept-suggestion.yml`;
 
 export interface HelpOptions {
   onStartTour: () => void;
@@ -268,12 +273,21 @@ function buildAboutSection(): HTMLElement {
   repoItem.appendChild(repoLink);
   links.appendChild(repoItem);
 
+  const suggestItem = document.createElement("li");
+  const suggestLink = document.createElement("a");
+  suggestLink.href = GITHUB_SUGGEST_CONCEPT_URL;
+  suggestLink.target = "_blank";
+  suggestLink.rel = "noopener noreferrer";
+  suggestLink.textContent = "Suggest a new concept";
+  suggestItem.appendChild(suggestLink);
+  links.appendChild(suggestItem);
+
   const issuesItem = document.createElement("li");
   const issuesLink = document.createElement("a");
   issuesLink.href = GITHUB_ISSUES_URL;
   issuesLink.target = "_blank";
   issuesLink.rel = "noopener noreferrer";
-  issuesLink.textContent = "Report a wrong or missing concept";
+  issuesLink.textContent = "Report a wrong or outdated concept";
   issuesItem.appendChild(issuesLink);
   links.appendChild(issuesItem);
 
