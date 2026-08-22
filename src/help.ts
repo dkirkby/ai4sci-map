@@ -32,6 +32,8 @@ export function initHelp(container: HTMLElement, options: HelpOptions): void {
   button.type = "button";
   button.className = "help-button";
   button.setAttribute("aria-label", "Help");
+  button.setAttribute("aria-haspopup", "dialog");
+  button.setAttribute("aria-expanded", "false");
   button.setAttribute("aria-keyshortcuts", "?");
   button.title = "Help (?)";
 
@@ -49,6 +51,7 @@ export function initHelp(container: HTMLElement, options: HelpOptions): void {
     if (!backdrop) return;
     backdrop.remove();
     backdrop = null;
+    button.setAttribute("aria-expanded", "false");
     previouslyFocused?.focus();
     previouslyFocused = null;
   }
@@ -60,15 +63,13 @@ export function initHelp(container: HTMLElement, options: HelpOptions): void {
     // collide, so requesting the panel (button or "?") always wins.
     stopTour();
     previouslyFocused = document.activeElement as HTMLElement | null;
+    button.setAttribute("aria-expanded", "true");
 
     backdrop = document.createElement("div");
     backdrop.className = "help-panel-backdrop";
     backdrop.tabIndex = -1;
     backdrop.addEventListener("click", (event) => {
       if (event.target === backdrop) closePanel();
-    });
-    backdrop.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closePanel();
     });
 
     const panel = document.createElement("div");
@@ -113,7 +114,7 @@ export function initHelp(container: HTMLElement, options: HelpOptions): void {
           zoomHint,
           "Search matches every concept, not just what's on screen — a dimmed result is above your current detail level.",
           "Copy link grabs a URL for exactly what you're looking at.",
-          'Drag the marker on the bar at the bottom to show more ("Deep dive") or less ("Essential") detail; the +/− numbers preview what a jump would change.',
+          `Drag the marker on the bar at the bottom to show more ("Deep dive") or less ("Essential") detail, or ${tapLower} a number to jump straight there; the +/− numbers preview what a jump would change.`,
         ]),
       ),
     );
@@ -141,6 +142,35 @@ export function initHelp(container: HTMLElement, options: HelpOptions): void {
     );
 
     panel.appendChild(buildAboutSection());
+
+    // `aria-modal="true"` above claims the page behind the panel is inert,
+    // so Tab needs to actually honor that -- without this, there's nothing
+    // stopping focus from walking out of the panel into the page underneath
+    // it (the panel's own elements are the last thing in the DOM, per
+    // index.html's ordering, so forward-Tab off the last one would otherwise
+    // wrap around to the very first focusable element on the page instead of
+    // back to the top of the panel).
+    backdrop.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closePanel();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = panel.querySelectorAll<HTMLElement>("button, a[href]");
+      if (focusable.length === 0) return;
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      const active = document.activeElement;
+      if (event.shiftKey) {
+        if (active === backdrop || active === first) {
+          event.preventDefault();
+          last.focus();
+        }
+      } else if (active === backdrop || active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
 
     backdrop.appendChild(panel);
     container.appendChild(backdrop);

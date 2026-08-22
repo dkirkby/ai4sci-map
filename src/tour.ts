@@ -152,13 +152,17 @@ export function startTour(elements: TourElements): void {
   callout.className = "tour-callout";
   callout.setAttribute("role", "region");
   callout.setAttribute("aria-label", "Guided tour");
+  // On the whole callout, not just the text -- so a step change announces
+  // its position ("3 of 7") together with its text as one utterance, rather
+  // than a screen reader only picking up the text and leaving the count to
+  // be discovered separately.
+  callout.setAttribute("aria-live", "polite");
 
   const progress = document.createElement("p");
   progress.className = "tour-callout-progress";
 
   const text = document.createElement("p");
   text.className = "tour-callout-text";
-  text.setAttribute("aria-live", "polite");
 
   const actions = document.createElement("div");
   actions.className = "tour-callout-actions";

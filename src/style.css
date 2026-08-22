@@ -932,6 +932,8 @@ body {
   position: fixed;
   z-index: 51;
   width: min(300px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 12px;
@@ -940,6 +942,16 @@ body {
   transition:
     top 0.2s ease,
     left 0.2s ease;
+}
+
+/* Sliding the spotlight/callout between steps is decorative -- skip it for
+   visitors who've asked for reduced motion rather than snapping instantly,
+   which reads as a bug, this instead jumps straight to each step's position. */
+@media (prefers-reduced-motion: reduce) {
+  .tour-spotlight,
+  .tour-callout {
+    transition: none;
+  }
 }
 
 .tour-callout-progress {
