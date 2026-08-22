@@ -11,6 +11,7 @@ import {
 } from "./render.js";
 import { initSearch, setSearchLevel } from "./search.js";
 import { initShareButton } from "./share.js";
+import { hasSeenTour, notifyNavigation, startTour, type TourElements } from "./tour.js";
 import type { ConceptKind, GraphData } from "./types.js";
 
 const CONCEPT_PARAM = "concept";
@@ -67,10 +68,22 @@ async function main() {
     return url;
   }
 
-  function navigateTo(conceptId: string): void {
-    const url = navigationUrl((u) => u.searchParams.set(CONCEPT_PARAM, conceptId));
+  /**
+   * Commits a real navigation: pushes history, redraws, and tells a running
+   * guided tour that the user just did something (see tour.ts's
+   * notifyNavigation) so it can advance itself. Deliberately not used by the
+   * resize-triggered or level-bar-preview redraws below, which redraw #app
+   * without pushing history -- those aren't the user acting on a tour step.
+   */
+  function commitNavigation(url: URL): void {
     history.pushState(null, "", url);
     renderRoute(false);
+    notifyNavigation();
+  }
+
+  function navigateTo(conceptId: string): void {
+    const url = navigationUrl((u) => u.searchParams.set(CONCEPT_PARAM, conceptId));
+    commitNavigation(url);
   }
 
   function navigateToKind(kind: ConceptKind, conceptId: string): void {
@@ -78,14 +91,12 @@ async function main() {
       u.searchParams.set(KIND_PARAM, kind);
       u.searchParams.set(HILITE_PARAM, conceptId);
     });
-    history.pushState(null, "", url);
-    renderRoute(false);
+    commitNavigation(url);
   }
 
   function navigateToKindOnly(kind: ConceptKind): void {
     const url = navigationUrl((u) => u.searchParams.set(KIND_PARAM, kind));
-    history.pushState(null, "", url);
-    renderRoute(false);
+    commitNavigation(url);
   }
 
   function navigateToAcronym(acronym: string, conceptId: string): void {
@@ -93,15 +104,13 @@ async function main() {
       u.searchParams.set(TLA_PARAM, acronym);
       u.searchParams.set(HILITE_PARAM, conceptId);
     });
-    history.pushState(null, "", url);
-    renderRoute(false);
+    commitNavigation(url);
   }
 
   function navigateToLevel(level: number): void {
     const url = new URL(location.href);
     url.searchParams.set(LEVEL_PARAM, String(level));
-    history.pushState(null, "", url);
-    renderRoute(false);
+    commitNavigation(url);
   }
 
   const renderOptions: RenderOptions = {
@@ -216,11 +225,22 @@ async function main() {
   });
   resizeObserver.observe(app);
 
+  const tourElements: TourElements = { app, searchRoot, shareRoot, levelBarRoot, helpRoot };
+
   initSearch(searchRoot, [...index.conceptsById.values()], { onSelectConcept: navigateTo });
   initShareButton(shareRoot);
-  initHelp(helpRoot);
+  initHelp(helpRoot, { onStartTour: () => startTour(tourElements) });
 
   renderRoute(true);
+
+  // Auto-starts once per browser (see tour.ts's hasSeenTour), only when the
+  // initial view is the normal concept diagram -- a first-ever visit landing
+  // on a shared kind-browser/acronym-cloud link has no center card, satellite,
+  // etc. for most tour steps to point at, so this skips showing it (without
+  // marking it seen) rather than presenting a near-empty tour.
+  if (!hasSeenTour() && app.querySelector(".center-card")) {
+    startTour(tourElements);
+  }
 }
 
 main().catch((err) => {

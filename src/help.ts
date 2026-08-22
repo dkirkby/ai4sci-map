@@ -1,8 +1,13 @@
 import { LEVEL_LABELS } from "./level-bar.js";
+import { stopTour } from "./tour.js";
 import { CONCEPT_KINDS } from "./types.js";
 
 const GITHUB_REPO_URL = "https://github.com/dkirkby/ai4sci-map";
 const GITHUB_ISSUES_URL = `${GITHUB_REPO_URL}/issues`;
+
+export interface HelpOptions {
+  onStartTour: () => void;
+}
 
 /**
  * A floating "?" button (plus a "?" keyboard shortcut) opening a persistent
@@ -10,7 +15,7 @@ const GITHUB_ISSUES_URL = `${GITHUB_REPO_URL}/issues`;
  * like search.ts/share.ts, since #app is fully rebuilt on every graph redraw
  * (see render.ts) and this needs to persist across navigations.
  */
-export function initHelp(container: HTMLElement): void {
+export function initHelp(container: HTMLElement, options: HelpOptions): void {
   container.innerHTML = "";
 
   // Detected once, not watched live -- input mode essentially never changes
@@ -50,6 +55,10 @@ export function initHelp(container: HTMLElement): void {
 
   function openPanel(): void {
     if (backdrop) return;
+    // A running tour and the reference panel are both fixed overlays rooted
+    // in #help-root -- opening one while the other is up would visually
+    // collide, so requesting the panel (button or "?") always wins.
+    stopTour();
     previouslyFocused = document.activeElement as HTMLElement | null;
 
     backdrop = document.createElement("div");
@@ -82,6 +91,16 @@ export function initHelp(container: HTMLElement): void {
     title.className = "help-panel-title";
     title.textContent = "Help";
     panel.appendChild(title);
+
+    const tourButton = document.createElement("button");
+    tourButton.type = "button";
+    tourButton.className = "help-panel-tour-button";
+    tourButton.textContent = "Take the tour";
+    tourButton.addEventListener("click", () => {
+      closePanel();
+      options.onStartTour();
+    });
+    panel.appendChild(tourButton);
 
     panel.appendChild(
       buildSection(

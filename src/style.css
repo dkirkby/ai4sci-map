@@ -827,6 +827,27 @@ body {
   font-size: 20px;
 }
 
+.help-panel-tour-button {
+  display: block;
+  width: 100%;
+  margin: 0 0 20px;
+  padding: 10px 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+.help-panel-tour-button:hover,
+.help-panel-tour-button:active {
+  opacity: 0.9;
+}
+
 .help-panel-section {
   margin-bottom: 20px;
 }
@@ -884,4 +905,115 @@ body {
 
 .help-panel-links a {
   color: var(--accent);
+}
+
+/* Guided tour (src/tour.ts). No separate full-page backdrop: the spotlight's
+   oversized box-shadow spread darkens everything outside its own small rect,
+   and that rect itself is pointer-events:none -- so whatever's underneath
+   (the real satellite, kind badge, etc.) stays fully clickable, letting the
+   tour react to a real interaction (see tour.ts's notifyNavigation) instead
+   of only ever advancing via its own Back/Next. */
+.tour-spotlight {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  border-radius: 10px;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+  transition:
+    top 0.2s ease,
+    left 0.2s ease,
+    width 0.2s ease,
+    height 0.2s ease;
+}
+
+.tour-callout {
+  position: fixed;
+  z-index: 51;
+  width: min(300px, calc(100vw - 24px));
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px var(--shadow);
+  padding: 16px;
+  transition:
+    top 0.2s ease,
+    left 0.2s ease;
+}
+
+.tour-callout-progress {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.tour-callout-text {
+  margin: 0 0 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+.tour-callout-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tour-callout-skip {
+  border: none;
+  background: none;
+  padding: 6px 4px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tour-callout-skip:hover,
+.tour-callout-skip:active {
+  color: var(--fg);
+}
+
+.tour-callout-nav {
+  display: flex;
+  gap: 8px;
+}
+
+.tour-callout-back,
+.tour-callout-next {
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  background: var(--card-bg);
+  color: var(--fg);
+}
+
+.tour-callout-back:hover:not(:disabled),
+.tour-callout-back:active:not(:disabled) {
+  background: var(--highlight-bg);
+}
+
+.tour-callout-back:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.tour-callout-next {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.tour-callout-next:hover,
+.tour-callout-next:active {
+  opacity: 0.9;
 }
