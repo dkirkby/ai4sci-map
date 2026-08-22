@@ -1,5 +1,6 @@
 import "./style.css";
 import { buildGraphIndex, resolveConceptId } from "./graph.js";
+import { initHelp } from "./help.js";
 import { renderLevelBar } from "./level-bar.js";
 import {
   render,
@@ -36,10 +37,12 @@ async function main() {
   const searchRoot = document.getElementById("search-root");
   const shareRoot = document.getElementById("share-root");
   const levelBarRoot = document.getElementById("level-bar-root");
+  const helpRoot = document.getElementById("help-root");
   if (!app) throw new Error("Missing #app container");
   if (!searchRoot) throw new Error("Missing #search-root container");
   if (!shareRoot) throw new Error("Missing #share-root container");
   if (!levelBarRoot) throw new Error("Missing #level-bar-root container");
+  if (!helpRoot) throw new Error("Missing #help-root container");
 
   const response = await fetch(`${import.meta.env.BASE_URL}graph.json`);
   if (!response.ok) {
@@ -215,6 +218,7 @@ async function main() {
 
   initSearch(searchRoot, [...index.conceptsById.values()], { onSelectConcept: navigateTo });
   initShareButton(shareRoot);
+  initHelp(helpRoot);
 
   renderRoute(true);
 }

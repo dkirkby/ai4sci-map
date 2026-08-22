@@ -734,3 +734,154 @@ body {
   line-height: 1.5;
   color: var(--fg);
 }
+
+#help-root {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 30;
+}
+
+.help-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  box-shadow: 0 4px 18px var(--shadow);
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.help-button:hover,
+.help-button:active {
+  background: var(--highlight-bg);
+}
+
+.help-button-icon {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* Mirrors #level-bar-root's own move to a vertical strip against the right
+   edge here (see its rule below) -- the help button relocates to the
+   opposite corner so it doesn't collide with that strip. */
+@media (orientation: landscape) and (max-height: 500px) {
+  #help-root {
+    right: auto;
+    left: 20px;
+  }
+}
+
+.help-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 24px;
+}
+
+.help-panel {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px var(--shadow);
+  padding: 28px 24px 24px;
+}
+
+.help-panel-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.help-panel-close:hover,
+.help-panel-close:active {
+  background: var(--highlight-bg);
+  color: var(--fg);
+}
+
+.help-panel-title {
+  margin: 0 0 16px;
+  font-size: 20px;
+}
+
+.help-panel-section {
+  margin-bottom: 20px;
+}
+
+.help-panel-section:last-child {
+  margin-bottom: 0;
+}
+
+.help-panel-section-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.help-panel-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+.help-panel-list li {
+  margin-bottom: 6px;
+}
+
+.help-panel-list li:last-child {
+  margin-bottom: 0;
+}
+
+.help-panel-text {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--fg);
+}
+
+.help-panel-text:last-child {
+  margin-bottom: 0;
+}
+
+.help-panel-links {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.help-panel-links li {
+  margin-bottom: 4px;
+}
+
+.help-panel-links a {
+  color: var(--accent);
+}

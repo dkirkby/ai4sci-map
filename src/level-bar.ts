@@ -1,6 +1,6 @@
 import type { LevelCounts } from "./graph.js";
 
-const LEVEL_LABELS = [
+export const LEVEL_LABELS = [
   "Widely recognized",
   "Commonly encountered",
   "Familiar to an interested audience",
