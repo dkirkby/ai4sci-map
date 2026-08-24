@@ -10,6 +10,9 @@ const GITHUB_ISSUES_URL = `${GITHUB_REPO_URL}/issues`;
 // concept won't have; a form with labeled fields doesn't.
 const GITHUB_SUGGEST_CONCEPT_URL = `${GITHUB_ISSUES_URL}/new?template=concept-suggestion.yml`;
 
+const M_ASAI4S_URL = "https://ai4sci.ps.uci.edu/";
+const UCI_URL = "https://uci.edu/";
+
 export interface HelpOptions {
   onStartTour: () => void;
 }
@@ -228,6 +231,25 @@ function buildText(text: string): HTMLParagraphElement {
   return p;
 }
 
+/** Builds a `help-panel-text` paragraph from alternating plain-text and link segments. */
+function buildTextWithLinks(...segments: (string | { text: string; href: string })[]): HTMLParagraphElement {
+  const p = document.createElement("p");
+  p.className = "help-panel-text";
+  for (const segment of segments) {
+    if (typeof segment === "string") {
+      p.appendChild(document.createTextNode(segment));
+    } else {
+      const a = document.createElement("a");
+      a.href = segment.href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = segment.text;
+      p.appendChild(a);
+    }
+  }
+  return p;
+}
+
 /** Reuses `LEVEL_LABELS` (level-bar.ts) verbatim rather than re-authoring them here. */
 function buildLevelList(): HTMLElement {
   const wrapper = document.createElement("div");
@@ -257,6 +279,15 @@ function buildAboutSection(): HTMLElement {
   section.appendChild(
     buildText(
       "An interactive map of AI/ML concepts — one concept at a time, surrounded by everything it's directly related to.",
+    ),
+  );
+  section.appendChild(
+    buildTextWithLinks(
+      "This tool was created for the ",
+      { text: "Master of Applied AI for Science", href: M_ASAI4S_URL },
+      " at ",
+      { text: "UC Irvine", href: UCI_URL },
+      " with the help of LLM coding agents.",
     ),
   );
   section.appendChild(buildText("The concept data is hand-authored and validated before every deploy."));
