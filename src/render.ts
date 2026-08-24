@@ -1154,7 +1154,22 @@ export function renderAcronymCloud(
     .attr("viewBox", `0 0 ${viewWidth} ${viewHeight}`)
     .attr("class", "acronym-cloud");
 
-  svg
+  // Mirrors the main diagram's content-layer (see renderConceptMap below) --
+  // the precomputed layout sits in a zoomable+pannable group so a small
+  // acronym is still easy to tap accurately on a phone, on top of (rather
+  // than instead of) the tighter default fit above.
+  const contentLayer = svg.append("g").attr("class", "content-layer");
+  const zoomBehavior = d3
+    .zoom<SVGSVGElement, unknown>()
+    .scaleExtent([0.25, 4])
+    .translateExtent([
+      [-viewWidth * 0.5, -viewHeight * 0.5],
+      [viewWidth * 1.5, viewHeight * 1.5],
+    ])
+    .on("zoom", (event) => contentLayer.attr("transform", event.transform.toString()));
+  svg.call(zoomBehavior);
+
+  contentLayer
     .append("g")
     .attr("transform", `translate(${centerX}, ${centerY}) scale(${scale})`)
     .selectAll("text")
