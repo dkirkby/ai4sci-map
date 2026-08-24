@@ -133,8 +133,8 @@ the help content in the next section has to cover.
   (`?concept=`, `?kind=`, `?tla=`, plus `?hilite=` and `?level=`) — bookmarkable
   and shareable via the Copy link button.
 - Browser back/forward moves through view history (`popstate`).
-- No `?concept=` on first load picks a random concept, then rewrites the URL so
-  the random pick is itself bookmarkable.
+- No `?concept=` on first load defaults to "Artificial intelligence", then
+  rewrites the URL so that default is itself bookmarkable.
 - An unknown concept/kind/acronym in the URL shows an explicit error with a
   hint to use search, rather than silently substituting something else.
 
@@ -236,7 +236,7 @@ tour" control ignores that flag to allow a manual replay any time. Auto-shows
 once, after the first real `render()` call completes (so step 3 has a live
 satellite to point at), on whatever concept/URL the visitor actually landed on
 — "first visit" means first time in this browser, not first time on the
-default/random concept specifically.
+default concept specifically.
 
 ### D. Input-mode adaptation
 

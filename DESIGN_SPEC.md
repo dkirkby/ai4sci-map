@@ -14,7 +14,7 @@ Code is written in TypeScript and managed using npm.
 
 The current view is always focused on one concept, displayed prominently in the
 center of the view, along with its description. The initial concept is set via the
-URL query string. If none is provided, pick one at random.
+URL query string. If none is provided, default to "Artificial intelligence".
 
 Each concept that is directly connected to the central concept via a relationship
 is displayed surrounding the central concept, with satellite concepts sharing the

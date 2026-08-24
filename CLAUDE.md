@@ -92,8 +92,9 @@ items remain open:
   `location.href` at click time is always correct. Same sibling-of-`#app`
   placement as `search.ts`, for the same reason.
 - **`src/main.ts`** — entry point: fetches `graph.json`, resolves the initial
-  concept from `?concept=<id>` (random fallback, written back via
-  `history.replaceState` so the random pick is immediately bookmarkable), and
+  concept from `?concept=<id>` (falling back to `DEFAULT_CONCEPT_ID`,
+  `"artificial-intelligence"`, written back via `history.replaceState` so the
+  default is immediately bookmarkable), and
   defines `navigateTo(conceptId)` (pushes URL state, then redraws) as the single
   shared path used by both satellite clicks and search selection, plus a
   `popstate` listener for back/forward.

@@ -20,6 +20,10 @@ const TLA_PARAM = "tla";
 const HILITE_PARAM = "hilite";
 const LEVEL_PARAM = "level";
 const DEFAULT_LEVEL = 3;
+// Landing page for a bare URL (no query string at all) -- equivalent to
+// `?concept=artificial-intelligence&level=3`, giving new visitors a
+// consistent, curated starting point instead of a random concept.
+const DEFAULT_CONCEPT_ID = "artificial-intelligence";
 // Debounces re-layout while a resize is still in progress (e.g. a dragged
 // window edge fires many times a second) rather than redrawing every frame.
 const RESIZE_DEBOUNCE_MS = 150;
@@ -52,7 +56,6 @@ async function main() {
   }
   const data = (await response.json()) as GraphData;
   const index = buildGraphIndex(data);
-  const conceptIds = [...index.conceptsById.keys()];
 
   /**
    * Builds a URL for a navigation that replaces the view (concept/kind/tla
@@ -123,8 +126,8 @@ async function main() {
   /**
    * Draws whichever view the current URL's query params describe: a kind
    * listing if `kind` is present, an acronym word cloud if `tla` is present,
-   * otherwise the normal concept view (falling back to a random concept if
-   * `concept` is absent).
+   * otherwise the normal concept view (falling back to `DEFAULT_CONCEPT_ID`
+   * if `concept` is absent).
    * `rewriteUrl` is only passed true for the initial page load, matching the
    * existing convention of canonicalizing the URL once via `replaceState`
    * rather than on every popstate. Returns the drawn view's per-level concept
@@ -145,10 +148,8 @@ async function main() {
     const requested = params.get(CONCEPT_PARAM);
     // Falls back to the raw (unresolved) value when nothing matches, so
     // render() hits its "Unknown concept" error path instead of silently
-    // substituting a random concept.
-    const conceptId = requested
-      ? (resolveConceptId(index, requested) ?? requested)
-      : conceptIds[Math.floor(Math.random() * conceptIds.length)]!;
+    // substituting the default concept.
+    const conceptId = requested ? (resolveConceptId(index, requested) ?? requested) : DEFAULT_CONCEPT_ID;
 
     if (rewriteUrl && conceptId !== requested) {
       const url = new URL(location.href);

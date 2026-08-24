@@ -16,8 +16,8 @@ This is a **proof of concept**. Currently implemented:
 
 - The full zoomable browsing interaction described in `DESIGN_SPEC.md`: a
   central concept with grouped, relationship-styled satellites; satellite-satellite
-  arcs; click-to-recenter; URL-based deep linking (`?concept=<id>`), with a random
-  concept chosen when none is given.
+  arcs; click-to-recenter; URL-based deep linking (`?concept=<id>`), defaulting to
+  "Artificial intelligence" when none is given.
 - A data build pipeline that validates the hand-authored YAML concept database
   (`data/`) and compiles it into the JSON the app loads.
 - Automated deployment to GitHub Pages on every push to `main` (see
