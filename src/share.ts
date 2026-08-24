@@ -1,3 +1,5 @@
+import { trackEvent } from "./analytics.js";
+
 const COPIED_RESET_DELAY_MS = 1600;
 
 const LINK_ICON_PATHS =
@@ -60,7 +62,10 @@ export function initShareButton(container: HTMLElement): void {
 
   button.addEventListener("click", () => {
     navigator.clipboard.writeText(location.href).then(
-      () => showState("copied"),
+      () => {
+        trackEvent("share_copy_link", { path: `${location.pathname}${location.search}` });
+        showState("copied");
+      },
       () => showState("failed"),
     );
   });

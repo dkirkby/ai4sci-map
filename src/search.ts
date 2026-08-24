@@ -1,3 +1,4 @@
+import { trackEvent } from "./analytics.js";
 import type { Concept } from "./types.js";
 
 export interface SearchOptions {
@@ -100,6 +101,7 @@ export function initSearch(container: HTMLElement, concepts: Concept[], options:
   }
 
   function selectConcept(concept: Concept): void {
+    trackEvent("search_select", { search_term: input.value.trim(), concept_id: concept.id });
     closeDropdown();
     input.value = "";
     input.blur();

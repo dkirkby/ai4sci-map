@@ -1,4 +1,5 @@
 import "./style.css";
+import { initAnalytics, trackPageView } from "./analytics.js";
 import { buildGraphIndex, resolveConceptId } from "./graph.js";
 import { initHelp } from "./help.js";
 import { renderLevelBar } from "./level-bar.js";
@@ -38,6 +39,8 @@ function parseLevel(raw: string | null): number {
 }
 
 async function main() {
+  initAnalytics();
+
   const app = document.getElementById("app");
   const searchRoot = document.getElementById("search-root");
   const shareRoot = document.getElementById("share-root");
@@ -81,6 +84,7 @@ async function main() {
   function commitNavigation(url: URL): void {
     history.pushState(null, "", url);
     renderRoute(false);
+    trackCurrentView();
     notifyNavigation();
   }
 
@@ -174,6 +178,28 @@ async function main() {
     renderRoute(false, level);
   }
 
+  /**
+   * Human-readable GA4 page_title for the view `params` describes, mirroring
+   * renderCurrentView's own kind/tla/concept branching (kept separate rather
+   * than threading a title through ViewResult, since this is read-only and
+   * analytics-specific). The path itself is just the current URL -- the query
+   * params already fully identify the view, so there's no separate route
+   * table to consult.
+   */
+  function describeCurrentView(params: URLSearchParams): { path: string; title: string } {
+    const path = `${location.pathname}${location.search}`;
+
+    const kind = params.get(KIND_PARAM);
+    if (kind !== null) return { path, title: `Kind: ${kind}` };
+
+    const tla = params.get(TLA_PARAM);
+    if (tla !== null) return { path, title: `Acronym: ${tla}` };
+
+    const requested = params.get(CONCEPT_PARAM);
+    const conceptId = requested ? (resolveConceptId(index, requested) ?? requested) : DEFAULT_CONCEPT_ID;
+    return { path, title: index.conceptsById.get(conceptId)?.label ?? conceptId };
+  }
+
   function renderRoute(rewriteUrl: boolean, overrideLevel?: number): void {
     const params = new URLSearchParams(location.search);
     const level = overrideLevel ?? parseLevel(params.get(LEVEL_PARAM));
@@ -189,7 +215,22 @@ async function main() {
     searchRoot!.style.setProperty("--legend-height", `${result.legendHeight}px`);
   }
 
-  window.addEventListener("popstate", () => renderRoute(false));
+  /**
+   * Sends a GA4 virtual pageview for whatever renderRoute just drew. Called
+   * only from real-navigation sites (commitNavigation, popstate, the initial
+   * load) -- deliberately not from inside renderRoute itself, since that's
+   * also invoked by the resize observer and by previewLevel's per-tick drag
+   * preview, neither of which is a navigation worth counting.
+   */
+  function trackCurrentView(): void {
+    const { path, title } = describeCurrentView(new URLSearchParams(location.search));
+    trackPageView(path, title);
+  }
+
+  window.addEventListener("popstate", () => {
+    renderRoute(false);
+    trackCurrentView();
+  });
 
   // The radial layout's ellipse is sized from #app's own rendered pixels (see
   // render.ts), which only stays correct if a viewport-size change (dragging
@@ -233,6 +274,7 @@ async function main() {
   initHelp(helpRoot, { onStartTour: () => startTour(tourElements) });
 
   renderRoute(true);
+  trackCurrentView();
 
   // Auto-starts once per browser (see tour.ts's hasSeenTour), only when the
   // initial view is the normal concept diagram -- a first-ever visit landing
