@@ -777,6 +777,23 @@ body {
   }
 }
 
+/* #level-bar-root's row (5 44px ticks plus the two edge labels -- none of
+   it shrinks further below the 340px width where the labels themselves
+   drop, since the ticks are already at the accessible-minimum touch target)
+   measures roughly 345px wide and is centered on the viewport. Centered at
+   that width, it reaches to within ~65px of each edge -- exactly the strip
+   #help-root's 44px button plus its 20px margin occupies -- so below
+   roughly 480px viewport width the two would overlap. This is the common
+   case on a phone held upright (unlike the landscape rule above, which
+   already avoids the collision by going vertical), so lift the button to
+   sit above the bar instead of beside it: 20px margin + the bar's own
+   56px height (44px tick + 6px padding top/bottom) + a 12px gap. */
+@media (max-width: 480px) and (orientation: portrait) {
+  #help-root {
+    bottom: 88px;
+  }
+}
+
 .help-panel-backdrop {
   position: fixed;
   inset: 0;
