@@ -85,19 +85,34 @@ items remain open:
   no separate build-time search index. Built once against `#search-root`, a DOM
   node in `index.html` that's a *sibling* of `#app`, not a child of it — `#app`
   gets fully wiped on every graph redraw (see below), which would destroy the
-  search box if it lived there.
+  search box if it lived there. Fires a `search_select` analytics event (query
+  text + chosen concept id) on selection.
 - **`src/share.ts`** — a "Copy link" button that writes `location.href` to the
   clipboard via the Clipboard API. Needs no conceptId/state of its own: the URL
   is already kept in sync with the centered concept by `main.ts`, so reading
   `location.href` at click time is always correct. Same sibling-of-`#app`
-  placement as `search.ts`, for the same reason.
+  placement as `search.ts`, for the same reason. Fires a `share_copy_link`
+  analytics event on a successful copy.
+- **`src/analytics.ts`** — a thin GA4 wrapper (`initAnalytics`, `trackPageView`,
+  `trackEvent`) around a manually-bootstrapped `gtag.js`, not the literal Google
+  snippet: init sets `send_page_view: false` so `main.ts` can send one virtual
+  pageview per *real* navigation itself, rather than relying on gtag's automatic
+  one (which fires on script load, not on when `#app`'s content actually
+  changes). Every exported function no-ops unless `import.meta.env.PROD` and
+  `initAnalytics` has run, so `npm run dev` never sends traffic and call sites
+  elsewhere (`search.ts`, `share.ts`) don't need their own prod guard.
 - **`src/main.ts`** — entry point: fetches `graph.json`, resolves the initial
   concept from `?concept=<id>` (falling back to `DEFAULT_CONCEPT_ID`,
   `"artificial-intelligence"`, written back via `history.replaceState` so the
   default is immediately bookmarkable), and
   defines `navigateTo(conceptId)` (pushes URL state, then redraws) as the single
   shared path used by both satellite clicks and search selection, plus a
-  `popstate` listener for back/forward.
+  `popstate` listener for back/forward. `trackCurrentView()` (see
+  `src/analytics.ts`) is called only from real-navigation entry points --
+  `commitNavigation`, the `popstate` listener, and the initial `renderRoute(true)`
+  call -- deliberately not from inside `renderRoute` itself, since that also runs
+  for the resize observer's redraw and the level bar's per-tick drag preview,
+  neither of which is a navigation worth counting as a pageview.
 
 Every redraw fully clears and rebuilds the SVG (`innerHTML = ""` /
 `selectAll('*').remove()`) rather than using D3's enter/update/exit pattern —
